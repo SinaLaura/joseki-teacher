@@ -166,25 +166,27 @@ At many nodes there is more than one good move. Rules:
 Keep it really small at first. That's the whole point. The joseki are introduced **one after
 another**: the next one starts only when the previous main line has reached *Review*.
 
+Exact moves and sources are in [RESEARCH.md](RESEARCH.md).
+
 **Joseki 1: 4-4 point, 3-3 invasion**
-- Main line
-- Later: blocking from the other side
+- Main line: the **simple extension** (6 moves, Black gets the outside and sente)
+- First variation: the **double hane** (Black takes the corner back, White gets a ponnuki and sente)
 
 **Joseki 2: 4-4 point, low approach → knight's move response**
-- Main line (the approaching side settles with a slide and extension)
-- Later: one other common answer to the approach (e.g. the one-space jump)
+- Main line (the approaching side settles with a slide and a two-space extension)
+- Later: one other common answer to the approach (e.g. the one-space jump), or White's modern
+  attachment instead of the slide
 
 **Joseki 3: 3-4 point, small knight approach**
-- Main line of its most common answer
-- Later: one common variation
+- Main line: the **kick** (attach and stand), then extensions on both sides
+- Later: the knight's move answer
 
 That's about 3 main lines at the start and about 6 lines with the first variations. With both
 colors and random orientation, it's enough for many weeks of daily 5-minute sessions.
 
-**Open task:** check every line against a reliable, modern source before it goes into the app.
-Options include AI-era joseki dictionaries such as the OGS Joseki Explorer, Sensei's Library, and
-KataGo analysis. Check content licenses before reusing anything. Some older joseki are considered
-outdated since AI, so skip them for now.
+**Checked (2026-11-24):** all three main lines are current joseki in the OGS Joseki Explorer. No
+source has an open content license, so we write our own SGF and explanations and use the sources only
+to check against. Details in [RESEARCH.md](RESEARCH.md).
 
 ### Later expansions (rough order)
 
@@ -336,8 +338,10 @@ type MistakeReaction = "show-explain" | "retry-hint" | "restart-line";
 
 ## 8. Open questions
 
-- **Content source and license:** where exactly do the joseki trees come from, and who checks them?
-  Check against OGS Joseki Explorer, Sensei's Library or KataGo.
+- ~~**Content source and license**~~ Answered in [RESEARCH.md](RESEARCH.md): write our own SGF and
+  check it against the OGS Joseki Explorer.
+- **iPhone or Android?** iPhone Safari has no vibration API, so haptics only work on Android in a
+  PWA (see [RESEARCH.md](RESEARCH.md), 3.2).
 - **Mistake reaction weights:** equal thirds, or weighted (e.g. more "show + explain" for newer
   lines)?
 - **Where do you play?** OGS, Fox, KGS or in person? This matters for a possible "import my games"

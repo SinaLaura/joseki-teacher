@@ -77,4 +77,4 @@ moves, and the opponent can deviate. The plan:
 ## Status
 
 📝 Planning: no code yet. See [IDEAS.md](IDEAS.md) for the decisions so far and the brainstorm on
-how to build it.
+how to build it, and [RESEARCH.md](RESEARCH.md) for the checked joseki lines, sources and tech notes.
