@@ -118,21 +118,34 @@ function playOn(board, m) {
 // ---------- board view ----------
 const view = { board: new Map(), last: null, hint: null, wrong: null, numbers: new Map() };
 
+const STONE_BASE = { B: "#1b1b1b", W: "#f1ede4" };
+function stone(x, y, color, opacity) {
+  const r = S * 0.47;
+  return `<g opacity="${opacity}">` +
+    `<circle cx="${cx(x)}" cy="${cy(y)}" r="${r}" fill="${STONE_BASE[color]}"` +
+    (color === "W" ? ` stroke="#a39a8a" stroke-width="0.8"` : "") + `/>` +
+    `<circle cx="${cx(x)}" cy="${cy(y)}" r="${r}" fill="url(#jt-shine-${color}) none"/></g>`;
+}
+
 function renderBoard() {
   const svg = $("board");
   const parts = [];
+  // Every stone and the board get a solid base color first. The gradients only add shine on top,
+  // with a fallback, so a browser that can't resolve them still shows correct colors.
   parts.push(`<defs>
-    <linearGradient id="wood" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="jt-wood" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#e4bf78"/><stop offset="0.5" stop-color="#d8ae62"/><stop offset="1" stop-color="#c99b4f"/>
     </linearGradient>
-    <radialGradient id="black" cx="0.35" cy="0.3" r="0.75">
-      <stop offset="0" stop-color="#5a5a5a"/><stop offset="0.45" stop-color="#202020"/><stop offset="1" stop-color="#080808"/>
+    <radialGradient id="jt-shine-B" cx="0.35" cy="0.3" r="0.7">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.32"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
     </radialGradient>
-    <radialGradient id="white" cx="0.35" cy="0.3" r="0.8">
-      <stop offset="0" stop-color="#ffffff"/><stop offset="0.7" stop-color="#ece8df"/><stop offset="1" stop-color="#c9c3b6"/>
+    <radialGradient id="jt-shine-W" cx="0.35" cy="0.3" r="0.8">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.9"/><stop offset="0.65" stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset="1" stop-color="#6b6253" stop-opacity="0.3"/>
     </radialGradient>
   </defs>`);
-  parts.push(`<rect width="420" height="432" fill="url(#wood)"/>`);
+  parts.push(`<rect width="420" height="432" fill="#d8ae62"/>`);
+  parts.push(`<rect width="420" height="432" fill="url(#jt-wood) none"/>`);
   // grid: board edges on top (y=0) and right (x=18); lines run off the view to the left and bottom
   for (let x = X0; x <= 18; x++) parts.push(`<line x1="${cx(x)}" y1="${cy(0)}" x2="${cx(x)}" y2="432" stroke="#3b2a17" stroke-width="${x === 18 ? 2 : 1}"/>`);
   for (let y = 0; y <= 9; y++) parts.push(`<line x1="0" y1="${cy(y)}" x2="${cx(18)}" y2="${cy(y)}" stroke="#3b2a17" stroke-width="${y === 0 ? 2 : 1}"/>`);
@@ -144,7 +157,7 @@ function renderBoard() {
     const [x, y] = k.split(",").map(Number);
     if (x < X0 || y > 9) continue;
     parts.push(`<circle cx="${cx(x) + 1.5}" cy="${cy(y) + 2}" r="${S * 0.47}" fill="rgba(0,0,0,0.3)"/>`);
-    parts.push(`<circle cx="${cx(x)}" cy="${cy(y)}" r="${S * 0.47}" fill="url(#${c === "B" ? "black" : "white"})"/>`);
+    parts.push(stone(x, y, c, 1));
   }
   if (view.last) {
     const c = view.board.get(key(view.last.x, view.last.y));
@@ -152,7 +165,7 @@ function renderBoard() {
   }
   if (view.hint) {
     const { x, y, color, strong } = view.hint;
-    parts.push(`<circle cx="${cx(x)}" cy="${cy(y)}" r="${S * 0.47}" fill="url(#${color === "B" ? "black" : "white"})" opacity="${strong ? 0.75 : 0.35}"/>`);
+    parts.push(stone(x, y, color, strong ? 0.75 : 0.35));
     if (strong) parts.push(`<circle cx="${cx(x)}" cy="${cy(y)}" r="${S * 0.5}" fill="none" stroke="#7fd36a" stroke-width="3"/>`);
   }
   if (view.wrong) {
