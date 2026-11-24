@@ -1,22 +1,43 @@
 # Ideas: how to build Joseki Teacher
 
-This is a brainstorm. Nothing here is final.
+This is a brainstorm. The decisions in section 0 are settled. Everything else is still open.
+
+---
+
+## 0. Decisions so far
+
+From the interview on 2026-11-24:
+
+| Topic                | Decision                                                                       |
+| -------------------- | ------------------------------------------------------------------------------ |
+| Audience             | Just me: a personal tool                                                       |
+| Level                | 25k–15k: simple explanations, main lines first                                 |
+| Device               | Phone first                                                                    |
+| Language             | English                                                                        |
+| First joseki         | 4-4 3-3 invasion · 4-4 low approach + knight's move · 3-4 small knight approach |
+| Prior knowledge      | None: every new line starts with a walkthrough                                 |
+| Session length       | About 5 minutes a day                                                          |
+| Board look           | Classic wood: kaya-style wood, slate and shell stones                          |
+| Wrong move reaction  | **Mixed at random** (see 1.3)                                                  |
+| Motivation           | **No gamification**: no streaks, XP or badges, just "done for today"           |
+| Building             | Planning only for now, no code yet                                             |
 
 ---
 
 ## 1. What the app should do
 
-### The daily session (core loop)
+### 1.1 The daily session (core loop)
 
 ```
 Open app
-  → "Today: 9 reviews · 1 new line · about 5 min"   [Start]
+  → "Today: 6 reviews · 1 new line · about 5 min"   [Start]
   → Board shows a corner position, "Black to play"
   → Tap the next move
        ✓ correct  → soft stone click, opponent replies automatically, continue
-       ✗ wrong    → gentle shake, correct move shown + one-line "why", line marked for early review
-  → Line finished → next line
-  → Session done → summary: "8/10 perfect · streak 12 days · 3-3 invasion: 70 % mastered"
+       ✗ wrong    → one of several reactions (see 1.3), line comes back for review sooner
+  → Line finished → short result summary ("Black: corner territory · White: outside wall")
+  → Next line
+  → Session done → "Done for today. See you tomorrow."
 ```
 
 You don't need to configure anything or rate yourself ("Was this easy or hard?"). The app grades
@@ -29,7 +50,11 @@ you from what you actually did:
 | Any wrong move                     | Again |
 | Fast and right many times in a row | Easy  |
 
-### What is a "card"?
+**A 5-minute budget:** one line takes about 20–40 seconds to play, so one session holds roughly
+6–10 lines. New lines are added only when the reviews leave room. For example, at most one new line
+every 2 days, paused automatically when reviews would push the session past 5 minutes.
+
+### 1.2 What is a "card"?
 
 There are three options:
 
@@ -49,14 +74,44 @@ On top of that:
 - **Random orientation.** The corner is rotated and mirrored at random (8 symmetries) and appears in
   any of the 4 corners. You learn the *shape*, not the coordinates.
 
-### Learning stages for each line (like vocabulary)
+### 1.3 Wrong moves: a random mix of reactions
 
-1. **Watch.** An animated walkthrough of the line, one sentence for each move.
+After a wrong move, the app picks one of these reactions at random, to keep practice from getting
+monotonous:
+
+| Reaction             | What happens                                                                                    |
+| -------------------- | ----------------------------------------------------------------------------------------------- |
+| **Show + explain**   | The correct move appears with its one-line *why*, and the line continues.                       |
+| **Retry with hint**  | "Not quite, try again." 1–2 more tries, with a hint (highlighted area) after the first miss, then the answer. |
+| **Restart the line** | The correct move is shown, then you replay the whole line from the beginning.                   |
+
+- Grading is the same whichever reaction comes up: any wrong move counts as **Again**. The
+  randomness changes the *experience*, not the schedule.
+- Tunable later: the weights (e.g. 50 / 30 / 20), or rules such as "never restart in a very long
+  line".
+
+### 1.4 Learning stages for each line
+
+Because there's no prior knowledge, every new line goes through all the stages:
+
+1. **Watch.** An animated walkthrough of the line, one sentence for each move. You tap to go to the
+   next move, at your own pace.
 2. **Guided.** You play it with hints, such as a highlighted area or a faint "ghost stone".
 3. **Recall.** You play it with no hints.
 4. **Review.** The line enters the spaced-repetition schedule and is mixed with other joseki,
    colors and orientations.
 5. **Mastered.** It shows up only rarely.
+
+### 1.5 Help for the 25k–15k level
+
+- **Plain-English explanations.** One sentence for each move, two at most, and no jargon without
+  explanation.
+- **Tap-to-define glossary.** Terms like *approach, pincer, slide, extension, hane, base,
+  influence, tenuki* are underlined. Tapping one shows a one-line definition and a mini diagram.
+- **Result summary at the end of each line.** It says who got what (for example corner territory
+  against an outside wall) and why that's a fair trade. That's the core idea of joseki.
+- **Show only the main line** plus at most 1–2 very common variations for each joseki at first.
+  Trick plays, "slightly worse" nuances and old-style lines can wait.
 
 ---
 
@@ -78,8 +133,8 @@ This is where joseki learning gets interesting, and where most apps or books get
 
 - At the start, only the **main line** is active.
 - When a line reaches *Review* status, the **most common deviation** from it unlocks.
-- This grows into a **skill tree view**, a map of the joseki where branches light up as you learn
-  them. That's also good for motivation.
+- A plain **joseki map** shows the tree and which branches you've learned. It's an overview, not a
+  game element.
 
 ### Several correct answers
 
@@ -99,79 +154,85 @@ At many nodes there is more than one good move. Rules:
 - **Tenuki.** Knowing when you can play elsewhere. Tenuki (play elsewhere) is offered as a valid
   answer.
 - **Mistakes and how to punish them.** "Your opponent plays this common amateur mistake. Punish it!"
-  These are fun and very practical.
-- **Trick plays (hamete).** Recognize them and answer them safely.
-- **Context.** Later there will be small whole-board positions where the *right* variation depends on
-  the surroundings: a working ladder, nearby stones, direction of play. This is the step from
-  "memorizing joseki" to "using joseki".
+  These are very practical at 25k–15k, because opponents at that level often leave joseki.
+- **Trick plays (hamete).** Recognize them and answer them safely. This comes later.
+- **Context.** Small whole-board positions where the *right* variation depends on the surroundings:
+  nearby stones, direction of play, ladders. This also comes much later.
 
 ---
 
-## 3. Starting content (v1)
+## 3. Starting content
 
-Keep it really small at first. That's the whole point.
+Keep it really small at first. That's the whole point. The joseki are introduced **one after
+another**: the next one starts only when the previous main line has reached *Review*.
 
 **Joseki 1: 4-4 point, 3-3 invasion**
 - Main line
-- Branch: blocking from the other side
-- One or two common follow-ups
+- Later: blocking from the other side
 
 **Joseki 2: 4-4 point, low approach → knight's move response**
 - Main line (the approaching side settles with a slide and extension)
-- Later: other answers to the approach (one-space jump, attach-and-extend, a pincer)
+- Later: one other common answer to the approach (e.g. the one-space jump)
 
-That's about 6–10 lines total. With both colors and random orientation, it's enough for several
-weeks of daily practice.
+**Joseki 3: 3-4 point, small knight approach**
+- Main line of its most common answer
+- Later: one common variation
+
+That's about 3 main lines at the start and about 6 lines with the first variations. With both
+colors and random orientation, it's enough for many weeks of daily 5-minute sessions.
 
 **Open task:** check every line against a reliable, modern source before it goes into the app.
 Options include AI-era joseki dictionaries such as the OGS Joseki Explorer, Sensei's Library, and
 KataGo analysis. Check content licenses before reusing anything. Some older joseki are considered
-outdated since AI, so mark them (`old-style`) or skip them.
+outdated since AI, so skip them for now.
 
 ### Later expansions (rough order)
 
-1. More answers to the 4-4 approach (pincers, high approach)
-2. 3-4 point (komoku): small knight approach and its common answers
-3. 3-4 point: one-space high approach
-4. 3-3 point basics
-5. 5-3 / 5-4 points (niche)
-6. Joseki in context (whole-board decisions)
+1. More answers to the 4-4 approach (one-space jump, attach-and-extend, a simple pincer)
+2. More 3-4 point joseki (e.g. the one-space high approach)
+3. 3-3 point basics
+4. Common mistakes and how to punish them, for all learned joseki
+5. Joseki in context (whole-board decisions)
 
 ---
 
 ## 4. Look and feel
 
-- **Board:** clean and calm. A light wood texture or a modern flat style (both available as themes),
-  slate-and-shell stones with soft shadows.
+- **Board: classic wood.** A warm, kaya-style wood texture with fine dark lines, slate-and-shell
+  stones (slight sheen, subtle grain on the white stones) and soft drop shadows.
 - **Zoomed corner view:** show only the relevant corner (about a 10×10 crop), so stones are big
   and easy to tap on a phone. You can zoom out to the full board.
-- **Sound and haptics:** a satisfying, quiet stone click and a light vibration on placement. A
-  gentle "tock" for right and a soft shake for wrong. No harsh buzzer.
+- **Sound and haptics:** a satisfying wooden stone click and a light vibration on placement. A gentle
+  "tock" for right and a soft shake for wrong. No harsh buzzer.
 - **Animations:** stones "drop" onto the board, the opponent's reply follows after a short natural
   delay, and correct moves glow briefly.
 - **Typography:** minimal text. Explanations are one sentence, two at most.
-- **Dark mode** from the start.
-- **Mood:** calm, focused, a little Japanese-inspired, with no gamified clutter.
+- **Dark mode** for the surrounding UI, with the board staying wood.
+- **Mood:** calm and focused, without any gamified clutter.
 
 ---
 
-## 5. Motivation without stress
+## 5. Motivation without gamification
 
-- **Small daily goal:** about 5 minutes or 10 cards. Finishing should feel easy.
-- **Limit new material** (for example, 1–2 new lines per day) so reviews never pile up.
-- **Streaks**, kept gentle: freeze days, no guilt-tripping.
-- **A collection to fill:** a "joseki map" where learned lines light up, plus mastery % for each
-  joseki.
-- **One optional daily reminder** at a time the user picks.
+**Decided:** no streaks, XP, levels or badges.
+
+- After the session: **"Done for today."** Nothing more.
+- Instead of game mechanics, the app relies on:
+  - **Short sessions.** About 5 minutes is easy to keep doing.
+  - **Visible progress, kept factual.** The joseki map shows which lines you know. It's information,
+    not a reward.
+  - **Small amounts of new material**, so reviews never pile up and opening the app never feels like
+    a chore.
+- Maybe: one optional daily reminder at a time you pick. It's off by default.
 
 ---
 
-## 6. Tech ideas
+## 6. Tech ideas (for when it's time to build)
 
 ### Platform
 
-- **Start as a PWA** (Progressive Web App). It's installable on iOS, Android and desktop, works
-  offline, and needs only one codebase. It's the fastest way to something usable.
+- **Phone first, as a PWA** (Progressive Web App). It's installable on the home screen, works
+  offline, needs only one codebase, and needs no app store, which is fine for a personal tool.
 - Go native (or use Capacitor, Flutter or React Native) later, only if the PWA isn't good enough,
   for example for notifications on iOS.
 
@@ -179,13 +240,13 @@ outdated since AI, so mark them (`old-style`) or skip them.
 
 - **TypeScript + Vite** + a light UI framework (React, Preact or Svelte)
 - **Board rendering:** SVG for crisp output at any size and easy animation. Options to evaluate:
-  - Write a small custom SVG board. A single zoomed corner is simple, and the look stays fully under
-    our control.
+  - Write a small custom SVG board. A single zoomed corner is simple, and the wood look stays fully
+    under our control.
   - Or use existing libraries: `@sabaki/shudan` (Go board component), `@sabaki/go-board` (rules,
     captures), `@sabaki/sgf` (SGF parsing), or WGo.js.
 - **Spaced repetition:** start with simple **Leitner boxes**, then move to **FSRS** (the modern
   algorithm used in Anki; `ts-fsrs` is a TypeScript implementation).
-- **Storage:** local-first in IndexedDB, with no account needed. Optional sync later.
+- **Storage:** local-first in IndexedDB, with no account and no server.
 - **Content:** one SGF file per joseki in the repo (`content/joseki/*.sgf`). A build step turns it
   into JSON for the app. Custom SGF properties hold status and tags.
 
@@ -211,6 +272,7 @@ interface Joseki {
   name: string;              // "4-4 point: 3-3 invasion"
   rootId: string;
   nodes: Record<string, JosekiNode>;
+  resultSummary: string;     // "Black: outside wall · White: corner territory"
 }
 
 interface Line {
@@ -234,6 +296,8 @@ interface MoveStat {         // per-move weakness tracking
   attempts: number;
   errors: number;
 }
+
+type MistakeReaction = "show-explain" | "retry-hint" | "restart-line";
 ```
 
 ---
@@ -241,41 +305,44 @@ interface MoveStat {         // per-move weakness tracking
 ## 7. Roadmap draft
 
 **v0.1: "it works"**
-- One joseki (3-3 invasion), main line + 1–2 branches
+- Joseki 1 (3-3 invasion), main line only
+- Watch → guided → recall stages
 - Play-through drill: auto opponent moves, right/wrong feedback, one-line explanations
 - Both colors
-- Leitner-box scheduling, a "Today" screen, a streak counter
-- PWA, local storage
+- Leitner-box scheduling, a "Today" screen, "done for today"
+- PWA on the phone, local storage
 
 **v0.2: "it feels good"**
-- Second joseki (low approach, knight's move response)
+- Classic wood board, stone sounds, haptics, animations
 - Random orientation and corner
-- Polished board, sounds, animations, dark mode
-- Watch and guided stages for new lines
+- Random mix of mistake reactions (show / retry / restart)
+- Glossary taps and result summaries
+- Joseki 2 (low approach, knight's move response)
 
-**v0.3: "variations"**
-- Unlock system and joseki map (skill tree view)
+**v0.3: "it grows"**
+- Joseki 3 (3-4 small knight approach)
+- First variations + unlock system + joseki map
 - Accept several correct answers
-- "Punish the mistake" cards
 - Switch to FSRS
 
 **Later / maybe**
-- 3-4 point joseki
+- More joseki (see 3, "Later expansions")
+- "Punish the mistake" cards
 - Joseki-in-context whole-board puzzles
-- Import your own games (SGF, or from OGS) and see where *you* left joseki
+- Import your own games (SGF) and see where you left joseki
 - KataGo-backed explanations ("why is this move bad?")
-- Optional account and sync
-- Shared community decks (like Anki decks)
 
 ---
 
 ## 8. Open questions
 
-- **Target level?** For example around 20k–5k. This decides how much explanation each move needs and
-  which variations count as "common".
-- **Language?** English only, or German as well?
-- **Mobile-first?** Probably yes, since daily habits happen on the phone.
 - **Content source and license:** where exactly do the joseki trees come from, and who checks them?
+  Check against OGS Joseki Explorer, Sensei's Library or KataGo.
+- **Mistake reaction weights:** equal thirds, or weighted (e.g. more "show + explain" for newer
+  lines)?
+- **Where do you play?** OGS, Fox, KGS or in person? This matters for a possible "import my games"
+  feature later.
+- **New-line pace:** is "at most one new line every 2 days" right, or faster or slower?
+- **Free explore mode?** Should you be able to browse the whole tree freely in a separate "Library",
+  besides the learning flow?
 - **Name?** "Joseki Teacher" works. Other options: "Daily Joseki", "Joseki Garden", "Corner Kata".
-- **Free explore mode?** Should you be able to browse the whole tree freely, or only through the
-  learning flow? (Probably both: learn in the flow, browse in a separate "Library".)

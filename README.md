@@ -24,28 +24,43 @@ it, and build up long-term memory with very little effort.
 4. A short *why* explains each move, so you understand the joseki and don't just memorize it.
 5. The app schedules each sequence for review, earlier if you struggled and later if it was easy.
 
+## Who it's for (for now)
+
+A **personal tool**, built for one player:
+
+- **Level:** about 25k–15k. Explanations are simple and use plain English, and the content covers
+  main lines plus only the most common variations.
+- **Device:** phone first, with a zoomed corner view, big stones and one-thumb use.
+- **Language:** English.
+- **Starting point:** no prior joseki knowledge. Every new sequence is first shown, then practiced
+  with help, then recalled.
+
+It can grow into something for others later, but it doesn't have to.
+
 ## Principles
 
-- **Daily, but small.** One session takes about 5 minutes, and there's a cap on new material per day.
+- **Daily, but small.** One session takes about 5 minutes.
 - **Low effort.** You open the app and press start. You don't plan what to study or rate yourself,
   because the app sees how you did.
 - **High effect over time.** Spaced repetition builds knowledge that lasts.
-- **Looks nice.** A calm, beautiful board with good stones and good sound. It should be a pleasure to open.
+- **No pressure.** No streaks, XP or badges. There's just today's session and a quiet "done for
+  today".
+- **Looks nice.** A classic wooden board, slate and shell stones, a soft stone sound. It should be a
+  pleasure to open.
 - **Understanding over rote memory.** Every move has a one-line explanation of its purpose.
 
 ## Start small
 
-The first version covers **one or two of the most common joseki** and nothing else:
+The first version covers **three of the most common joseki**, introduced one after another:
 
 1. **4-4 point (hoshi): 3-3 invasion.** This is probably the most frequent joseki in modern
-   (post-AI) play, at every level.
-2. **4-4 point: low approach, knight's move response.** This classic joseki teaches the basic
-   ideas of approach, base and extension.
+   play, at every level.
+2. **4-4 point: low approach, knight's move response.** A classic that teaches the basic ideas
+   of approach, base and extension.
+3. **3-4 point (komoku): small knight approach.** This is the most common joseki from the other
+   main corner point.
 
-Both start from the 4-4 point, which is the most common opening move today, so a learner only needs
-to deal with one corner type at first.
-
-More joseki come later, one at a time (see [IDEAS.md](IDEAS.md)).
+Each one starts with only its main line. More joseki come much later (see [IDEAS.md](IDEAS.md)).
 
 ## Variations
 
@@ -53,12 +68,13 @@ A joseki is a **tree** of moves, not a single line. At many points there are sev
 moves, and the opponent can deviate. The plan:
 
 - Learn the **main line** first.
-- When the main line is solid, **unlock the most common variations**, a bit like a skill tree.
+- When the main line is solid, **unlock the most common variations**, one at a time.
 - Accept **every correct joseki move**. When there are several good moves, the app doesn't count
   the other good ones as wrong.
 - Later, add **common mistakes and how to punish them**, plus **context**: when to choose which
-  variation, such as which side to block from or what to do when a ladder works.
+  variation, such as which side to block from.
 
 ## Status
 
-🌱 Idea stage. See [IDEAS.md](IDEAS.md) for the brainstorm on how to build it.
+📝 Planning: no code yet. See [IDEAS.md](IDEAS.md) for the decisions so far and the brainstorm on
+how to build it.
