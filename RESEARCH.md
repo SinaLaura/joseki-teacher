@@ -227,11 +227,9 @@ against.
 
 ## 4. New or changed open questions
 
-- **iPhone or Android?** This decides whether haptics are possible in the PWA.
-- **Joseki 1 order:** OK to teach the simple extension first and the double hane as the first
-  variation? (Recommended.)
-- **Joseki 2 honesty note:** OK to teach the slide even though pros rarely play it now? (Recommended
-  for 25k–15k. Say so in one sentence in the app.)
+- ~~**iPhone or Android?**~~ **Android** (decided 2026-11-24), so vibration works.
+- ~~**Joseki 1 order**~~ **Yes:** simple extension first, double hane as the first variation.
+- ~~**Joseki 2 honesty note**~~ **Yes:** teach the slide, with one sentence in the app.
 - **OJE data:** stay reference-only (recommended for a personal tool), or ask OGS for permission to
   reuse their tree later?
 

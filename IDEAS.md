@@ -21,6 +21,9 @@ From the interview on 2026-11-24:
 | Wrong move reaction  | **Mixed at random** (see 1.3)                                                  |
 | Motivation           | **No gamification**: no streaks, XP or badges, just "done for today"           |
 | Building             | Planning only for now, no code yet                                             |
+| Phone                | Android (so vibration works in the PWA)                                        |
+| Joseki 1 order       | Simple extension (knight's move) first, double hane as first variation         |
+| Joseki 2 line        | Teach the slide, with one sentence that pros now usually play something else  |
 
 ---
 
@@ -340,8 +343,7 @@ type MistakeReaction = "show-explain" | "retry-hint" | "restart-line";
 
 - ~~**Content source and license**~~ Answered in [RESEARCH.md](RESEARCH.md): write our own SGF and
   check it against the OGS Joseki Explorer.
-- **iPhone or Android?** iPhone Safari has no vibration API, so haptics only work on Android in a
-  PWA (see [RESEARCH.md](RESEARCH.md), 3.2).
+- ~~**iPhone or Android?**~~ Android, so haptics work in the PWA.
 - **Mistake reaction weights:** equal thirds, or weighted (e.g. more "show + explain" for newer
   lines)?
 - **Where do you play?** OGS, Fox, KGS or in person? This matters for a possible "import my games"
