@@ -230,8 +230,8 @@ against.
 - ~~**iPhone or Android?**~~ **Android** (decided 2026-11-24), so vibration works.
 - ~~**Joseki 1 order**~~ **Yes:** simple extension first, double hane as the first variation.
 - ~~**Joseki 2 honesty note**~~ **Yes:** teach the slide, with one sentence in the app.
-- **OJE data:** stay reference-only (recommended for a personal tool), or ask OGS for permission to
-  reuse their tree later?
+- ~~**OJE data**~~ **Reference only** (decided 2026-11-24). Ask OGS only if the app ever grows a lot
+  or goes public.
 
 ---
 

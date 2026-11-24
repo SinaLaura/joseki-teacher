@@ -24,6 +24,7 @@ From the interview on 2026-11-24:
 | Phone                | Android (so vibration works in the PWA)                                        |
 | Joseki 1 order       | Simple extension (knight's move) first, double hane as first variation         |
 | Joseki 2 line        | Teach the slide, with one sentence that pros now usually play something else  |
+| Content source       | Own SGF + own explanations; OGS Joseki Explorer only to check lines against   |
 
 ---
 
