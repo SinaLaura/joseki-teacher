@@ -1,0 +1,65 @@
+(;GM[1]FF[4]CA[UTF-8]SZ[19]
+GN[4-4 point: 3-3 invasion]
+SO[Checked against the OGS Joseki Explorer and the resigning-in-sente 3-3 invasion series, 2026-11-24. Explanations are our own.]
+C[Black has the 4-4 point in the upper-right corner. White invades at the 3-3 point. Three lines: the knight's move (main line), the double hane, and the push.]
+
+;B[pd]JS[joseki]JT[main-line]
+C[The 4-4 point (star point). It is fast and good for the sides, but it leaves the 3-3 point open.]
+
+;W[qc]JS[joseki]JT[main-line]
+C[White invades at the 3-3 point. There is just enough room in the corner for White to live.]
+
+;B[qd]JS[joseki]JT[main-line,block-direction]
+C[Black blocks on the side where they want to build, here the right side. Now White can only grow along the top.]
+
+;W[pc]JS[joseki]JT[main-line]
+C[White crawls along the top to get room for eyes.]
+
+(;B[od]JS[joseki]JT[main-line]
+C[Black extends. This is the simplest choice: Black lets White live small and keeps a strong wall.]
+
+(;W[nb]JS[joseki]JT[main-line]
+C[White slides with a knight's move along the second line. Now White's corner group is safe.]
+JL[33-knight]JN[3-3 invasion: knight's move]
+JR[White gets a small, safe corner. Black gets a strong wall facing the right side, and sente: Black may play anywhere next.])
+
+(;W[oc]JS[joseki]JT[variation]
+C[Instead of sliding, White pushes into Black's wall to get a little more room on top.]
+
+;B[nc]JS[joseki]JT[variation]
+C[Black hanes at the head of White's stones and stops them from growing along the top.]
+
+;W[nb]JS[joseki]JT[variation]
+C[White hanes underneath to make the corner safe.]
+JL[33-push]JN[3-3 invasion: push]JU[33-double-hane]
+JR[Same idea as the knight's move: White gets the corner, Black gets the outside and sente. White's corner may need one more move here later.]))
+
+(;B[oc]JS[joseki]JT[variation]
+C[Black hanes instead, taking away White's room on top. This is how Black fights for the corner.]
+
+;W[ob]JS[joseki]JT[variation]
+C[White hanes underneath to keep some space along the edge.]
+
+;B[nb]JS[joseki]JT[variation]
+C[The double hane: Black hanes a second time to take the corner back.]
+
+;W[nc]JS[joseki]JT[variation]
+C[White cuts. Black's hane stone at P17 is now in atari: it has only one liberty left.]
+
+;B[od]JS[joseki]JT[variation]
+C[Black connects and saves the P17 stone.]
+
+;W[mb]JS[joseki]JT[variation]
+C[White puts Black's O18 stone in atari.]
+
+;B[pb]JS[joseki]JT[variation]
+C[Black answers with an atari of their own, on White's P18 stone.]
+
+;W[na]JS[joseki]JT[variation]
+C[White captures O18. The diamond shape around the empty point is a ponnuki, which is very strong on the outside.]
+
+;B[qb]JS[joseki]JT[variation]
+C[Black puts White's two corner stones in atari. Now Black controls the corner.]
+JL[33-double-hane]JN[3-3 invasion: double hane]JU[33-knight]
+JR[Black gets the corner, about 10 points, but in gote. White gets a ponnuki and strength on top, plus sente. White's two corner stones still leave a little aji for later.])
+)

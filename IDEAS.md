@@ -166,11 +166,13 @@ At many nodes there is more than one good move. Rules:
 Keep it really small at first. That's the whole point. The joseki are introduced **one after
 another**: the next one starts only when the previous main line has reached *Review*.
 
-Exact moves and sources are in [RESEARCH.md](RESEARCH.md).
+Exact moves and sources are in [RESEARCH.md](RESEARCH.md). The app-ready file for joseki 1 is
+[content/joseki/33-invasion.sgf](content/joseki/33-invasion.sgf) (see [content/joseki](content/joseki/README.md)).
 
 **Joseki 1: 4-4 point, 3-3 invasion**
 - Main line: the **simple extension** (6 moves, Black gets the outside and sente)
 - First variation: the **double hane** (Black takes the corner back, White gets a ponnuki and sente)
+- Then: the **push** (White pushes instead of sliding; same result idea as the main line)
 
 **Joseki 2: 4-4 point, low approach → knight's move response**
 - Main line (the approaching side settles with a slide and a two-space extension)
