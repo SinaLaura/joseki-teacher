@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#2b2420">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Joseki Teacher</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main id="home" class="screen">
+    <h1>Joseki Teacher</h1>
+    <p id="summary" class="summary">Loading…</p>
+    <button id="start" class="primary" hidden>Start</button>
+  </main>
+
+  <main id="train" class="screen" hidden>
+    <header>
+      <div id="title" class="title"></div>
+      <div id="subtitle" class="subtitle"></div>
+    </header>
+    <svg id="board" viewBox="0 0 420 432" role="img" aria-label="Go board, upper-right corner"></svg>
+    <section class="panel">
+      <p id="text" class="text"></p>
+      <div id="actions" class="actions"></div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

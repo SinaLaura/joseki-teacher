@@ -308,7 +308,8 @@ type MistakeReaction = "show-explain" | "retry-hint" | "restart-line";
 
 ## 7. Roadmap draft
 
-**v0.1: "it works"**
+**v0.1: "it works"** ✅ built 2026-11-24. The first unlocked variations come along for free,
+because the app reads the whole SGF tree.
 - Joseki 1 (3-3 invasion), main line only
 - Watch → guided → recall stages
 - Play-through drill: auto opponent moves, right/wrong feedback, one-line explanations
