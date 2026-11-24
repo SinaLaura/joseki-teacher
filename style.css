@@ -71,4 +71,5 @@ button {
   cursor: pointer;
 }
 button.primary { background: var(--accent); color: #2b2420; font-weight: 600; }
+button.more { background: transparent; color: var(--muted); border: 1px solid #574a40; }
 button:active { transform: translateY(1px); }

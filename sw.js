@@ -1,5 +1,5 @@
 // Network first, so updates show up right away; the cache is the offline fallback.
-const CACHE = "joseki-teacher-v0.1.1";
+const CACHE = "joseki-teacher-v0.1.2";
 const FILES = [
   "./",
   "index.html",

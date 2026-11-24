@@ -244,6 +244,23 @@ function buildQueue() {
   return q;
 }
 
+// "I want more": the next new card even past today's limit; if every unlocked card is already
+// learned, a few extra practice runs (soonest due first) that don't change the review schedule.
+function moreQueue() {
+  for (const l of unlockedLines()) for (const c of ["B", "W"]) {
+    const id = `${l.id}:${c}`;
+    if (!state.cards[id]) return [{ id, line: l, color: c, isNew: true }];
+  }
+  return Object.entries(state.cards)
+    .sort((a, b) => a[1].due.localeCompare(b[1].due))
+    .slice(0, 3)
+    .map(([id]) => {
+      const [lineId, color] = id.split(":");
+      return { id, line: lines.find((l) => l.id === lineId), color, practice: true, extra: true };
+    })
+    .filter((i) => i.line);
+}
+
 function header(item, stage) {
   $("title").textContent = item.line.name;
   $("subtitle").textContent = `${stage} · you play ${colorName(item.color)}`;
@@ -307,7 +324,7 @@ async function drill(item, stage, guided) {
 
 async function runItem(item) {
   const t = today();
-  if (item.practice) return drill(item, "Once more", false);
+  if (item.practice) return drill(item, item.extra ? "Extra practice" : "Once more", false);
   if (item.isNew) {
     await watch(item);
     await drill(item, "New line: guided", true);
@@ -330,9 +347,8 @@ async function runItem(item) {
   return ok;
 }
 
-async function session() {
+async function session(queue) {
   $("home").hidden = true; $("train").hidden = false;
-  const queue = buildQueue();
   while (queue.length) {
     const item = queue.shift();
     const ok = await runItem(item);
@@ -348,6 +364,9 @@ function showHome() {
   if (!q.length) {
     $("summary").textContent = "Done for today.\nSee you tomorrow.";
     $("start").hidden = true;
+    const more = moreQueue();
+    $("more").hidden = !more.length;
+    $("more").textContent = more.some((i) => i.isNew) ? "I want more: learn a new line" : "I want more: extra practice";
     return;
   }
   const parts = [];
@@ -355,9 +374,11 @@ function showHome() {
   if (fresh) parts.push(`${fresh} new line${fresh > 1 ? "s" : ""}`);
   $("summary").textContent = `Today: ${parts.join(" · ")}\nabout ${Math.max(1, q.length * (fresh ? 2 : 1))} min`;
   $("start").hidden = false;
+  $("more").hidden = true;
 }
 
-$("start").onclick = () => session();
+$("start").onclick = () => session(buildQueue());
+$("more").onclick = () => session(moreQueue());
 
 async function init() {
   if (new URLSearchParams(location.search).has("reset")) {
