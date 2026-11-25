@@ -76,6 +76,9 @@ function mount(root, Comp) {
     const vals = comp.renderVals(), tmp = document.createElement('div');
     tpl.content.childNodes.forEach((n, i) => build(n, vals, tmp, String(i), false));
     morphChildren(root, tmp);
+    // the version label only shows on the joseki overview
+    const ver = document.getElementById('ver');
+    if (ver) ver.style.display = comp.state.screen === 'menu' ? '' : 'none';
   };
   comp._render = draw;
   draw();

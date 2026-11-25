@@ -76,6 +76,9 @@ function mount(root, Comp) {
     const vals = comp.renderVals(), tmp = document.createElement('div');
     tpl.content.childNodes.forEach((n, i) => build(n, vals, tmp, String(i), false));
     morphChildren(root, tmp);
+    // the version label only shows on the joseki overview
+    const ver = document.getElementById('ver');
+    if (ver) ver.style.display = comp.state.screen === 'menu' ? '' : 'none';
   };
   comp._render = draw;
   draw();
@@ -709,6 +712,14 @@ class Component extends DCLogic {
   a.textContent = window.JOSEKI_VERSION || 'dev';
   document.getElementById('ver').appendChild(a);
 }
+// Full screen on phones: hides Android's status and navigation bar, also in a browser tab and before
+// Chrome has picked up the manifest's "fullscreen". Browsers only allow this after a tap, so ask on each
+// tap while not in full screen (swiping the bars back in leaves full screen). iPhones don't support it.
+document.addEventListener('pointerup', () => {
+  const el = document.documentElement;
+  if (!matchMedia('(pointer: coarse)').matches || document.fullscreenElement || !el.requestFullscreen) return;
+  el.requestFullscreen({ navigationUI: 'hide' }).catch(() => {});
+});
 window.addEventListener('resize', fit);
 fit();
 document.fonts && document.fonts.ready.then(() => {});
