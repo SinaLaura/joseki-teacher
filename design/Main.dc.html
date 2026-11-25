@@ -801,8 +801,17 @@ class Component extends DCLogic {
     if (key === 't') upd.rd = { r: s.round, p: rd1.p + gain, bad: rd1.bad };
     upd[key] = n + 1;
     this.setState(upd);
-    if (n + 1 < 6 && par !== 2) setTimeout(() => { if (this.state[key] === n + 1) this.setState({ [key]: n + 2 }); }, 1500);
   }
+  // One pending timer per name (White's auto move, the Pick steps, the stage intro). A new key replaces the old
+  // timer and stopTimer cancels it, so a timer never fires into a state it wasn't set for, and the same step
+  // (e.g. White's first move after restarting Try) is always armed again.
+  later(name, key, ms, fn) {
+    const T = this._tm || (this._tm = {});
+    if (T[name] && T[name].key === key) return;
+    if (T[name]) clearTimeout(T[name].h);
+    T[name] = { key: key, h: setTimeout(() => { T[name] = null; fn(); }, ms) };
+  }
+  stopTimer(name) { const T = this._tm; if (T && T[name]) { clearTimeout(T[name].h); T[name] = null; } }
   tagline() {
     // Shown at the top of the joseki overview. A new line is picked each time the overview opens,
     // never the same one twice in a row.
@@ -844,7 +853,7 @@ class Component extends DCLogic {
     const passed = thr ? cleanTot >= 3 : s.pts >= 10;
     const autoWait = s.screen === 'lesson' && !s.intro && (st === 0 || st === 3) && nn < 6 && par !== 2 && nn % 2 !== par && !s.wrong;
     const ak = [s.jid, st, s.round, nn, s.review].join('|');
-    if (autoWait && this._autoKey !== ak) { this._autoKey = ak; setTimeout(() => { const t = this.state, k2 = t.stage === 3 ? 't' : 'n'; if ([t.jid, t.stage, t.round, t[k2], t.review].join('|') === ak && !t.intro && t.screen === 'lesson') this.setState({ [k2]: t[k2] + 1 }); }, 1200); }
+    if (autoWait) this.later('auto', ak, 1200, () => { const t = this.state, k2 = t.stage === 3 ? 't' : 'n'; if ([t.jid, t.stage, t.round, t[k2], t.review].join('|') === ak && !t.intro && t.screen === 'lesson') this.setState({ [k2]: t[k2] + 1 }); }); else this.stopTimer('auto');
     const stagesL = ['Try', 'Learn', 'Pick', 'Train'];
     const rvStart = (stg) => () => this.setState(Object.assign({ screen: 'lesson', review: true, stage: stg, intro: false, n: 1, t: 0, round: 0, w: 1, q: 0, ph: 0, answered: null, elim: [], flash: null, pts: 0, msg: '', kind: '', wrong: null, tries: 0, rd: null, sadLast: false }, this.dirInit(s.jid, false)));
     const stages = stagesL.map((l, i) => ({
@@ -912,7 +921,7 @@ class Component extends DCLogic {
         showNext = true;
         if (s.review) { nextLabel = 'Done'; nextAction = () => this.setState({ screen: 'picker', msg: '', kind: '', wrong: null, tries: 0, rd: null, sadLast: false }); }
         else if (!T) { nextLabel = 'Continue'; nextAction = () => this.setState(enter(1)); }
-        else if (passed && thr) { nextLabel = 'Done'; nextAction = () => { if (this.state.exiting) return; this.setState({ exiting: true }); setTimeout(() => this.setState({ exiting: false, screen: 'result', msg: '', kind: '', wrong: null, learned: Object.assign({}, this.state.learned, { [s.jid]: true }) }), 1900); }; showMore = true; moreAction = () => this.setState(Object.assign({ tries: 0, rd: null, sadLast: false, t: 1, clean: cleanTot, help: cornerBad, round: s.round + 1, msg: '', kind: '', wrong: null, learned: Object.assign({}, s.learned, { [s.jid]: true }) }, this.dirInit(s.jid, sched[(s.round + 1) % sched.length].both ? 'both' : sched[(s.round + 1) % sched.length].white))); }
+        else if (passed && thr) { nextLabel = 'Done'; nextAction = () => { if (this.state.exiting) return; this.setState({ exiting: true }); setTimeout(() => this.state.exiting && this.state.screen === 'lesson' && this.setState({ exiting: false, screen: 'result', msg: '', kind: '', wrong: null, learned: Object.assign({}, this.state.learned, { [s.jid]: true }) }), 1900); }; showMore = true; moreAction = () => this.setState(Object.assign({ tries: 0, rd: null, sadLast: false, t: 1, clean: cleanTot, help: cornerBad, round: s.round + 1, msg: '', kind: '', wrong: null, learned: Object.assign({}, s.learned, { [s.jid]: true }) }, this.dirInit(s.jid, sched[(s.round + 1) % sched.length].both ? 'both' : sched[(s.round + 1) % sched.length].white))); }
         else if (passed) { nextLabel = 'See result'; nextAction = () => this.setState({ screen: 'result', msg: '', kind: '', wrong: null, learned: Object.assign({}, s.learned, { [s.jid]: true }) }); showMore = true; moreAction = () => this.setState(Object.assign({ tries: 0, rd: null, sadLast: false, t: 1, clean: cleanTot, help: cornerBad, round: s.round + 1, msg: '', kind: '', wrong: null, learned: Object.assign({}, s.learned, { [s.jid]: true }) }, this.dirInit(s.jid, sched[(s.round + 1) % sched.length].both ? 'both' : sched[(s.round + 1) % sched.length].white))); }
         else { nextLabel = 'Next corner'; nextAction = () => this.setState(Object.assign({ tries: 0, rd: null, sadLast: false, t: 1, clean: cleanTot, help: cornerBad, round: s.round + 1, msg: '', kind: '', wrong: null }, this.dirInit(s.jid, sched[(s.round + 1) % sched.length].both ? 'both' : sched[(s.round + 1) % sched.length].white))); }
       }
@@ -937,8 +946,7 @@ class Component extends DCLogic {
       const fin = done && last && !!seq[q.shown + 1] && !!seq[q.shown + 1].w;
       const pk = [s.jid, s.q, s.review, ph, done].join('|');
       const phRun = s.screen === 'lesson' && !s.intro && (ph < 2 || adv || (fin && ph < 4));
-      if (!phRun) this._phKey = null;
-      if (phRun && this._phKey !== pk) { this._phKey = pk; setTimeout(() => { const t = this.state; if (t.screen === 'lesson' && t.stage === 2 && !t.intro && [t.jid, t.q, t.review, t.ph, t.answered !== null].join('|') === pk) this.setState(adv ? { q: t.q + 1, ph: 1, answered: null, elim: [], flash: null, msg: '', kind: '' } : (fin ? (ph === 2 ? { ph: 3, msg: '', kind: '' } : { ph: 4 }) : { ph: ph + 1 })); }, adv || (fin && ph === 2) ? (s.kind === 'bad' ? 2200 : 1400) : (ph === 0 ? 1200 : 1000)); }
+      if (phRun) this.later('ph', pk, adv || (fin && ph === 2) ? (s.kind === 'bad' ? 2200 : 1400) : (ph === 0 ? 1200 : 1000), () => { const t = this.state; if (t.screen === 'lesson' && t.stage === 2 && !t.intro && [t.jid, t.q, t.review, t.ph, t.answered !== null].join('|') === pk) this.setState(adv ? { q: t.q + 1, ph: 1, answered: null, elim: [], flash: null, msg: '', kind: '' } : (fin ? (ph === 2 ? { ph: 3, msg: '', kind: '' } : { ph: 4 }) : { ph: ph + 1 })); }); else this.stopTimer('ph');
       const endIn = fin && ph >= 3;
       items = stoneItems(seq.slice(0, ph < 1 ? q.shown - 1 : (endIn ? q.shown + 2 : q.shown)), -1).map((it, i) => ({ ...it, style: it.style.replace(/animation:[^;]*;/, '') + (i === (endIn ? q.shown + 1 : q.shown - 1) ? 'animation:drop .4s ease-out both;' : '') }));
       prompt = ph < 1 || adv || (fin && ph === 2) ? 'White is thinking …' : (s.q === 0 && !done ? 'How should Black respond?' : '');
@@ -994,9 +1002,8 @@ class Component extends DCLogic {
     // Stage intro as a short pause on the play screen: after 1.5 s (or a tap) the stage starts by itself.
     const pv = inLesson && s.intro && (this.props.intro || 'board') === 'board';
     const ik = s.jid + '|' + s.stage + '|' + s.review;
-    if (pv && this._introKey !== ik) { this._introKey = ik; setTimeout(() => { const t = this.state; if (t.screen === 'lesson' && t.intro && t.jid + '|' + t.stage + '|' + t.review === ik) this.setState({ intro: false }); }, 2500); }
-    if (!pv) this._introKey = null;
-    if (!inLesson || st !== 2) this._phKey = null;
+    if (pv) this.later('intro', ik, 2500, () => { const t = this.state; if (t.screen === 'lesson' && t.intro && t.jid + '|' + t.stage + '|' + t.review === ik) this.setState({ intro: false }); }); else this.stopTimer('intro');
+    if (!inLesson || st !== 2) this.stopTimer('ph');
     const big = this.props.hd !== 'cur', tz = big ? 24 : 22;
     const TX = big ? [228, 278, 328] : [204, 234, 264], KX = big ? [16, 86, 160, 198] : [14, 72, 132, 178];
     let sxPos = KX[st];
@@ -1034,7 +1041,7 @@ class Component extends DCLogic {
       isMenu: s.screen === 'menu', isPicker: s.screen === 'picker', isStart: s.screen === 'start', isIntro: inLesson && s.intro && (this.props.intro || 'board') !== 'board', isLesson: inLesson && (!s.intro || (this.props.intro || 'board') === 'board'), isResult: s.screen === 'result',
       stepsInfo: [{ t: 'Try', txt: 'font-size:17px;font-weight:800;color:#2d3042', dot: 'width:22px;height:22px;box-sizing:border-box;border-radius:11px;background:#fff;border:4px solid ' + '#c9ccd9' }, { t: 'Learn', txt: 'font-size:17px;font-weight:700;color:#868a9c', dot: 'width:22px;height:22px;box-sizing:border-box;border-radius:11px;background:#fff;border:4px solid ' + '#c9ccd9' }, { t: 'Pick', txt: 'font-size:17px;font-weight:700;color:#868a9c', dot: 'width:22px;height:22px;box-sizing:border-box;border-radius:11px;background:#fff;border:4px solid ' + '#c9ccd9' }, { t: 'Train', txt: 'font-size:17px;font-weight:700;color:#868a9c', dot: 'width:26px;height:26px;box-sizing:border-box;border-radius:13px;background:#fff;border:4px solid ' + '#4b4f6e' }],
       begin: () => this.setState(Object.assign({}, fresh, this.dirInit(s.jid, false))),
-      toMenu: () => this.setState({ screen: s.review ? 'picker' : 'menu', msg: '', kind: '', wrong: null, tries: 0, rd: null, sadLast: false }),
+      toMenu: () => this.setState({ screen: s.review ? 'picker' : 'menu', exiting: false, msg: '', kind: '', wrong: null, tries: 0, rd: null, sadLast: false }),
       toMenuFromPicker: () => this.setState({ screen: 'menu', review: false }),
       pickerList: ['Try', 'Learn', 'Pick', 'Train'].map((label, stg) => ({ label: label, dot: 'width:30px;height:30px;flex:none;background:' + this.web(2) + ' center/30px no-repeat', rowStyle: (this.props.variant === 'b' ? 'display:flex;align-items:center;gap:16px;padding:0 18px;margin-bottom:12px;background:#fffdf7;border:2px solid #4b4f6e;border-width:2px 2.7px 2.4px 2.2px;border-radius:26px 20px 28px 22px/22px 28px 20px 26px;' : 'display:flex;align-items:center;gap:18px;padding:6px 0;') + 'width:100%;height:64px;background-color:' + (this.props.variant === 'b' ? '#fffdf7' : 'transparent') + ';font-family:\'Patrick Hand\',Nunito,sans-serif;font-size:30px;color:#2d3042;', act: rvStart(stg) })),
       startStage: () => this.setState({ intro: false }),
