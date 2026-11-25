@@ -148,7 +148,7 @@
 <div style="{{barWrap}}"><div style="{{barBox}}"><div style="{{barFill}}"></div><div style="{{markerStyle}}"></div><div style="{{walkerStyle}}"></div></div></div>
 <div style="position:relative;flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center">
 <sc-if value="{{ preview }}" hint-placeholder-val="{{ false }}">
-<div style="display:flex;flex-direction:column;justify-content:flex-end;height:76px;flex:none;margin-bottom:24px;font-family:'Patrick Hand',Nunito,sans-serif;color:#2d3042"><div style="font-size:44px;line-height:1">{{introWord}}</div><div style="font-size:28px;line-height:1.1">{{introRest}}</div></div>
+<div style="display:flex;align-items:flex-end;height:76px;flex:none;margin-bottom:24px"><div style="font-family:'Patrick Hand',Nunito,sans-serif;font-size:28px;line-height:1.1;color:#2d3042;white-space:nowrap"><span style="font-size:44px;line-height:1">{{introWord}}</span> {{introRest}}</div></div>
 </sc-if>
 <sc-if value="{{ noPreview }}" hint-placeholder-val="{{ true }}">
 <div style="display:flex;align-items:flex-end;height:76px;flex:none;margin-bottom:24px"><div style="{{promptStyle}}">{{shownPrompt}}</div></div>
