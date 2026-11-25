@@ -64,5 +64,5 @@ The whole app is drawn in pencil, and all of the following came from the owner's
 
 ## Not built yet
 
-A third joseki with a verified, very common sequence, spaced repetition (Leitner boxes), variations, and unlocking
+Spaced repetition (Leitner boxes), variations, and unlocking
 the joseki one after another (`UNLOCK_ALL` in `tools/runtime.js`).
