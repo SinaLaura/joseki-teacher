@@ -180,10 +180,87 @@ class Component extends DCLogic {
       watch: lesson({ stage: 1, w: 3, pts: 1 }),
       decide: lesson({ stage: 2, q: 0, pts: 2 }),
       'decide-wrong': lesson({ stage: 2, q: 0, pts: 2, flash: 0, elim: [0], wk: 1, kind: 'bad', msg: 'Not quite. Try again.' }),
-      transfer: lesson({ stage: 3, t: 2, pts: 5 }),
+      transfer: lesson({ stage: 3, t: 2, pts: 5, clean: 1 }),
+      'transfer-web': lesson({ stage: 3, t: 6, pts: 8, clean: 1 }),
       result: { screen: 'result', pts: 10, learned: { j33: true } }
     };
     return P[name] || {};
+  }
+  stepBtn(i, st) {
+    if (this.props.row === 'strip') return 'flex:1;min-width:0;height:44px;padding:0 0 2px;border:0;border-radius:0;box-shadow:none;background:transparent;font-family:\'Patrick Hand\',Nunito,sans-serif;font-size:19px;color:' + (i === st ? '#fff' : (i < st ? '#3b3f58' : '#9a9eb8'));
+    const F = "font-family:'Patrick Hand',Nunito,sans-serif;";
+    if (this.props.variant === 'b') {
+      return 'flex:1;min-width:0;height:34px;padding:0 2px;' + F + 'font-size:17px;box-sizing:border-box;border:2px solid ' + (i > st ? '#aeb2c6' : '#4b4f6e') + ';border-width:2px 2.6px 2.2px 2.3px;border-radius:15px 18px 16px 17px/17px 15px 18px 16px;' + (i === st ? 'background:#4b4f6e;color:#fff' : (i < st ? 'background:transparent;color:#3b3f58' : 'background:transparent;color:#868a9c'));
+    }
+    return 'flex:1;min-width:0;height:38px;padding:0 0 6px;border:0;border-radius:0;box-shadow:none;' + F + 'font-size:21px;line-height:1;box-sizing:border-box;background:' + (i === st ? 'url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTIiIHByZXNlcnZlQXNwZWN0UmF0aW89Im5vbmUiPjxwYXRoIGQ9Ik0xIDYuNkMyNSA1LjYgNjIgNS40IDk5IDEuNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNGI0ZjZlIiBzdHJva2Utd2lkdGg9IjIuMyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBvcGFjaXR5PSIuOTIiLz48cGF0aCBkPSJNNSA3LjRDMzQgNi42IDY0IDYgOTAgMy4yIiBmaWxsPSJub25lIiBzdHJva2U9IiM0YjRmNmUiIHN0cm9rZS13aWR0aD0iLjkiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgb3BhY2l0eT0iLjUiLz48cGF0aCBkPSJNNyAxMC42QzMwIDkuOCA2NiAxMC40IDk5LjUgNS40IiBmaWxsPSJub25lIiBzdHJva2U9IiM0YjRmNmUiIHN0cm9rZS13aWR0aD0iMS44IiBzdHJva2UtbGluZWNhcD0icm91bmQiIG9wYWNpdHk9Ii44NSIvPjxwYXRoIGQ9Ik0xMiAxMS40QzQyIDEwLjYgNzAgMTAuNCA5MSA3LjIiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzRiNGY2ZSIgc3Ryb2tlLXdpZHRoPSIuOCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBvcGFjaXR5PSIuNDUiLz48L3N2Zz4=) center bottom/76% 10px no-repeat' : 'transparent') + ';color:' + (i === st ? '#2d3042' : (i < st ? '#6b6f8c' : '#b3b7ca'));
+  }
+  pline(x0, x1, y, col, w, seed) {
+    const R = (k) => { const v = Math.sin(k * 12.9898 + seed * 78.233) * 43758.5453; return (v - Math.floor(v)) * 2 - 1; };
+    const f = (v) => Math.round(v * 10) / 10;
+    const n = Math.max(2, Math.round((x1 - x0) / 40)), pts = [[x0, y + R(1) * 0.5]];
+    for (let i = 1; i <= n; i++) pts.push([x0 + (x1 - x0) * i / n, y + R(i + 2) * 0.9]);
+    let d = 'M' + f(pts[0][0]) + ' ' + f(pts[0][1]);
+    for (let i = 1; i < pts.length; i++) d += 'Q' + f((pts[i - 1][0] + pts[i][0]) / 2) + ' ' + f(pts[i - 1][1] + R(i + 9) * 0.7) + ' ' + f(pts[i][0]) + ' ' + f(pts[i][1]);
+    return '<path d="' + d + '" fill="none" stroke="' + col + '" stroke-width="' + w + '" stroke-linecap="round"/><path d="' + d + '" fill="none" stroke="' + col + '" stroke-width="' + f(w * 0.4) + '" opacity=".45" stroke-linecap="round" transform="translate(.6 .7)"/>';
+  }
+  knot(x, y, r, col, fill, seed) {
+    const R = (k) => { const v = Math.sin(k * 7.13 + seed * 3.7) * 9137.31; return (v - Math.floor(v)) * 2 - 1; };
+    const f = (v) => Math.round(v * 10) / 10;
+    let d = '';
+    for (let k = 0; k <= 8; k++) { const a = k / 8 * Math.PI * 2 + 0.4, rr = r + R(k % 8) * 0.6; d += (k ? 'L' : 'M') + f(x + rr * Math.cos(a)) + ' ' + f(y + rr * Math.sin(a)); }
+    return '<path d="' + d + '" fill="' + fill + '" stroke="' + col + '" stroke-width="1.6" stroke-linejoin="round"/>';
+  }
+  stripBg(st) {
+    const D = '#4b4f6e', w = 338 / 4;
+    let g = '<defs><pattern id="h" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(55)"><line x1="0" y1="0" x2="0" y2="6" stroke="#9a9eb8" stroke-width="1" opacity=".6"/></pattern></defs>';
+    for (let i = 0; i < 4; i++) {
+      const x = 1 + i * w;
+      if (i < st) g += '<path d="M' + (x + 3) + ' 6Q' + (x + w / 2) + ' 4.5 ' + (x + w - 1) + ' 5.5L' + (x + w - 2) + ' 38Q' + (x + w / 2) + ' 39.5 ' + (x + 2) + ' 38.5Z" fill="url(#h)"/>';
+      if (i === st) g += '<path d="M' + (x + 2) + ' 5.5Q' + (x + w / 2) + ' 3.8 ' + (x + w - 1.5) + ' 6L' + (x + w - 2.5) + ' 38.5Q' + (x + w / 2) + ' 40.2 ' + (x + 1.5) + ' 37.5Z" fill="' + D + '"/>';
+    }
+    g += '<path d="M14 4Q170 1.5 326 4.5Q338 5 338.5 16L338 29Q337.5 40 325 40Q170 42.5 14 39.5Q2 39 1.5 28L1.8 15Q2.2 4.2 14 4Z" fill="none" stroke="' + D + '" stroke-width="2.2" stroke-linejoin="round"/><path d="M15 5.5Q170 3.3 325 6" fill="none" stroke="' + D + '" stroke-width=".7" opacity=".4"/>';
+    [[85.2, 84.1], [170.6, 168.4], [253.9, 255.6]].forEach(a => { g += '<path d="M' + a[0] + ' 4.5L' + a[1] + ' 39.5" stroke="' + D + '" stroke-width="1.8" stroke-linecap="round"/>'; });
+    return 'url(data:image/svg+xml;base64,' + btoa('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 44">' + g + '</svg>') + ')';
+  }
+  threadRowBg(sx, st) {
+    const D = '#4b4f6e', L = '#c9ccd9', X = [14, 72, 132, 190];
+    const g = this.pline(4, 416, 44, L, 2.2, 4);
+    return 'url(data:image/svg+xml;base64,' + btoa('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 70">' + g + '</svg>') + ')';
+  }
+  inkBg() {
+    return 'url(data:image/svg+xml;base64,' + btoa('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 70">' + this.pline(4, 416, 44, '#4b4f6e', 1.8, 3) + '</svg>') + ')';
+  }
+  demoStep() {
+    // Canvas-only helper: does the next sensible thing so the flow can be clicked through.
+    const s = this.state, v = this.renderVals();
+    if (s.screen === 'menu') return v.josekiList[0].act();
+    if (s.screen === 'start') return v.begin();
+    if (s.screen === 'result') return v.resultAction();
+    if (s.screen !== 'lesson') return;
+    if (s.intro) return v.startStage();
+    if (v.showNext) return v.nextAction();
+    const st = s.stage;
+    if (st === 2) { const ok = this.data()[s.jid].qs[s.q].ok; return v.options[ok].pick(); }
+    if (st === 0 || st === 3) {
+      const key = st === 3 ? 't' : 'n', sched = s.sched || [{ mode: 1, white: false }];
+      const mode = st === 3 ? sched[s.round % sched.length].mode : 0;
+      const m = this.tf(this.seq(s.dir)[s[key]], mode);
+      const cell = v.cells.find(c => c.label === 'Point column ' + m.c + ', row ' + m.r);
+      if (cell) cell.tap();
+    }
+  }
+  optBg(seed) {
+    const R = (k) => { const v = Math.sin(k * 12.9898 + seed * 78.233) * 43758.5453; return (v - Math.floor(v)) * 2 - 1; };
+    const f = (v) => Math.round(v * 10) / 10;
+    const P = [];
+    for (let k = 0; k < 14; k++) { const a = k / 14 * Math.PI * 2 + 0.5, rr = 13.4 + R(k) * 0.45; P.push([17 + rr * Math.cos(a), 17 + rr * Math.sin(a)]); }
+    const mid = (i) => { const p = P[i % 14], q = P[(i + 1) % 14]; return [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2]; };
+    let d = 'M' + f(mid(0)[0]) + ' ' + f(mid(0)[1]);
+    for (let i = 1; i <= 14; i++) { const c = P[i % 14], m = mid(i); d += 'Q' + f(c[0]) + ' ' + f(c[1]) + ' ' + f(m[0]) + ' ' + f(m[1]); }
+    let h = '';
+    for (let k = 0; k < 7; k++) { const o = -6 + k * 5.2 + R(20 + k) * 0.8; h += '<path d="M' + f(o) + ' 34L' + f(o + 20) + ' 0" stroke="#8d91ab" stroke-width=".9" stroke-linecap="round" opacity=".55"/>'; }
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 34 34"><defs><clipPath id="c"><circle cx="17" cy="17" r="12.6"/></clipPath></defs><g clip-path="url(#c)">' + h + '</g><path d="' + d + 'Z" fill="none" stroke="#4b4f6e" stroke-width="1.5" stroke-linejoin="round" opacity=".8"/></svg>';
+    return 'url(data:image/svg+xml;base64,' + btoa(svg) + ')';
   }
   dirInit(jid, userWhite) {
     if (userWhite === 'both') return { dir: 0, dirSet: false };
@@ -562,17 +639,22 @@ class Component extends DCLogic {
     const white = st === 3 && !s.review && rnd.white;
     const both = st === 3 && !s.review && !!rnd.both;
     const par = both ? 2 : (white ? 1 : 0);
+    const thr = (this.props.row || 'thread') === 'thread';
+    const cornerBad = st === 3 && !!(s.rd && s.rd.r === s.round && s.rd.bad);
+    const cleanNow = st === 3 && !s.review && s.t >= 6 && !cornerBad;
+    const cleanTot = st === 3 ? (s.clean || 0) + (cleanNow ? 1 : 0) : 0;
+    const passed = thr ? cleanTot >= 3 : s.pts >= 10;
     const stagesL = ['Try', 'Watch', 'Decide', 'Transfer'];
     const rvStart = (stg) => () => this.setState(Object.assign({ screen: 'lesson', review: true, stage: stg, intro: false, n: 2, t: 0, round: 0, w: 0, q: 0, answered: null, elim: [], flash: null, pts: 0, msg: '', kind: '', wrong: null, tries: 0, rd: null, sadLast: false }, this.dirInit(s.jid, false)));
     const stages = stagesL.map((l, i) => ({
       act: s.review ? rvStart(i) : () => { const sc = this.mkSched(); this.setState(Object.assign({ review: false, stage: i, intro: true, n: 2, t: sc[0].white ? 1 : 0, round: 0, sched: sc, w: 0, q: 0, answered: null, elim: [], flash: null, msg: '', kind: '', wrong: null, tries: 0, rd: null, sadLast: false }, this.dirInit(s.jid, i === 3 && sc[0].white))); }, cursor: 'pointer',
       label: l,
-      btn: 'flex:1;min-width:0;height:36px;padding:0 2px;font-size:12.5px;font-weight:800;box-sizing:border-box;border:2px solid ' + (i > st ? '#aeb2c6' : '#4b4f6e') + ';border-width:2px 2.6px 2.2px 2.3px;border-radius:15px 18px 16px 17px/17px 15px 18px 16px;' + (i === st ? 'background:#4b4f6e;color:#fff;box-shadow:1.5px 2px 0 rgba(75,79,110,.3)' : (i < st ? 'background:#dcdee8;color:#3b3f58' : 'background:#fff;color:#868a9c')),
-      hasLink: i < 3,
+      btn: this.stepBtn(i, st),
+      hasLink: this.props.variant === 'b' && i < 3,
       link: 'flex:none;width:12px;height:8px;background:' + this.linkBg(i < st) + ' center/12px 8px no-repeat'
     }));
     const pips = [];
-    const passedNow = !s.review && s.pts >= 10;
+    const passedNow = !s.review && passed;
     const barPct = s.screen === 'result' ? 88 : Math.max(0, Math.min(100, s.pts / (s.review ? ({ 0: 2, 2: 3, 3: 3 }[st] || 3) : 16) * 100));
     const webOn = !s.review && barPct > 62.6;
     for (let i = 0; i < goal; i++) {
@@ -599,7 +681,7 @@ class Component extends DCLogic {
     };
     let swap = false;
     const stoneItems = (list, sadIdx, hopIdx, numbered) => list.map((m, i) => this.mk(m.c, m.r, m.w !== swap ? 'w' : 'b', '', { num: numbered ? i + 1 : 0, sad: i === sadIdx, anim: i === list.length - 1 || i === hopIdx ? (i === hopIdx && s.kind === 'ok' ? 'drop .4s ease-out, hop .5s ease-in-out .45s 2' : (i === list.length - 1 ? 'drop .4s ease-out' : '')) : '' }));
-    const enter = (stage) => ({ elim: [], flash: null, tries: 0, rd: null, sadLast: false, stage: stage, intro: true, msg: '', kind: '', wrong: null });
+    const enter = (stage) => ({ went: Object.assign({}, s.went, { [stage - 1]: true }), exiting: false, clean: 0, elim: [], flash: null, tries: 0, rd: null, sadLast: false, stage: stage, intro: true, msg: '', kind: '', wrong: null });
     if (st === 0 || st === 3) {
       swap = white;
       const list = seq.slice(0, nn).map(m => this.tf(m, mode));
@@ -619,13 +701,14 @@ class Component extends DCLogic {
       else if (nn === 2 || nn === 4) prompt = J.tryP[nn];
       else if (!T) prompt = 'Well done!';
       else if (s.review) prompt = 'Done!';
-      else prompt = s.pts >= 10 ? 'Joseki passed!' : '';
+      else prompt = thr ? (cornerBad && !passed ? 'This corner stays tangled.' : '') : (passed ? 'Joseki passed!' : '');
       if (nn >= 6) {
         showNext = true;
         if (s.review) { nextLabel = 'Done'; nextAction = () => this.setState({ screen: 'picker', msg: '', kind: '', wrong: null, tries: 0, rd: null, sadLast: false }); }
         else if (!T) { nextLabel = 'Continue'; nextAction = () => this.setState(enter(1)); }
-        else if (s.pts >= 10) { nextLabel = 'See result'; nextAction = () => this.setState({ screen: 'result', msg: '', kind: '', wrong: null, learned: Object.assign({}, s.learned, { [s.jid]: true }) }); showMore = true; moreAction = () => this.setState(Object.assign({ tries: 0, rd: null, sadLast: false, t: sched[(s.round + 1) % sched.length].white ? 1 : 0, round: s.round + 1, msg: '', kind: '', wrong: null, learned: Object.assign({}, s.learned, { [s.jid]: true }) }, this.dirInit(s.jid, sched[(s.round + 1) % sched.length].both ? 'both' : sched[(s.round + 1) % sched.length].white))); }
-        else { nextLabel = 'Next corner'; nextAction = () => this.setState(Object.assign({ tries: 0, rd: null, sadLast: false, t: sched[(s.round + 1) % sched.length].white ? 1 : 0, round: s.round + 1, msg: '', kind: '', wrong: null }, this.dirInit(s.jid, sched[(s.round + 1) % sched.length].both ? 'both' : sched[(s.round + 1) % sched.length].white))); }
+        else if (passed && thr) { nextLabel = 'Done'; nextAction = () => { if (this.state.exiting) return; this.setState({ exiting: true }); setTimeout(() => this.setState({ exiting: false, screen: 'result', msg: '', kind: '', wrong: null, learned: Object.assign({}, this.state.learned, { [s.jid]: true }) }), 1900); }; showMore = true; moreAction = () => this.setState(Object.assign({ tries: 0, rd: null, sadLast: false, t: sched[(s.round + 1) % sched.length].white ? 1 : 0, clean: cleanTot, round: s.round + 1, msg: '', kind: '', wrong: null, learned: Object.assign({}, s.learned, { [s.jid]: true }) }, this.dirInit(s.jid, sched[(s.round + 1) % sched.length].both ? 'both' : sched[(s.round + 1) % sched.length].white))); }
+        else if (passed) { nextLabel = 'See result'; nextAction = () => this.setState({ screen: 'result', msg: '', kind: '', wrong: null, learned: Object.assign({}, s.learned, { [s.jid]: true }) }); showMore = true; moreAction = () => this.setState(Object.assign({ tries: 0, rd: null, sadLast: false, t: sched[(s.round + 1) % sched.length].white ? 1 : 0, clean: cleanTot, round: s.round + 1, msg: '', kind: '', wrong: null, learned: Object.assign({}, s.learned, { [s.jid]: true }) }, this.dirInit(s.jid, sched[(s.round + 1) % sched.length].both ? 'both' : sched[(s.round + 1) % sched.length].white))); }
+        else { nextLabel = 'Next corner'; nextAction = () => this.setState(Object.assign({ tries: 0, rd: null, sadLast: false, t: sched[(s.round + 1) % sched.length].white ? 1 : 0, clean: cleanTot, round: s.round + 1, msg: '', kind: '', wrong: null }, this.dirInit(s.jid, sched[(s.round + 1) % sched.length].both ? 'both' : sched[(s.round + 1) % sched.length].white))); }
       }
     } else if (st === 1) {
       items = stoneItems(seq.slice(0, s.w));
@@ -677,24 +760,44 @@ class Component extends DCLogic {
       { t: 'Try', d: 'Try to find the joseki.', b: 'Start' },
       { t: 'Watch', d: 'Remember the shape.', b: 'Start' },
       { t: 'Decide', d: 'Find the right move.', b: 'Start' },
-      { t: 'Transfer', d: s.review ? 'A quick refresh.' : 'Fill the bar.', b: 'Start' }
+      { t: 'Transfer', d: s.review ? 'A quick refresh.' : (thr ? 'Play three clean corners.' : 'Fill the bar.'), b: 'Start' }
     ];
     const msgBg = s.kind === 'ok' ? '#dff3e7' : (s.kind === 'bad' ? '#ffe3dc' : 'transparent');
     const msgFg = s.kind === 'ok' ? '#1f6b45' : '#a8402a';
-    const fresh = { tries: 0, rd: null, sadLast: false, screen: 'lesson', review: false, stage: 0, intro: true, n: 2, t: 0, round: 0, w: 0, q: 0, answered: null, pts: 0, msg: '', kind: '', wrong: null };
+    const fresh = { went: {}, clean: 0, exiting: false, tries: 0, rd: null, sadLast: false, screen: 'lesson', review: false, stage: 0, intro: true, n: 2, t: 0, round: 0, w: 0, q: 0, answered: null, pts: 0, msg: '', kind: '', wrong: null };
     const chip = (k) => 'flex:none;border:1.6px solid currentColor;border-radius:14px 10px 13px 9px/10px 13px 9px 14px;padding:3px 10px;font-size:12px;font-weight:800;' + ({ g: 'background:#dff3e7;color:#1f6b45', p: 'background:#e9ebf1;color:#3f4366', b: 'background:#e6eaf2;color:#2d4f8f', x: 'background:#eceef3;color:#6e7285' })[k];
     const card = (o) => 'background:#fffdf7;border:2px solid #4b4f6e;border-width:2px 2.8px 2.4px 2.2px;border-radius:26px 20px 28px 22px/22px 28px 20px 26px;padding:16px;box-shadow:2px 3px 0 rgba(75,79,110,.22);display:flex;flex-direction:column;gap:12px;opacity:' + o;
     const btn = (on) => 'height:46px;border:0;border-radius:23px;font-size:15px;font-weight:800;' + (on ? 'background:#4b4f6e;color:#fff' : 'background:#eceef3;color:#868a9c');
     const inLesson = s.screen === 'lesson';
-    const hangLen = ({ menu: 50, picker: 50, start: 40, result: 110 })[s.screen] || 60;
+    const TX = [222, 264, 306];
+    let sxPos = [14, 72, 132, 190][st];
+    const exiting = !!s.exiting;
+    if (st === 3) { const seg = Math.min(cleanTot, 2), a = cleanTot === 0 ? 190 : TX[cleanTot - 1], b = TX[seg]; const pp = par === 2 ? 0 : par; let mine = 0; for (let i = 0; i < Math.min(s.t, 6); i++) if (i % 2 === pp) mine++; sxPos = exiting ? 440 : cleanTot >= 3 ? 306 : a + (b - a) * ((cleanNow || cornerBad) ? 0 : mine / 3); }
+    const hangLen = ({ menu: 100, picker: 50, start: 40, result: 110 })[s.screen] || 60;
     return {
-      tagline,
+      isThread: thr, isStrip: this.props.row === 'strip',
+      stageRowStyle: thr ? 'display:none' : (this.props.row === 'strip' ? 'display:flex;align-items:stretch;height:44px;flex:none;margin-top:14px;background:' + this.stripBg(st) + ' center/340px 44px no-repeat' : 'display:flex;align-items:center;margin-top:14px;flex:none'),
+      threadBox: 'position:relative;width:340px;height:70px;flex:none;margin-top:56px;background:' + this.threadRowBg(sxPos, st) + ' left top/420px 70px no-repeat',
+      threadWalker: 'position:absolute;top:22px;width:44px;height:44px;transition:left ' + (exiting ? '1.8s ease-in' : '.6s ease') + ';left:' + (sxPos - 22) + 'px;background:' + this.sketchSpider() + ' center/48px no-repeat',
+      threadInk: 'position:absolute;left:0;top:0;height:70px;overflow:hidden;width:' + sxPos + 'px;transition:width ' + (exiting ? '1.8s ease-in' : '.6s ease') + ';background:' + this.inkBg() + ' left top/420px 70px no-repeat',
+      threadKnots: [14, 72, 132].map((x, i) => ({ style: 'position:absolute;top:33px;width:22px;height:22px;left:' + (x - 11) + 'px;background:' + this.web(s.went && s.went[i] ? 2 : (i <= st ? 1 : 0)) + ' center/22px no-repeat' + (s.went && s.went[i] ? ';animation:pop .5s ease-out' : '') })),
+      threadLabels: ['Try', 'Watch', 'Decide', 'Transfer'].map((t, i) => ({ t: t, act: stages[i].act, style: 'position:absolute;top:-18px;height:30px;padding:0 4px 3px;border:0;background:' + (i === st ? 'url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTIiIHByZXNlcnZlQXNwZWN0UmF0aW89Im5vbmUiPjxwYXRoIGQ9Ik0xIDYuNkMyNSA1LjYgNjIgNS40IDk5IDEuNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNGI0ZjZlIiBzdHJva2Utd2lkdGg9IjIuMyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBvcGFjaXR5PSIuOTIiLz48cGF0aCBkPSJNNSA3LjRDMzQgNi42IDY0IDYgOTAgMy4yIiBmaWxsPSJub25lIiBzdHJva2U9IiM0YjRmNmUiIHN0cm9rZS13aWR0aD0iLjkiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgb3BhY2l0eT0iLjUiLz48cGF0aCBkPSJNNyAxMC42QzMwIDkuOCA2NiAxMC40IDk5LjUgNS40IiBmaWxsPSJub25lIiBzdHJva2U9IiM0YjRmNmUiIHN0cm9rZS13aWR0aD0iMS44IiBzdHJva2UtbGluZWNhcD0icm91bmQiIG9wYWNpdHk9Ii44NSIvPjxwYXRoIGQ9Ik0xMiAxMS40QzQyIDEwLjYgNzAgMTAuNCA5MSA3LjIiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzRiNGY2ZSIgc3Ryb2tlLXdpZHRoPSIuOCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBvcGFjaXR5PSIuNDUiLz48L3N2Zz4=) center bottom/90% 7px no-repeat' : 'transparent') + ';font-family:\'Patrick Hand\',Nunito,sans-serif;line-height:1;font-size:' + (i === st ? 20 : 16) + 'px;color:' + (i === st ? '#2d3042' : (i < st ? '#6b6f8c' : '#b3b7ca')) + ';' + (i === 0 ? 'left:-4px' : (i === 3 ? 'left:182px' : 'left:' + [14, 72, 132][i] + 'px;transform:translateX(-50%)')) })),
+      threadTangles: [222, 264, 306].map((x, i) => ({ style: 'position:absolute;top:33px;width:22px;height:22px;left:' + (x - 11) + 'px;background:' + this.web(i < cleanTot ? 2 : 0) + ' center/22px no-repeat' + (i < cleanTot ? ';animation:pop .5s ease-out' : '') })),
+      rappelBox: thr ? 'position:absolute;z-index:2;pointer-events:none;top:0;left:calc(50% - 45px);width:90px;display:flex;flex-direction:column;align-items:center;transform-origin:45px 0;animation:swing 3s ease-in-out 2.8s infinite' : 'display:none',
+      rappelThread: 'width:6px;background:' + this.threadBg() + ' center top/6px 22px repeat-y;height:370px;animation:rp 2.8s ease-in-out',
+      rappelSpider: 'flex:none;width:90px;height:90px;margin-top:-44px;background:' + this.sketchSpider() + ' center/104px no-repeat',
+      resultWebs: [0, 1, 2].map(() => ({ style: 'width:30px;height:30px;background:' + this.web(2) + ' center/30px no-repeat' })),
+      barWrap: thr ? 'display:none' : 'height:44px;display:flex;align-items:center;flex:none',
+      resultTextStyle: thr ? 'display:none' : 'font-size:16px;line-height:1.5;color:#5a5f74;max-width:300px',
+      resultWrap: 'position:relative;height:100%;box-sizing:border-box;padding:' + (thr ? '0' : '56px') + ' 28px 40px;display:flex;flex-direction:column;align-items:center;justify-content:' + (thr ? 'flex-start' : 'center') + ';text-align:center;gap:16px',
+      isDemo: !!this.props.demo, demoNext: () => this.demoStep(),
+      tagline, vA: this.props.variant !== 'b', pkClass: this.props.variant === 'b' ? 'pkb' : 'pk', ruleStyle: 'height:8px;flex:none;margin:8px 0;background:' + this.trackBg() + ' center/100% 6px no-repeat',
       isMenu: s.screen === 'menu', isPicker: s.screen === 'picker', isStart: s.screen === 'start', isIntro: inLesson && s.intro, isLesson: inLesson && !s.intro, isResult: s.screen === 'result',
       stepsInfo: [{ t: 'Try', txt: 'font-size:17px;font-weight:800;color:#2d3042', dot: 'width:22px;height:22px;box-sizing:border-box;border-radius:11px;background:#fff;border:4px solid ' + '#c9ccd9' }, { t: 'Watch', txt: 'font-size:17px;font-weight:700;color:#868a9c', dot: 'width:22px;height:22px;box-sizing:border-box;border-radius:11px;background:#fff;border:4px solid ' + '#c9ccd9' }, { t: 'Decide', txt: 'font-size:17px;font-weight:700;color:#868a9c', dot: 'width:22px;height:22px;box-sizing:border-box;border-radius:11px;background:#fff;border:4px solid ' + '#c9ccd9' }, { t: 'Transfer', txt: 'font-size:17px;font-weight:700;color:#868a9c', dot: 'width:26px;height:26px;box-sizing:border-box;border-radius:13px;background:#fff;border:4px solid ' + '#4b4f6e' }],
       begin: () => this.setState(Object.assign({}, fresh, this.dirInit(s.jid, false))),
       toMenu: () => this.setState({ screen: s.review ? 'picker' : 'menu', msg: '', kind: '', wrong: null, tries: 0, rd: null, sadLast: false }),
       toMenuFromPicker: () => this.setState({ screen: 'menu', review: false }),
-      pickerList: ['Try', 'Watch', 'Decide', 'Transfer'].map((label, stg) => ({ label: label, tint: ['#e9ebf1', '#ffe3dc', '#dff3e7', '#e6eaf2'][stg], act: rvStart(stg) })),
+      pickerList: ['Try', 'Watch', 'Decide', 'Transfer'].map((label, stg) => ({ label: label, dot: 'width:30px;height:30px;flex:none;background:' + this.web(2) + ' center/30px no-repeat', rowStyle: (this.props.variant === 'b' ? 'display:flex;align-items:center;gap:16px;padding:0 18px;margin-bottom:12px;background:#fffdf7;border:2px solid #4b4f6e;border-width:2px 2.7px 2.4px 2.2px;border-radius:26px 20px 28px 22px/22px 28px 20px 26px;' : 'display:flex;align-items:center;gap:18px;padding:6px 0;') + 'width:100%;height:64px;background-color:' + (this.props.variant === 'b' ? '#fffdf7' : 'transparent') + ';font-family:\'Patrick Hand\',Nunito,sans-serif;font-size:30px;color:#2d3042;', act: rvStart(stg) })),
       startStage: () => this.setState({ intro: false }),
       introTitle: intros[st].t, introText: intros[st].d, introButton: intros[st].b,
       lessonTitle: s.review ? 'Review' : J.short, josekiTitle: J.title,
@@ -703,23 +806,23 @@ class Component extends DCLogic {
       threadStyle: 'width:6px;background:' + this.threadBg() + ' center top/6px 22px repeat-y;height:' + hangLen + 'px;animation:l' + hangLen + ' 2.2s ease-out',
       bugStyle: 'flex:none;width:54px;height:54px;margin-top:-12px;background:' + this.sketchSpider() + ' center/64px no-repeat',
       josekiWhy: J.why, thinkSpider: 'width:100%;max-width:330px;height:220px;flex:none;background:' + this.sketch(s.jid) + ' center/contain no-repeat',
-      logoSpider: 'width:44px;height:44px;margin:-5px;background:' + this.sketchSpider() + ' center/52px no-repeat', heroSpider: 'width:130px;height:130px;margin:-10px;animation:drop .5s ease-out;background:' + this.sketchSpider() + ' center/150px no-repeat', resultSpider: 'width:150px;height:150px;background:' + this.sketchSpider() + ' center/170px no-repeat;animation:hop .6s ease-in-out 2',
-      barBox: st === 1 ? 'display:none' : 'position:relative;height:44px;width:100%;background:' + this.barSvg(false) + ' left 29px/342px 8px no-repeat',
+      logoSpider: 'width:44px;height:44px;margin:-5px;background:' + this.sketchSpider() + ' center/52px no-repeat', heroSpider: 'width:130px;height:130px;margin:-10px;animation:drop .5s ease-out;background:' + this.sketchSpider() + ' center/150px no-repeat', resultSpider: thr ? 'display:none' : 'width:150px;height:150px;background:' + this.sketchSpider() + ' center/170px no-repeat;animation:hop .6s ease-in-out 2',
+      barBox: (st === 1 || thr) ? 'display:none' : 'position:relative;height:44px;width:100%;background:' + this.barSvg(false) + ' left 29px/342px 8px no-repeat',
       barFill: 'position:absolute;left:0;top:29px;height:8px;overflow:hidden;background:' + this.barSvg(true) + ' left top/342px 8px no-repeat;transition:width .5s ease;width:' + barPct + '%',
       markerStyle: s.review ? 'display:none' : 'position:absolute;left:calc(62.5% - 13px);top:20px;width:26px;height:26px;background:' + this.web(webOn ? 2 : (!s.review && s.pts >= 10 ? 1 : 0)) + ' center/26px no-repeat' + (webOn ? ';animation:pop .5s ease-out' : ''),
       walkerStyle: 'position:absolute;top:17px;width:32px;height:32px;transition:left .5s ease;left:calc(' + barPct + '% - 16px);background:' + this.sketchSpider() + ' center/34px no-repeat', gridStyle: 'display:none', edges: [], boardStyle,
                   josekiList: ['j33', 'j44'].map((id, k, arr) => {
         const D = this.data()[id], done = !!s.learned[id], open = UNLOCK_ALL || k === 0 || !!s.learned[arr[k - 1]];
         return { thumb: this.thumbBg(id), name: D.title, sub: open ? (done ? 'Ready to review' : D.sub) : 'After ' + this.data()[arr[k - 1]].short, tint: D.tint,
-          chip: done ? 'Learned' : (open ? 'New' : 'Locked'), chipStyle: chip(done ? 'g' : (open ? 'p' : 'x')), card: card(open ? 1 : 0.55),
+          chip: done ? 'Learned' : (open ? 'New' : 'Locked'), chipStyle: chip(done ? 'g' : (open ? 'p' : 'x')), rowStyle: (this.props.variant === 'b' ? 'display:flex;flex-direction:column;padding:16px 18px 10px;margin-bottom:16px;background:#fffdf7;border:2px solid #4b4f6e;border-width:2px 2.7px 2.4px 2.2px;border-radius:26px 20px 28px 22px/22px 28px 20px 26px;' : 'display:flex;flex-direction:column;padding:6px 0 2px;') + 'opacity:' + (open ? 1 : 0.55),
           btn: done ? 'Review' : (open ? 'Start' : 'Locked'), btnStyle: btn(open), hasWatch: false, btn2Style: '', watch: () => this.setState({ screen: 'lesson', jid: id, review: true, watchOnly: true, stage: 1, intro: false, w: 0, q: 0, answered: null, pts: 0, msg: '', kind: '', wrong: null, tries: 0, rd: null, sadLast: false }),
           act: !open ? () => {} : () => this.setState({ screen: 'start', jid: id, pts: 0, review: false }) };
       }),
       shownPrompt: s.kind === 'bad' && s.msg ? s.msg : prompt, stages, prompt, stones: items, cells, showMore, moreAction, showNext, nextLabel, nextAction, showOptions, options,
-      promptStyle: 'flex:1;box-sizing:border-box;font-family:\'Patrick Hand\',Nunito,sans-serif;font-size:22px;font-weight:400;line-height:1.2;min-height:44px;border-radius:14px;' + (s.kind === 'bad' && s.msg ? 'flex:none;width:fit-content;min-height:0;color:#b5483a;padding-bottom:2px;background:url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAiIHByZXNlcnZlQXNwZWN0UmF0aW89Im5vbmUiPjxwYXRoIGQ9Ik0xIDVDMTQgMyAyMiA3LjQgMzggNC42UzYyIDYuOCA3OCAzLjggOTYgNS40IDk5LjUgMy4yIiBmaWxsPSJub25lIiBzdHJva2U9IiNkOTU1M2IiIHN0cm9rZS13aWR0aD0iMS44IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48cGF0aCBkPSJNNiA3LjZDMzAgNi40IDYwIDguMiA5MiA2LjIiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2Q5NTUzYiIgc3Ryb2tlLXdpZHRoPSIuOSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBvcGFjaXR5PSIuNTUiLz48L3N2Zz4=) left bottom/100% 9px no-repeat;' : '') + ((st === 0 || st === 3) && nn < 6 && par !== 2 && nn % 2 !== par ? 'animation:pulse 1.1s ease-in-out infinite;color:#7a7e90;' : ''),
+      promptStyle: 'flex:1;box-sizing:border-box;font-family:\'Patrick Hand\',Nunito,sans-serif;font-size:26px;font-weight:400;line-height:1.15;border-radius:14px;' + (s.kind === 'bad' && s.msg ? 'flex:none;width:fit-content;min-height:0;color:#b5483a;padding-bottom:2px;background:url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAiIHByZXNlcnZlQXNwZWN0UmF0aW89Im5vbmUiPjxwYXRoIGQ9Ik0xIDVDMTQgMyAyMiA3LjQgMzggNC42UzYyIDYuOCA3OCAzLjggOTYgNS40IDk5LjUgMy4yIiBmaWxsPSJub25lIiBzdHJva2U9IiNkOTU1M2IiIHN0cm9rZS13aWR0aD0iMS44IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48cGF0aCBkPSJNNiA3LjZDMzAgNi40IDYwIDguMiA5MiA2LjIiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2Q5NTUzYiIgc3Ryb2tlLXdpZHRoPSIuOSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBvcGFjaXR5PSIuNTUiLz48L3N2Zz4=) left bottom/100% 9px no-repeat;' : '') + ((st === 0 || st === 3) && nn < 6 && par !== 2 && nn % 2 !== par ? 'animation:pulse 1.1s ease-in-out infinite;color:#7a7e90;' : ''),
       msg: s.msg, msgStyle: 'min-height:44px;box-sizing:border-box;border-radius:16px 12px 18px 13px/13px 18px 12px 16px;' + (s.msg ? 'border:1.8px solid ' + (s.kind === 'ok' ? '#2f9e6a' : '#d9553b') + ';' : '') + 'padding:' + (s.msg ? '10px 14px' : '0') + ';font-size:14px;font-weight:700;line-height:1.35;background:' + msgBg + ';color:' + msgFg,
-      resultTitle: s.review ? 'Review done!' : 'Passed!',
-      resultText: s.review ? 'Refreshed.' : (s.jid !== 'j34' ? 'New joseki unlocked.' : 'Well done.'),
+      resultTitle: thr ? 'Well spun.' : (s.review ? 'Review done!' : 'Passed!'),
+      resultText: s.review ? 'Refreshed.' : J.title,
       resultButton: 'Back to menu',
       resultAction: () => this.setState({ screen: 'menu' })
     };
@@ -735,14 +838,6 @@ class Component extends DCLogic {
   a.textContent = window.JOSEKI_VERSION || 'dev';
   document.getElementById('ver').appendChild(a);
 }
-// Full screen on phones: hides Android's status and navigation bar, also in a browser tab and before
-// Chrome has picked up the manifest's "fullscreen". Browsers only allow this after a tap, so ask on each
-// tap while not in full screen (swiping the bars back in leaves full screen). iPhones don't support it.
-document.addEventListener('pointerup', () => {
-  const el = document.documentElement;
-  if (!matchMedia('(pointer: coarse)').matches || document.fullscreenElement || !el.requestFullscreen) return;
-  el.requestFullscreen({ navigationUI: 'hide' }).catch(() => {});
-});
 window.addEventListener('resize', fit);
 fit();
 document.fonts && document.fonts.ready.then(() => {});

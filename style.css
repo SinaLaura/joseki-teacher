@@ -20,10 +20,15 @@ button:not([aria-label^="Point"]):not([aria-label^="Option"]):not(.stp):not(.mnu
 @keyframes l40{from{height:0}to{height:40px}}
 @keyframes l50{from{height:0}to{height:50px}}
 @keyframes l60{from{height:0}to{height:60px}}
+@keyframes l100{from{height:0}to{height:100px}}
 @keyframes l110{from{height:0}to{height:110px}}
 @keyframes fade{to{opacity:0}}
 @keyframes fade2{to{opacity:0}}
 @keyframes strike{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:none}}
+@keyframes rp{from{height:0}to{height:370px}}
+@keyframes sway{0%,100%{transform:rotate(0)}50%{transform:rotate(3deg)}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+button.pk:not(.a):not(.b):not(.c):not(.d):not(.e){border:0 !important;box-shadow:none !important;border-radius:0 !important;text-align:left}
+button.pri.rt:not(.a):not(.b):not(.c):not(.d){margin-right:0 !important;margin-left:auto !important;font-size:24px !important}
 #ver{position:absolute;left:0;right:0;bottom:5px;text-align:center;font:700 12px Nunito,system-ui,sans-serif;color:#6b6f8c;pointer-events:none;z-index:50}
 #ver a{color:inherit;text-decoration:none;pointer-events:auto;padding:4px 8px}
