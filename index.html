@@ -98,10 +98,12 @@
 <sc-if value="{{ s.hasLink }}" hint-placeholder-val="{{ false }}"><div style="{{s.link}}"></div></sc-if>
 </sc-for>
 </div>
-<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px;padding-bottom:40px">
+<div style="position:relative;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px;padding-bottom:40px">
 <div style="{{heroSpider}}"></div>
-<button class="pri ttl" onClick="{{startStage}}">{{introTitle}}</button>
+<sc-if value="{{ introCalm }}" hint-placeholder-val="{{ false }}"><div style="font-family:'Patrick Hand',Nunito,sans-serif;font-size:46px;line-height:1;color:#2d3042">{{introTitle}}</div></sc-if>
+<sc-if value="{{ introBtn }}" hint-placeholder-val="{{ true }}"><button class="pri ttl" onClick="{{startStage}}">{{introTitle}}</button></sc-if>
 <div style="font-size:16px;line-height:1.5;color:#5a5f74;max-width:290px">{{introText}}</div>
+<button class="stp" aria-label="Start {{introTitle}}" onClick="{{startStage}}" style="position:absolute;inset:0;border:0;background:transparent;padding:0;z-index:5"></button>
 </div>
 </div>
 </sc-if>
@@ -144,9 +146,14 @@
 </sc-for>
 </div>
 <div style="{{barWrap}}"><div style="{{barBox}}"><div style="{{barFill}}"></div><div style="{{markerStyle}}"></div><div style="{{walkerStyle}}"></div></div></div>
-<div style="flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center">
+<div style="position:relative;flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center">
+<sc-if value="{{ preview }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;justify-content:flex-end;height:76px;flex:none;margin-bottom:24px;font-family:'Patrick Hand',Nunito,sans-serif;color:#2d3042"><div style="font-size:44px;line-height:1">{{introWord}}</div><div style="font-size:28px;line-height:1.1">{{introRest}}</div></div>
+</sc-if>
+<sc-if value="{{ noPreview }}" hint-placeholder-val="{{ true }}">
 <div style="display:flex;align-items:flex-end;height:76px;flex:none;margin-bottom:24px"><div style="{{promptStyle}}">{{shownPrompt}}</div></div>
-<div style="flex:none;display:flex;justify-content:center">
+</sc-if>
+<div style="{{boardWrap}}">
 <div style="{{boardStyle}}">
 <div style="{{gridStyle}}"></div>
 <sc-for list="{{edges}}" as="e" hint-placeholder-count="2">
@@ -160,6 +167,7 @@
 </sc-for>
 </div>
 </div>
+<sc-if value="{{ preview }}" hint-placeholder-val="{{ false }}"><button class="stp" aria-label="Start {{introTitle}}" onClick="{{startStage}}" style="position:absolute;inset:0;border:0;background:transparent;padding:0;z-index:5"></button></sc-if>
 <sc-if value="{{ showOptions }}" hint-placeholder-val="{{ false }}">
 <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;flex:none">
 <sc-for list="{{options}}" as="o" hint-placeholder-count="3">

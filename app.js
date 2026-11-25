@@ -225,7 +225,7 @@ class Component extends DCLogic {
   }
   threadRowBg(sx, st) {
     const D = '#4b4f6e', L = '#c9ccd9', X = [14, 72, 132, 190];
-    const g = this.pline(4, this.props.hd !== 'cur' ? 308 : 264, 44, L, 2.2, 4);
+    const g = this.pline(4, this.props.hd !== 'cur' ? 284 : 264, 44, L, 2.2, 4);
     return 'url(data:image/svg+xml;base64,' + btoa('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 70">' + g + '</svg>') + ')';
   }
   inkBg() {
@@ -745,7 +745,7 @@ class Component extends DCLogic {
     } else if (st === 1) {
       items = stoneItems(seq.slice(0, s.w));
       const ex = J.ex;
-      prompt = s.w === 0 ? 'Learn.' : ex[s.w - 1];
+      prompt = s.w === 0 ? '' : ex[s.w - 1];
       showNext = true;
       nextLabel = s.w < 6 ? 'Next' : (s.review ? 'Done' : 'Continue');
       nextAction = () => s.w < 6 ? this.setState({ w: s.w + 1 }) : s.review ? this.setState({ screen: 'picker', w: 0 }) : this.setState(Object.assign(enter(2), { q: 0, answered: null, pts: s.pts + 1 }));
@@ -801,8 +801,13 @@ class Component extends DCLogic {
     const card = (o) => 'background:#fffdf7;border:2px solid #4b4f6e;border-width:2px 2.8px 2.4px 2.2px;border-radius:26px 20px 28px 22px/22px 28px 20px 26px;padding:16px;box-shadow:2px 3px 0 rgba(75,79,110,.22);display:flex;flex-direction:column;gap:12px;opacity:' + o;
     const btn = (on) => 'height:46px;border:0;border-radius:23px;font-size:15px;font-weight:800;' + (on ? 'background:#4b4f6e;color:#fff' : 'background:#eceef3;color:#868a9c');
     const inLesson = s.screen === 'lesson';
+    // Stage intro as a short pause on the play screen: after 1.5 s (or a tap) the stage starts by itself.
+    const pv = inLesson && s.intro && (this.props.intro || 'board') === 'board';
+    const ik = s.jid + '|' + s.stage + '|' + s.review;
+    if (pv && this._introKey !== ik) { this._introKey = ik; setTimeout(() => { const t = this.state; if (t.screen === 'lesson' && t.intro && t.jid + '|' + t.stage + '|' + t.review === ik) this.setState({ intro: false }); }, 1500); }
+    if (!pv) this._introKey = null;
     const big = this.props.hd !== 'cur', tz = big ? 24 : 22;
-    const TX = big ? [236, 272, 308] : [204, 234, 264], KX = big ? [16, 86, 160, 212] : [14, 72, 132, 178];
+    const TX = big ? [220, 252, 284] : [204, 234, 264], KX = big ? [16, 86, 160, 198] : [14, 72, 132, 178];
     let sxPos = KX[st];
     const exiting = !!s.exiting;
     if (st === 3) { const seg = Math.min(cleanTot, 2), a = cleanTot === 0 ? KX[3] : TX[cleanTot - 1], b = TX[seg]; const pp = par === 2 ? 0 : par; let mine = 0; for (let i = 0; i < Math.min(s.t, 6); i++) if (i % 2 === pp) mine++; sxPos = exiting ? 440 : cleanTot >= 3 ? TX[2] : a + (b - a) * ((cleanNow || cornerBad) ? 0 : mine / 3); }
@@ -826,9 +831,14 @@ class Component extends DCLogic {
       hdCur: this.props.hd === 'cur', hdX: (this.props.hd || 'x') === 'x', hdY: this.props.hd === 'y',
       headTitle: s.review ? 'Review · ' + J.short : J.title,
       headThumb: 'width:46px;height:46px;flex:none;background:' + this.thumbBg(s.jid) + ' center/46px 46px no-repeat',
+      preview: inLesson && s.intro && (this.props.intro || 'board') === 'board', noPreview: !(inLesson && s.intro && (this.props.intro || 'board') === 'board'),
+      boardWrap: 'flex:none;display:flex;justify-content:center;transition:opacity .4s;' + (inLesson && s.intro && (this.props.intro || 'board') === 'board' ? 'opacity:.3' : ''),
+      introLine: ['Try to find the joseki.', 'Learn why it\u2019s played.', 'Pick the right move.', 'Train until it sticks.'][st] || '',
+      introWord: (['Try to find the joseki.', 'Learn why it\u2019s played.', 'Pick the right move.', 'Train until it sticks.'][st] || '').split(' ')[0], introRest: (['Try to find the joseki.', 'Learn why it\u2019s played.', 'Pick the right move.', 'Train until it sticks.'][st] || '').split(' ').slice(1).join(' '),
+      introCalm: this.props.intro === 'calm', introBtn: this.props.intro !== 'calm',
       isDemo: !!this.props.demo, demoNext: () => this.demoStep(),
       tagline, vA: this.props.variant !== 'b', pkClass: this.props.variant === 'b' ? 'pkb' : 'pk', ruleStyle: 'height:8px;flex:none;margin:8px 0;background:' + this.trackBg() + ' center/100% 6px no-repeat',
-      isMenu: s.screen === 'menu', isPicker: s.screen === 'picker', isStart: s.screen === 'start', isIntro: inLesson && s.intro, isLesson: inLesson && !s.intro, isResult: s.screen === 'result',
+      isMenu: s.screen === 'menu', isPicker: s.screen === 'picker', isStart: s.screen === 'start', isIntro: inLesson && s.intro && (this.props.intro || 'board') !== 'board', isLesson: inLesson && (!s.intro || (this.props.intro || 'board') === 'board'), isResult: s.screen === 'result',
       stepsInfo: [{ t: 'Try', txt: 'font-size:17px;font-weight:800;color:#2d3042', dot: 'width:22px;height:22px;box-sizing:border-box;border-radius:11px;background:#fff;border:4px solid ' + '#c9ccd9' }, { t: 'Learn', txt: 'font-size:17px;font-weight:700;color:#868a9c', dot: 'width:22px;height:22px;box-sizing:border-box;border-radius:11px;background:#fff;border:4px solid ' + '#c9ccd9' }, { t: 'Pick', txt: 'font-size:17px;font-weight:700;color:#868a9c', dot: 'width:22px;height:22px;box-sizing:border-box;border-radius:11px;background:#fff;border:4px solid ' + '#c9ccd9' }, { t: 'Train', txt: 'font-size:17px;font-weight:700;color:#868a9c', dot: 'width:26px;height:26px;box-sizing:border-box;border-radius:13px;background:#fff;border:4px solid ' + '#4b4f6e' }],
       begin: () => this.setState(Object.assign({}, fresh, this.dirInit(s.jid, false))),
       toMenu: () => this.setState({ screen: s.review ? 'picker' : 'menu', msg: '', kind: '', wrong: null, tries: 0, rd: null, sadLast: false }),
@@ -840,7 +850,7 @@ class Component extends DCLogic {
       sideStyle: 'flex:none;width:26px;height:26px;border-radius:13px;box-sizing:border-box;margin-top:1px;' + (st === 1 ? 'display:none' : (white ? 'background:#fff;border:2px solid #2d3042' : 'background:#2d3042')),
       hangStyle: s.screen !== 'menu' ? 'display:none' : 'position:absolute;z-index:2;pointer-events:none;top:0;right:28px;width:54px;display:flex;flex-direction:column;align-items:center;transform-origin:27px 0;animation:swing 2.4s ease-in-out infinite',
       threadStyle: 'width:6px;background:' + this.threadBg() + ' center top/6px 22px repeat-y;height:' + hangLen + 'px;animation:l' + hangLen + ' 2.2s ease-out',
-      bugStyle: 'flex:none;width:54px;height:54px;margin-top:-12px;background:' + this.sketchSpider() + ' center/64px no-repeat',
+      bugStyle: 'flex:none;width:54px;height:54px;margin-top:-17px;background:' + this.sketchSpider() + ' center/64px no-repeat',
       josekiWhy: J.why, thinkSpider: 'width:100%;max-width:330px;height:220px;flex:none;background:' + this.sketch(s.jid) + ' center/contain no-repeat',
       logoSpider: 'width:44px;height:44px;margin:-5px;background:' + this.sketchSpider() + ' center/52px no-repeat', heroSpider: 'width:130px;height:130px;margin:-10px;animation:drop .5s ease-out;background:' + this.sketchSpider() + ' center/150px no-repeat', resultSpider: thr ? 'display:none' : 'width:150px;height:150px;background:' + this.sketchSpider() + ' center/170px no-repeat;animation:hop .6s ease-in-out 2',
       barBox: (st === 1 || thr) ? 'display:none' : 'position:relative;height:44px;width:100%;background:' + this.barSvg(false) + ' left 29px/342px 8px no-repeat',
@@ -853,12 +863,12 @@ class Component extends DCLogic {
         return { thumb: this.thumbBg(id), name: D.title, sub: open ? (done ? 'Ready to review' : D.sub) : 'After ' + this.data()[arr[k - 1]].short, tint: D.tint,
           chip: done ? 'Learned' : (open ? 'New' : 'Locked'), chipStyle: chip(done ? 'g' : (open ? 'p' : 'x')), markStyle: 'width:32px;height:32px;flex:none;' + ((isDone || isNext) ? 'background:' + this.todoMark(isDone, k + 3) + ' center/32px no-repeat' : ''),
           aria: D.title + (isDone ? ', done' : (isNext ? ', to do' : '')),
-          todoStyle: isNext && !isDone ? 'flex:none;font-family:\'Patrick Hand\',Nunito,sans-serif;font-size:19px;color:#6b6f8c;transform:rotate(-8deg);margin-right:-8px;margin-top:-14px' : 'display:none',
+          todoStyle: isNext && !isDone ? 'flex:none;font-family:\'Patrick Hand\',Nunito,sans-serif;font-size:19px;color:#6b6f8c;transform:rotate(-8deg);margin-right:-14px;margin-top:-14px;color:#c9772f' : 'display:none',
           rowStyle: (this.props.variant === 'b' ? 'display:flex;flex-direction:column;padding:16px 18px 10px;margin-bottom:16px;background:#fffdf7;border:2px solid #4b4f6e;border-width:2px 2.7px 2.4px 2.2px;border-radius:26px 20px 28px 22px/22px 28px 20px 26px;' : 'display:flex;align-items:center;gap:14px;width:100%;padding:10px 0;background:transparent;font-family:inherit;') + 'opacity:' + (open ? 1 : 0.55),
           btn: done ? 'Review' : (open ? 'Start' : 'Locked'), btnStyle: btn(open), hasWatch: false, btn2Style: '', watch: () => this.setState({ screen: 'lesson', jid: id, review: true, watchOnly: true, stage: 1, intro: false, w: 0, q: 0, answered: null, pts: 0, msg: '', kind: '', wrong: null, tries: 0, rd: null, sadLast: false }),
           act: !open ? () => {} : () => this.setState({ screen: 'start', jid: id, pts: 0, review: false }) };
       }),
-      shownPrompt: s.kind === 'bad' && s.msg ? s.msg : prompt, stages, prompt, stones: items, cells, showMore, moreAction, showNext, nextLabel, nextAction, showOptions, options,
+      shownPrompt: s.kind === 'bad' && s.msg ? s.msg : prompt, stages, prompt, stones: items, cells, showMore: showMore && !(inLesson && s.intro), moreAction, showNext: showNext && !(inLesson && s.intro), nextLabel, nextAction, showOptions, options,
       promptStyle: 'flex:1;box-sizing:border-box;font-family:\'Patrick Hand\',Nunito,sans-serif;font-size:26px;font-weight:400;line-height:1.15;border-radius:14px;' + (s.kind === 'bad' && s.msg ? 'flex:none;width:fit-content;min-height:0;color:#b5483a;padding-bottom:2px;background:url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAiIHByZXNlcnZlQXNwZWN0UmF0aW89Im5vbmUiPjxwYXRoIGQ9Ik0xIDVDMTQgMyAyMiA3LjQgMzggNC42UzYyIDYuOCA3OCAzLjggOTYgNS40IDk5LjUgMy4yIiBmaWxsPSJub25lIiBzdHJva2U9IiNkOTU1M2IiIHN0cm9rZS13aWR0aD0iMS44IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48cGF0aCBkPSJNNiA3LjZDMzAgNi40IDYwIDguMiA5MiA2LjIiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2Q5NTUzYiIgc3Ryb2tlLXdpZHRoPSIuOSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBvcGFjaXR5PSIuNTUiLz48L3N2Zz4=) left bottom/100% 9px no-repeat;' : '') + ((st === 0 || st === 3) && nn < 6 && par !== 2 && nn % 2 !== par ? 'animation:pulse 1.1s ease-in-out infinite;color:#7a7e90;' : ''),
       msg: s.msg, msgStyle: 'min-height:44px;box-sizing:border-box;border-radius:16px 12px 18px 13px/13px 18px 12px 16px;' + (s.msg ? 'border:1.8px solid ' + (s.kind === 'ok' ? '#2f9e6a' : '#d9553b') + ';' : '') + 'padding:' + (s.msg ? '10px 14px' : '0') + ';font-size:14px;font-weight:700;line-height:1.35;background:' + msgBg + ';color:' + msgFg,
       resultTitle: thr ? 'Well spun.' : (s.review ? 'Review done!' : 'Passed!'),
