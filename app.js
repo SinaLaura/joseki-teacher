@@ -861,7 +861,9 @@ class Component extends DCLogic {
     const TX = big ? [228, 278, 328] : [204, 234, 264], KX = big ? [16, 86, 160, 198] : [14, 72, 132, 178];
     let sxPos = KX[st];
     const exiting = !!s.exiting;
-    if (st === 3) { const seg = Math.min(cleanTot, 2), a = cleanTot === 0 ? KX[3] : TX[cleanTot - 1], b = TX[seg]; const pp = par === 2 ? 0 : par; let mine = 0; for (let i = 0; i < Math.min(s.t, 6); i++) if (i % 2 === pp) mine++; sxPos = exiting ? 440 : cleanTot >= 3 ? TX[2] : a + (b - a) * ((cleanNow || cornerBad) ? 0 : mine / 3); }
+    // Train: she sits on the tangle of the corner being played (the first one as soon as Train starts),
+    // stays on it while its web is spun, then moves on to the next tangle with the next corner.
+    if (st === 3) sxPos = exiting ? 440 : cleanNow ? TX[cleanTot - 1] : TX[Math.min(cleanTot, 2)];
     const hangLen = ({ menu: 100, picker: 50, start: 40, result: 110 })[s.screen] || 60;
     return {
       isThread: thr, isStrip: this.props.row === 'strip',
