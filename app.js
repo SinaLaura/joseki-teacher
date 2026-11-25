@@ -191,7 +191,7 @@ class Component extends DCLogic {
       'try-wrong': lesson({ stage: 0, n: 1, wrong: wrong, wk: 1, tries: 1, sadLast: true, kind: 'bad', msg: 'Not quite. Try again.' }),
       'try-hint': lesson({ stage: 0, n: 1, wrong: wrong, wk: 1, tries: 2, sadLast: true, kind: 'bad', msg: 'This is the spot.' }),
       watch: lesson({ stage: 1, w: 3, pts: 1 }),
-      decide: lesson({ stage: 2, q: 0, pts: 2 }),
+      decide: lesson({ stage: 2, q: 0, pts: 2, ph: 0 }),
       'decide-wrong': lesson({ stage: 2, q: 0, pts: 2, flash: 0, elim: [0], wk: 1, kind: 'bad', msg: 'Not quite. Try again.' }),
       transfer: lesson({ stage: 3, t: 2, pts: 5, clean: 1 }),
       'transfer-web': lesson({ stage: 3, t: 6, pts: 8, clean: 1 }),
@@ -637,9 +637,10 @@ class Component extends DCLogic {
     else if (kind === 'ok') s += 'border-radius:0;background:' + this.ringBg('#2f9e6a', false, 'rgba(47,158,106,.35)', c + r) + ';';
     else if (kind === 'bad' || kind === 'wrong') s += 'border-radius:0;background:' + this.stoneBg(!!o.white, c + r, false, true) + ';animation:' + (o.k % 2 ? 'fade' : 'fade2') + ' .35s .95s forwards;';
     else if (kind === 'strike') s += 'border-radius:0;pointer-events:none;background:' + this.strokeBg(c + r, o.k) + ';animation:' + (o.k % 2 ? 'fade' : 'fade2') + ' .35s .95s forwards;';
-    else if (kind === 'q') s += 'pointer-events:none;border-radius:0;font-family:\'Patrick Hand\',Nunito,sans-serif;font-weight:400;font-size:24px;line-height:1;color:#4b4f6e;transform:rotate(' + ((c * 7 + r * 3) % 3 - 1) * 6 + 'deg);padding-bottom:2px;';
+    else if (kind === 'q') s += 'pointer-events:none;border-radius:0;font-family:\'Patrick Hand\',Nunito,sans-serif;font-weight:400;font-size:24px;line-height:1;color:#4b4f6e;--rot:' + ((c * 7 + r * 3) % 3 - 1) * 6 + 'deg;transform:rotate(var(--rot));padding-bottom:2px;';
     else if (kind === 'hint') s += 'border-radius:0;pointer-events:none;background:' + this.hintBg(c * 3 + r) + ';';
     else if (kind === 'ghost') s += 'border-radius:0;background:' + this.scribbleBg(c * 5 + r) + ';';
+    if (o.anim && kind !== 'b' && kind !== 'w') s += 'animation:' + o.anim + ';';
     return { style: s, eyes: eyes, mouth: mouth, label: label || '', num: o.num && (kind === 'b' || kind === 'w') ? String(o.num) : '', numStyle: o.num && (kind === 'b' || kind === 'w') ? 'position:absolute;right:-6px;top:-10px;z-index:2;font-family:\'Patrick Hand\',Nunito,sans-serif;font-size:15px;line-height:1;color:#4b4f6e;background:#faf6ec;padding:0 2px;border-radius:4px' : 'display:none' };
   }
   tap(key, mode, par, c, r) {
@@ -711,9 +712,9 @@ class Component extends DCLogic {
     const ak = [s.jid, st, s.round, nn, s.review].join('|');
     if (autoWait && this._autoKey !== ak) { this._autoKey = ak; setTimeout(() => { const t = this.state, k2 = t.stage === 3 ? 't' : 'n'; if ([t.jid, t.stage, t.round, t[k2], t.review].join('|') === ak && !t.intro && t.screen === 'lesson') this.setState({ [k2]: t[k2] + 1 }); }, 1200); }
     const stagesL = ['Try', 'Learn', 'Pick', 'Train'];
-    const rvStart = (stg) => () => this.setState(Object.assign({ screen: 'lesson', review: true, stage: stg, intro: false, n: 1, t: 0, round: 0, w: 1, q: 0, answered: null, elim: [], flash: null, pts: 0, msg: '', kind: '', wrong: null, tries: 0, rd: null, sadLast: false }, this.dirInit(s.jid, false)));
+    const rvStart = (stg) => () => this.setState(Object.assign({ screen: 'lesson', review: true, stage: stg, intro: false, n: 1, t: 0, round: 0, w: 1, q: 0, ph: 0, answered: null, elim: [], flash: null, pts: 0, msg: '', kind: '', wrong: null, tries: 0, rd: null, sadLast: false }, this.dirInit(s.jid, false)));
     const stages = stagesL.map((l, i) => ({
-      act: s.review ? rvStart(i) : () => { const sc = this.mkSched(); this.setState(Object.assign({ review: false, stage: i, intro: true, n: 1, t: 1, round: 0, sched: sc, w: 1, q: 0, answered: null, elim: [], flash: null, msg: '', kind: '', wrong: null, tries: 0, rd: null, sadLast: false }, this.dirInit(s.jid, i === 3 && sc[0].white))); }, cursor: 'pointer',
+      act: s.review ? rvStart(i) : () => { const sc = this.mkSched(); this.setState(Object.assign({ review: false, stage: i, intro: true, n: 1, t: 1, round: 0, sched: sc, w: 1, q: 0, ph: 0, answered: null, elim: [], flash: null, msg: '', kind: '', wrong: null, tries: 0, rd: null, sadLast: false }, this.dirInit(s.jid, i === 3 && sc[0].white))); }, cursor: 'pointer',
       label: l,
       btn: this.stepBtn(i, st),
       hasLink: this.props.variant === 'b' && i < 3,
@@ -752,7 +753,7 @@ class Component extends DCLogic {
     const asCol = (i, col) => J.go[i].replace(/\.$/, '') + ' as ' + col + '.';
     const say = (t) => !t ? t : (swap ? t.replace(/\b(Black|White|black|white)\b/g, (w) => ({ Black: 'White', White: 'Black', black: 'white', white: 'black' })[w]) : t);
     const stoneItems = (list, sadIdx, hopIdx, numbered) => list.map((m, i) => this.mk(m.c, m.r, m.w !== swap ? 'w' : 'b', '', { num: numbered ? i + 1 : 0, sad: i === sadIdx, anim: i === list.length - 1 || i === hopIdx ? (i === hopIdx && s.kind === 'ok' ? 'drop .4s ease-out, hop .5s ease-in-out .45s 2' : (i === list.length - 1 ? 'drop .4s ease-out' : '')) : '' }));
-    const enter = (stage) => ({ w: 1, help: false, went: Object.assign({}, s.went, { [stage - 1]: true }), exiting: false, clean: 0, elim: [], flash: null, tries: 0, rd: null, sadLast: false, stage: stage, intro: true, msg: '', kind: '', wrong: null });
+    const enter = (stage) => ({ w: 1, ph: 0, help: false, went: Object.assign({}, s.went, { [stage - 1]: true }), exiting: false, clean: 0, elim: [], flash: null, tries: 0, rd: null, sadLast: false, stage: stage, intro: true, msg: '', kind: '', wrong: null });
     if (st === 0 || st === 3) {
       swap = white;
       const list = seq.slice(0, nn).map(m => this.tf(m, mode));
@@ -792,14 +793,21 @@ class Component extends DCLogic {
       const qs = J.qs;
       const q = qs[s.q];
       swap = false; const ansW = !!seq[q.shown].w;
-      items = stoneItems(seq.slice(0, q.shown), -1).map(it => ({ ...it, style: it.style.replace(/animation:[^;]*;/, '') }));
-      prompt = say(q.p) + (s.q === 0 ? '\nHow should Black react?' : '');
+      // Step by step: White's last stone drops in (ph 0), then the text (ph 1), then the answer spots (ph 2).
+      const ph = s.ph == null ? 2 : s.ph;
+      const pk = [s.jid, s.q, s.review, ph].join('|');
+      const phRun = s.screen === 'lesson' && !s.intro && ph < 2;
+      if (!phRun) this._phKey = null;
+      if (phRun && this._phKey !== pk) { this._phKey = pk; setTimeout(() => { const t = this.state; if (t.screen === 'lesson' && t.stage === 2 && !t.intro && [t.jid, t.q, t.review, t.ph].join('|') === pk) this.setState({ ph: ph + 1 }); }, ph === 0 ? 1300 : 1000); }
+      items = stoneItems(seq.slice(0, q.shown), -1).map((it, i) => ({ ...it, style: it.style.replace(/animation:[^;]*;/, '') + (i === q.shown - 1 ? 'animation:drop .4s ease-out .4s both;' : '') }));
+      prompt = ph < 1 ? '\u00a0\n\u00a0' : say(q.p) + '\n' + (s.answered !== null ? 'Good.' : (s.q === 0 && ph >= 2 ? 'How should Black react?' : '\u00a0'));
+      const spotIn = s.elim.length === 0 && s.answered === null;
       const L = ['A', 'B', 'C'];
       q.opts.forEach((o, i) => {
         if (s.flash === i) { items.push(this.mk(o.c, o.r, 'bad', '', { k: s.wk, white: ansW }), this.mk(o.c, o.r, 'strike', '', { k: s.wk })); return; }
         if (s.answered !== null) { if (i === q.ok) items.push(this.mk(o.c, o.r, ansW ? 'w' : 'b', '', { anim: 'drop .4s ease-out, hop .5s ease-in-out .45s 2' })); return; }
-        if (s.elim.includes(i)) return;
-        items.push(this.mk(o.c, o.r, 'optb', ''), this.mk(o.c, o.r, 'q', '?'));
+        if (s.elim.includes(i) || ph < 2) return;
+        items.push(this.mk(o.c, o.r, 'optb', '', { anim: spotIn ? 'dropb .4s ease-out both' : '' }), this.mk(o.c, o.r, 'q', '?', { anim: spotIn ? 'dropr .4s ease-out both' : '' }));
       });
       showOptions = true;
       options = L.map((l, i) => {
@@ -818,13 +826,13 @@ class Component extends DCLogic {
       });
       showOptions = false;
       q.opts.forEach((o, i) => {
-        if (s.answered !== null || s.elim.includes(i)) return;
+        if (s.answered !== null || s.elim.includes(i) || ph < 2) return;
         cells.push({ label: 'Option ' + L[i], tap: options[i].pick, style: 'position:absolute;border:0;background:transparent;padding:0;width:38px;height:38px;left:' + (18 + (o.c - 1) * 38 - 19) + 'px;top:' + (18 + (o.r - 1) * 38 - 19) + 'px' });
       });
       if (s.answered !== null) {
         showNext = true;
-        nextLabel = s.q < qs.length - 1 ? 'Next' : 'Continue';
-        nextAction = () => s.q < qs.length - 1 ? this.setState({ q: s.q + 1, answered: null, elim: [], flash: null, msg: '', kind: '' }) : (s.review ? this.setState({ screen: 'picker', q: 0, answered: null, elim: [], flash: null, msg: '', kind: '' }) : this.setState((() => { const sc = this.mkSched(); return Object.assign(enter(3), { t: 1, round: 0, sched: sc }, this.dirInit(s.jid, sc[0].white)); })()));
+        nextLabel = s.q < qs.length - 1 ? 'Next' : 'Well done.';
+        nextAction = () => s.q < qs.length - 1 ? this.setState({ q: s.q + 1, ph: 0, answered: null, elim: [], flash: null, msg: '', kind: '' }) : (s.review ? this.setState({ screen: 'picker', q: 0, answered: null, elim: [], flash: null, msg: '', kind: '' }) : this.setState((() => { const sc = this.mkSched(); return Object.assign(enter(3), { t: 1, round: 0, sched: sc }, this.dirInit(s.jid, sc[0].white)); })()));
       }
     }
     const intros = [
@@ -835,7 +843,7 @@ class Component extends DCLogic {
     ];
     const msgBg = s.kind === 'ok' ? '#dff3e7' : (s.kind === 'bad' ? '#ffe3dc' : 'transparent');
     const msgFg = s.kind === 'ok' ? '#1f6b45' : '#a8402a';
-    const fresh = { help: false, went: {}, clean: 0, exiting: false, tries: 0, rd: null, sadLast: false, screen: 'lesson', review: false, stage: 0, intro: true, n: 1, t: 0, round: 0, w: 1, q: 0, answered: null, pts: 0, msg: '', kind: '', wrong: null };
+    const fresh = { ph: 0, help: false, went: {}, clean: 0, exiting: false, tries: 0, rd: null, sadLast: false, screen: 'lesson', review: false, stage: 0, intro: true, n: 1, t: 0, round: 0, w: 1, q: 0, answered: null, pts: 0, msg: '', kind: '', wrong: null };
     const chip = (k) => 'flex:none;border:1.6px solid currentColor;border-radius:14px 10px 13px 9px/10px 13px 9px 14px;padding:3px 10px;font-size:12px;font-weight:800;' + ({ g: 'background:#dff3e7;color:#1f6b45', p: 'background:#e9ebf1;color:#3f4366', b: 'background:#e6eaf2;color:#2d4f8f', x: 'background:#eceef3;color:#6e7285' })[k];
     const card = (o) => 'background:#fffdf7;border:2px solid #4b4f6e;border-width:2px 2.8px 2.4px 2.2px;border-radius:26px 20px 28px 22px/22px 28px 20px 26px;padding:16px;box-shadow:2px 3px 0 rgba(75,79,110,.22);display:flex;flex-direction:column;gap:12px;opacity:' + o;
     const btn = (on) => 'height:46px;border:0;border-radius:23px;font-size:15px;font-weight:800;' + (on ? 'background:#4b4f6e;color:#fff' : 'background:#eceef3;color:#868a9c');
@@ -845,6 +853,7 @@ class Component extends DCLogic {
     const ik = s.jid + '|' + s.stage + '|' + s.review;
     if (pv && this._introKey !== ik) { this._introKey = ik; setTimeout(() => { const t = this.state; if (t.screen === 'lesson' && t.intro && t.jid + '|' + t.stage + '|' + t.review === ik) this.setState({ intro: false }); }, 2500); }
     if (!pv) this._introKey = null;
+    if (!inLesson || st !== 2) this._phKey = null;
     const big = this.props.hd !== 'cur', tz = big ? 24 : 22;
     const TX = big ? [228, 278, 328] : [204, 234, 264], KX = big ? [16, 86, 160, 198] : [14, 72, 132, 178];
     let sxPos = KX[st];
