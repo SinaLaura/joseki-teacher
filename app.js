@@ -2,16 +2,6 @@
 // rendered from Component.renderVals() and patched into the live DOM (so CSS animations keep running).
 const UNLOCK_ALL = true; // set to false to unlock the joseki one after another
 const STORE = 'joseki.learned';
-// Shown at the top of the joseki overview; a new one is picked each time the overview opens.
-const TAGLINES = [
-  'Learn joseki from an eight-legged master',
-  'Spin your way through joseki',
-  'Your friendly neighborhood joseki master',
-  'Weaving your way to better Go',
-  "Don't get tangled in joseki",
-  'A web of joseki wisdom',
-  'The corner is our domain'
-];
 
 class DCLogic {
   constructor(props) { this.props = props || {}; this.state = {}; this._render = null; }
@@ -502,14 +492,24 @@ class Component extends DCLogic {
     if (n + 1 < 6 && par !== 2) setTimeout(() => { if (this.state[key] === n + 1) this.setState({ [key]: n + 2 }); }, 1500);
   }
   tagline() {
-    // Pick a new line whenever the overview is entered, never the same one twice in a row.
+    // Shown at the top of the joseki overview. A new line is picked each time the overview opens,
+    // never the same one twice in a row.
+    const lines = [
+      'Learn joseki from an eight-legged master',
+      'Spin your way through joseki',
+      'Your friendly neighborhood joseki master',
+      'Weaving your way to better Go',
+      "Don't get tangled in joseki",
+      'A web of joseki wisdom',
+      'The corner is our domain'
+    ];
     if (this.state.screen === 'menu' && this._lastScreen !== 'menu') {
       let k;
-      do { k = Math.floor(Math.random() * TAGLINES.length); } while (k === this._tag && TAGLINES.length > 1);
+      do { k = Math.floor(Math.random() * lines.length); } while (k === this._tag);
       this._tag = k;
     }
     this._lastScreen = this.state.screen;
-    return TAGLINES[this._tag || 0];
+    return lines[this._tag || 0];
   }
   renderVals() {
     const tagline = this.tagline();
