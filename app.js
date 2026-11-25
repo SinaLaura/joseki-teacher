@@ -127,7 +127,7 @@ class Component extends DCLogic {
         tryP: { 2: 'Extend low to the other side.', 4: 'Take the 3-3 point.' },
         tb: { 2: 'White approaches low. Extend low to the other side.', 4: 'White slides to the 2nd line. Take the 3-3 point.' },
         tw: { 1: 'Approach low in the {c} corner.', 3: 'Slide to the 2nd line.', 5: 'Extend along the edge.' },
-        ex: ['Black plays the star point.', 'White approaches low, a knight\u2019s move away on the 3rd line.', 'Black extends low to the other side, also a knight\u2019s move.', 'White slides onto the 2nd line.', 'Black takes the 3-3 point.', 'White extends along the top edge.'],
+        ex: ['Black plays the star point.', 'White approaches low, a knight\u2019s move away on the 3rd line.', 'Black extends low to the other side, also a knight\u2019s move.', 'White slides onto the 2nd line.', 'Black takes the 3-3 point.', 'White extends along the edge.'],
         qs: [
           { shown: 2, opts: [{ c: 5, r: 4 }, { c: 3, r: 6 }, { c: 7, r: 3 }], ok: 1, p: 'White made a low approach.' },
           { shown: 3, opts: [{ c: 6, r: 5 }, { c: 3, r: 2 }, { c: 4, r: 2 }], ok: 2, p: 'Slide to the 2nd line.' },
