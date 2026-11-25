@@ -57,23 +57,28 @@ The whole app is drawn in pencil, and all of the following came from the owner's
 - **Board:** crooked pencil lines with uneven pressure; where the board continues they stop at slightly different lengths,
   the pencil lifting off. Real edges are a firm stroke running a little past the corner. The star point is a soft pencil dot.
 - **Wrong move:** draw the stone, wait a moment, strike it through with one red stroke from bottom left to top right, then
-  fade it out. On the second miss the right spot is then sketched lightly (thin outline, light hatching).
+  fade it out. On the second miss the right spot fades in as a soft grey disc ("Try the sketched spot.").
 - **Progress thread:** one pencil thread with the stage names above it. Try, Learn and Pick are small tangles, Train
   has three (all tangles the same size, Train's centred under the word). Not reached: pale tangle; reached or skipped: bold tangle; done (stage finished, corner clean): web at once.
   The spider moves only on the player's (Black's) moves and draws a thin dark line behind her. After "Done" she walks
   out to the right, and the end screen shows her rappelling down above "Well spun." No color coding, little text, no
   gamification words ("Passed!", "unlocked").
-- **Pick answer spots** stay the soft grey discs.
+- **Pick answer spots** stay the soft grey discs, each with a small, slightly tilted handwritten "?".
 - **Stage start:** no separate intro screen. The play screen shows the board pale and, in the prompt area, the stage
-  word large with the rest of the sentence below ("Try / to find the joseki.", "Learn / why it's played.", "Pick / the right
-  move.", "Train / until it sticks."). After 1.5 s, or a tap anywhere, the stage starts. Learn starts with no text.
+  word large and the rest of the sentence on the same line ("**Try** to find the joseki.", "**Learn** why it's played.",
+  "**Pick** the right move.", "**Train** until it sticks."); the board is hidden meanwhile. After 2.5 s, or a tap anywhere,
+  the board fades in and the stage starts. Learn starts with the first stone already played and its explanation.
+- **First Try prompt of every joseki:** "Black to play." on its own line, then the joseki's hint (e.g. "Black to play. /
+  Extend low to the other side."). This is built into the logic, so it applies to every new joseki.
 - **The spider always hangs right on her string**, wherever she hangs (menu, end screen). When fixing something in one
   place, check every other place where the same thing appears.
 - **Play screens:** "Menu" small at the top left, the joseki name below it as the page title (header X), then the larger thread.
 - **Menu:** each joseki is one tappable row (no Start/Review words). On the right: a hand-drawn circle with a green check when
   done; only the next open joseki gets an empty circle with a tilted handwritten "to do".
 - **Spider (Ankabuti mascot):** classic curved legs with staggered lengths, a friendly face. The start screen of each
-  joseki has a sketch with spiders that tells the joseki as a little picture.
+  joseki has a sketch with spiders that tells the joseki as a little picture. Keep those spiders as they are (cute, light
+  bodies, dark faces); Black's spider has a light grey-blue body (`#c9ccd9`), White's a white one. Black is the corner owner,
+  White the one who approaches or invades, matching the description text. No arrowheads.
 - **Layout:** the board must not move when the text above it needs more or fewer lines (the text area has a fixed height).
   The app fills the whole screen with no border and is as large as the phone allows.
 
@@ -81,6 +86,8 @@ The whole app is drawn in pencil, and all of the following came from the owner's
 
 Only one place is current at a time. Before switching from the canvas to the repo (or Claude Code), ship the canvas state;
 before designing in the canvas again, copy `design/Main.dc.html` back to `project/Refined.dc.html` first.
+**Before every ship from the canvas:** compare `design/Main.dc.html` on `main` with the last version shipped from the canvas.
+If it has changes that didn't come from the canvas, stop and ask the owner instead of overwriting them.
 
 ## Open
 

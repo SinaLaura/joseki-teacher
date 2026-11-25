@@ -27,6 +27,7 @@ button:not([aria-label^="Point"]):not([aria-label^="Option"]):not(.stp):not(.mnu
 @keyframes strike{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:none}}
 @keyframes rp{from{height:0}to{height:370px}}
 @keyframes sway{0%,100%{transform:rotate(0)}50%{transform:rotate(3deg)}}
+@keyframes hintin{to{opacity:.4}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
 button.pk:not(.a):not(.b):not(.c):not(.d):not(.e){border:0 !important;box-shadow:none !important;border-radius:0 !important;text-align:left}
 button.pri.rt:not(.a):not(.b):not(.c):not(.d){margin-right:0 !important;margin-left:auto !important;font-size:24px !important}
