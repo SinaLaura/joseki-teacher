@@ -2,6 +2,16 @@
 // rendered from Component.renderVals() and patched into the live DOM (so CSS animations keep running).
 const UNLOCK_ALL = true; // set to false to unlock the joseki one after another
 const STORE = 'joseki.learned';
+// Shown at the top of the joseki overview; a new one is picked each time the overview opens.
+const TAGLINES = [
+  'Learn joseki from an eight-legged master',
+  'Spin your way through joseki',
+  'Your friendly neighborhood joseki master',
+  'Weaving your way to better Go',
+  "Don't get tangled in joseki",
+  'A web of joseki wisdom',
+  'The corner is our domain'
+];
 
 class DCLogic {
   constructor(props) { this.props = props || {}; this.state = {}; this._render = null; }
@@ -491,7 +501,18 @@ class Component extends DCLogic {
     this.setState(upd);
     if (n + 1 < 6 && par !== 2) setTimeout(() => { if (this.state[key] === n + 1) this.setState({ [key]: n + 2 }); }, 1500);
   }
+  tagline() {
+    // Pick a new line whenever the overview is entered, never the same one twice in a row.
+    if (this.state.screen === 'menu' && this._lastScreen !== 'menu') {
+      let k;
+      do { k = Math.floor(Math.random() * TAGLINES.length); } while (k === this._tag && TAGLINES.length > 1);
+      this._tag = k;
+    }
+    this._lastScreen = this.state.screen;
+    return TAGLINES[this._tag || 0];
+  }
   renderVals() {
+    const tagline = this.tagline();
     const s = this.state, st = s.stage, J = this.data()[s.jid], seq = this.seq(st === 0 || st === 3 ? s.dir : 0);
     const sched = s.sched || [{ mode: 1, white: false }];
     const rnd = sched[s.round % sched.length];
@@ -630,6 +651,7 @@ class Component extends DCLogic {
     const inLesson = s.screen === 'lesson';
     const hangLen = ({ menu: 50, picker: 50, start: 40, result: 110 })[s.screen] || 60;
     return {
+      tagline,
       isMenu: s.screen === 'menu', isPicker: s.screen === 'picker', isStart: s.screen === 'start', isIntro: inLesson && s.intro, isLesson: inLesson && !s.intro, isResult: s.screen === 'result',
       stepsInfo: [{ t: 'Try', txt: 'font-size:17px;font-weight:800;color:#2d3042', dot: 'width:22px;height:22px;box-sizing:border-box;border-radius:11px;background:#fff;border:4px solid ' + '#c9ccd9' }, { t: 'Watch', txt: 'font-size:17px;font-weight:700;color:#868a9c', dot: 'width:22px;height:22px;box-sizing:border-box;border-radius:11px;background:#fff;border:4px solid ' + '#c9ccd9' }, { t: 'Decide', txt: 'font-size:17px;font-weight:700;color:#868a9c', dot: 'width:22px;height:22px;box-sizing:border-box;border-radius:11px;background:#fff;border:4px solid ' + '#c9ccd9' }, { t: 'Transfer', txt: 'font-size:17px;font-weight:700;color:#868a9c', dot: 'width:26px;height:26px;box-sizing:border-box;border-radius:13px;background:#fff;border:4px solid ' + '#4b4f6e' }],
       begin: () => this.setState(Object.assign({}, fresh, this.dirInit(s.jid, false))),

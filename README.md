@@ -1,4 +1,4 @@
-# Joseki Teacher
+# Joseki Spider Sensei
 
 **A beautiful, low-effort daily joseki trainer for Go. It works like a vocabulary app.**
 
@@ -16,7 +16,7 @@ Vocabulary trainers such as Anki and Duolingo solved this problem for language l
 **spaced repetition**: you get short daily sessions, see each item again just before you'd forget
 it, and build up long-term memory with very little effort.
 
-**Joseki Teacher applies the same principle to joseki:**
+**Joseki Spider Sensei applies the same principle to joseki:**
 
 1. The app shows a corner position.
 2. You play the next move.
@@ -99,5 +99,6 @@ build step and no libraries, and works as an installable PWA on a phone.
 Add `?reset` to the URL to wipe your progress. To unlock the joseki one after another, set
 `UNLOCK_ALL` to `false` at the top of `app.js`.
 
-See [IDEAS.md](IDEAS.md) for the plan, [RESEARCH.md](RESEARCH.md) for the checked joseki lines, and
+See [IDEAS.md](IDEAS.md) for the plan, [RESEARCH.md](RESEARCH.md) for the checked joseki lines,
+[JOSEKI-RESOURCES.md](JOSEKI-RESOURCES.md) for resources and candidates for the next joseki, and
 [content/joseki](content/joseki/README.md) for the content format of the earlier version.
