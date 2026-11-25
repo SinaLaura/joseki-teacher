@@ -54,6 +54,9 @@ The whole app is drawn in pencil, and all of the following came from the owner's
   out to the right, and the end screen shows her rappelling down above "Well spun." No color coding, little text, no
   gamification words ("Passed!", "unlocked").
 - **Decide answer spots** stay the soft grey discs.
+- **Play screens:** "Menu" small at the top left, the joseki name below it as the page title (header X), then the larger thread.
+- **Menu:** each joseki is one tappable row (no Start/Review words). On the right: a hand-drawn circle with a green check when
+  done; only the next open joseki gets an empty circle with a tilted handwritten "to do".
 - **Spider (Ankabuti mascot):** classic curved legs with staggered lengths, a friendly face. The start screen of each
   joseki has a sketch with spiders that tells the joseki as a little picture.
 - **Layout:** the board must not move when the text above it needs more or fewer lines (the text area has a fixed height).
