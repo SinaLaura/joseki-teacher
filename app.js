@@ -794,19 +794,25 @@ class Component extends DCLogic {
       const q = qs[s.q];
       swap = false; const ansW = !!seq[q.shown].w;
       // Step by step: "White is thinking …" (ph 0), White's stone drops in (ph 1), then the answer spots (ph 2).
+      // The first question says "How should Black respond?" once White's stone is down.
       // After an answer the next question starts by itself (adv), with White already thinking.
+      // After the last answer White plays the joseki's last move (ph 3), then "Good." ends Pick (ph 4).
       const ph = s.ph == null ? 2 : s.ph;
-      const adv = s.answered !== null && s.q < qs.length - 1;
-      const pk = [s.jid, s.q, s.review, ph, adv].join('|');
-      const phRun = s.screen === 'lesson' && !s.intro && (ph < 2 || adv);
+      const last = s.q >= qs.length - 1, done = s.answered !== null;
+      const adv = done && !last;
+      const fin = done && last && !!seq[q.shown + 1] && !!seq[q.shown + 1].w;
+      const pk = [s.jid, s.q, s.review, ph, done].join('|');
+      const phRun = s.screen === 'lesson' && !s.intro && (ph < 2 || adv || (fin && ph < 4));
       if (!phRun) this._phKey = null;
-      if (phRun && this._phKey !== pk) { this._phKey = pk; setTimeout(() => { const t = this.state; if (t.screen === 'lesson' && t.stage === 2 && !t.intro && [t.jid, t.q, t.review, t.ph, t.answered !== null && t.q < qs.length - 1].join('|') === pk) this.setState(adv ? { q: t.q + 1, ph: 1, answered: null, elim: [], flash: null, msg: '', kind: '' } : { ph: ph + 1 }); }, adv ? (s.kind === 'bad' ? 2200 : 1400) : (ph === 0 ? 1200 : 1000)); }
-      items = stoneItems(seq.slice(0, ph < 1 ? q.shown - 1 : q.shown), -1).map((it, i) => ({ ...it, style: it.style.replace(/animation:[^;]*;/, '') + (i === q.shown - 1 ? 'animation:drop .4s ease-out both;' : '') }));
-      prompt = ph < 1 || adv ? 'White is thinking …' : '';
+      if (phRun && this._phKey !== pk) { this._phKey = pk; setTimeout(() => { const t = this.state; if (t.screen === 'lesson' && t.stage === 2 && !t.intro && [t.jid, t.q, t.review, t.ph, t.answered !== null].join('|') === pk) this.setState(adv ? { q: t.q + 1, ph: 1, answered: null, elim: [], flash: null, msg: '', kind: '' } : (fin ? (ph === 2 ? { ph: 3, msg: '', kind: '' } : { ph: 4 }) : { ph: ph + 1 })); }, adv || (fin && ph === 2) ? (s.kind === 'bad' ? 2200 : 1400) : (ph === 0 ? 1200 : 1000)); }
+      const endIn = fin && ph >= 3;
+      items = stoneItems(seq.slice(0, ph < 1 ? q.shown - 1 : (endIn ? q.shown + 2 : q.shown)), -1).map((it, i) => ({ ...it, style: it.style.replace(/animation:[^;]*;/, '') + (i === (endIn ? q.shown + 1 : q.shown - 1) ? 'animation:drop .4s ease-out both;' : '') }));
+      prompt = ph < 1 || adv || (fin && ph === 2) ? 'White is thinking …' : (s.q === 0 && !done ? 'How should Black respond?' : '');
       const spotIn = s.elim.length === 0 && s.answered === null;
       const L = ['A', 'B', 'C'];
       q.opts.forEach((o, i) => {
         if (s.flash === i) { items.push(this.mk(o.c, o.r, 'bad', '', { k: s.wk, white: ansW }), this.mk(o.c, o.r, 'strike', '', { k: s.wk })); return; }
+        if (endIn) return;
         if (s.answered !== null) { if (i === q.ok) items.push(this.mk(o.c, o.r, ansW ? 'w' : 'b', '', { anim: 'drop .4s ease-out, hop .5s ease-in-out .45s 2' })); return; }
         if (s.elim.includes(i) || ph < 2) return;
         items.push(this.mk(o.c, o.r, 'optb', '', { anim: spotIn ? 'dropb .4s ease-out both' : '' }), this.mk(o.c, o.r, 'q', '?', { anim: spotIn ? 'dropr .4s ease-out both' : '' }));
@@ -833,7 +839,7 @@ class Component extends DCLogic {
       });
       if (s.answered !== null) {
         showNext = true;
-        showNext = !adv;
+        showNext = !adv && (!fin || ph >= 4);
         nextLabel = 'Good.';
         nextAction = () => s.q < qs.length - 1 ? this.setState({ q: s.q + 1, ph: 0, answered: null, elim: [], flash: null, msg: '', kind: '' }) : (s.review ? this.setState({ screen: 'picker', q: 0, answered: null, elim: [], flash: null, msg: '', kind: '' }) : this.setState((() => { const sc = this.mkSched(); return Object.assign(enter(3), { t: 1, round: 0, sched: sc }, this.dirInit(s.jid, sc[0].white)); })()));
       }
