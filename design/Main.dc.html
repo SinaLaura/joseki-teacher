@@ -927,14 +927,16 @@ class Component extends DCLogic {
       const qs = J.qs;
       const q = qs[s.q];
       swap = false; const ansW = !!seq[q.shown].w;
-      // Step by step: White's last stone drops in (ph 0), then the text (ph 1), then the answer spots (ph 2).
+      // Step by step: "White is thinking …" (ph 0), White's stone drops in (ph 1), then the answer spots (ph 2).
+      // After an answer the next question starts by itself (adv), with White already thinking.
       const ph = s.ph == null ? 2 : s.ph;
-      const pk = [s.jid, s.q, s.review, ph].join('|');
-      const phRun = s.screen === 'lesson' && !s.intro && ph < 2;
+      const adv = s.answered !== null && s.q < qs.length - 1;
+      const pk = [s.jid, s.q, s.review, ph, adv].join('|');
+      const phRun = s.screen === 'lesson' && !s.intro && (ph < 2 || adv);
       if (!phRun) this._phKey = null;
-      if (phRun && this._phKey !== pk) { this._phKey = pk; setTimeout(() => { const t = this.state; if (t.screen === 'lesson' && t.stage === 2 && !t.intro && [t.jid, t.q, t.review, t.ph].join('|') === pk) this.setState({ ph: ph + 1 }); }, ph === 0 ? 1300 : 1000); }
-      items = stoneItems(seq.slice(0, q.shown), -1).map((it, i) => ({ ...it, style: it.style.replace(/animation:[^;]*;/, '') + (i === q.shown - 1 ? 'animation:drop .4s ease-out .4s both;' : '') }));
-      prompt = ph < 1 ? '\u00a0\n\u00a0' : say(q.p) + '\n' + (s.answered !== null ? 'Good.' : (s.q === 0 && ph >= 2 ? 'How should Black react?' : '\u00a0'));
+      if (phRun && this._phKey !== pk) { this._phKey = pk; setTimeout(() => { const t = this.state; if (t.screen === 'lesson' && t.stage === 2 && !t.intro && [t.jid, t.q, t.review, t.ph, t.answered !== null && t.q < qs.length - 1].join('|') === pk) this.setState(adv ? { q: t.q + 1, ph: 1, answered: null, elim: [], flash: null, msg: '', kind: '' } : { ph: ph + 1 }); }, adv ? (s.kind === 'bad' ? 2200 : 1400) : (ph === 0 ? 1200 : 1000)); }
+      items = stoneItems(seq.slice(0, ph < 1 ? q.shown - 1 : q.shown), -1).map((it, i) => ({ ...it, style: it.style.replace(/animation:[^;]*;/, '') + (i === q.shown - 1 ? 'animation:drop .4s ease-out both;' : '') }));
+      prompt = ph < 1 || adv ? 'White is thinking …' : '';
       const spotIn = s.elim.length === 0 && s.answered === null;
       const L = ['A', 'B', 'C'];
       q.opts.forEach((o, i) => {
@@ -965,7 +967,8 @@ class Component extends DCLogic {
       });
       if (s.answered !== null) {
         showNext = true;
-        nextLabel = s.q < qs.length - 1 ? 'Next' : 'Well done.';
+        showNext = !adv;
+        nextLabel = 'Good.';
         nextAction = () => s.q < qs.length - 1 ? this.setState({ q: s.q + 1, ph: 0, answered: null, elim: [], flash: null, msg: '', kind: '' }) : (s.review ? this.setState({ screen: 'picker', q: 0, answered: null, elim: [], flash: null, msg: '', kind: '' }) : this.setState((() => { const sc = this.mkSched(); return Object.assign(enter(3), { t: 1, round: 0, sched: sc }, this.dirInit(s.jid, sc[0].white)); })()));
       }
     }
