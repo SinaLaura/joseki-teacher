@@ -292,7 +292,10 @@ class Component extends DCLogic {
       let m, w;
       do { m = 1 + Math.floor(Math.random() * 3); w = Math.random() < 0.5; } while ((m === pm && w === pw) || (w === pw && run >= 2));
       run = w === pw ? run + 1 : 1; pm = m; pw = w;
-      out.push({ mode: m, white: w, both: i > 0 && Math.random() < 0.2 });
+      // A both-colors corner is never also a white corner: the stones are only swapped when the player
+      // practises White alone. Joseki texts name the real colors, so swapping in a both corner would mismatch.
+      const b = i > 0 && Math.random() < 0.2;
+      out.push({ mode: m, white: w && !b, both: b });
     }
     return out;
   }
@@ -801,8 +804,8 @@ class Component extends DCLogic {
     const key = st === 3 ? 't' : 'n';
     const nn = s[key];
     const goal = 10;
-    const white = st === 3 && !s.review && rnd.white;
     const both = st === 3 && !s.review && !!rnd.both;
+    const white = st === 3 && !s.review && !!rnd.white && !both;
     const par = both ? 2 : (white ? 1 : 0);
     const thr = (this.props.row || 'thread') === 'thread';
     const cornerBad = st === 3 && !!(s.rd && s.rd.r === s.round && s.rd.bad);
@@ -845,6 +848,9 @@ class Component extends DCLogic {
       return out;
     };
     let swap = false;
+    // Joseki texts (fp, tc, tb, tw, ex, tryP) always name the real colors. When the stones are shown swapped
+    // (player practises White but sees Black), the words Black/White are swapped too, so text and stones match.
+    const say = (t) => !t ? t : (swap ? t.replace(/\b(Black|White|black|white)\b/g, (w) => ({ Black: 'White', White: 'Black', black: 'white', white: 'black' })[w]) : t);
     const stoneItems = (list, sadIdx, hopIdx, numbered) => list.map((m, i) => this.mk(m.c, m.r, m.w !== swap ? 'w' : 'b', '', { num: numbered ? i + 1 : 0, sad: i === sadIdx, anim: i === list.length - 1 || i === hopIdx ? (i === hopIdx && s.kind === 'ok' ? 'drop .4s ease-out, hop .5s ease-in-out .45s 2' : (i === list.length - 1 ? 'drop .4s ease-out' : '')) : '' }));
     const enter = (stage) => ({ w: 1, help: false, went: Object.assign({}, s.went, { [stage - 1]: true }), exiting: false, clean: 0, elim: [], flash: null, tries: 0, rd: null, sadLast: false, stage: stage, intro: true, msg: '', kind: '', wrong: null });
     if (st === 0 || st === 3) {
@@ -859,11 +865,11 @@ class Component extends DCLogic {
       const nextCorner = corners[1 + ((s.round + 1) % 3)];
       const waiting = nn < 6 && par !== 2 && nn % 2 !== par;
       if (waiting) prompt = 'White is thinking …';
-      else if (T && both && nn < 6) prompt = nn === 0 ? (J.fp || 'Play the star point in the {c} corner.').replace('{c}', cornerName) : (nn === 1 ? J.tc.replace('{c}', cornerName) : (s.help && J.ex[nn] ? J.ex[nn] : (nn % 2 === 0 ? 'Black\u2019s turn.' : 'White\u2019s turn.')));
-      else if (T && nn < 6) prompt = nn < 2 ? (white ? J.tc.replace('{c}', cornerName) : (J.fp || 'Play the star point in the {c} corner.').replace('{c}', cornerName)) : (s.help ? ((white ? J.tw[nn] : J.tb[nn]) || J.ex[nn] || 'Black\u2019s turn.').replace('{c}', cornerName) : 'Black\u2019s turn.');
-      else if (white && nn % 2 === 1) prompt = J.tw[nn].replace('{c}', cornerName);
-      else if (nn === 0) prompt = (J.fp || 'Play the star point in the {c} corner.').replace('{c}', cornerName);
-      else if (nn === 2 || nn === 4) prompt = (nn === 2 && st === 0 ? 'Black to play.\n' : '') + J.tryP[nn];
+      else if (T && both && nn < 6) prompt = nn === 0 ? say(J.fp || 'Play the star point in the {c} corner.').replace('{c}', cornerName) : (nn === 1 ? say(J.tc).replace('{c}', cornerName) : (s.help && J.ex[nn] ? say(J.ex[nn]) : (nn % 2 === 0 ? 'Black\u2019s turn.' : 'White\u2019s turn.')));
+      else if (T && nn < 6) prompt = nn < 2 ? say(white ? J.tc : (J.fp || 'Play the star point in the {c} corner.')).replace('{c}', cornerName) : (s.help ? (say((white ? J.tw[nn] : J.tb[nn]) || J.ex[nn]) || 'Black\u2019s turn.').replace('{c}', cornerName) : 'Black\u2019s turn.');
+      else if (white && nn % 2 === 1) prompt = say(J.tw[nn]).replace('{c}', cornerName);
+      else if (nn === 0) prompt = say(J.fp || 'Play the star point in the {c} corner.').replace('{c}', cornerName);
+      else if (nn === 2 || nn === 4) prompt = (nn === 2 && st === 0 ? 'Black to play.\n' : '') + say(J.tryP[nn]);
       else if (!T) prompt = 'Well done!';
       else if (s.review) prompt = 'Done!';
       else prompt = thr ? '' : (passed ? 'Joseki passed!' : '');
@@ -887,7 +893,7 @@ class Component extends DCLogic {
       const q = qs[s.q];
       swap = !!seq[q.shown].w;
       items = stoneItems(seq.slice(0, q.shown), -1).map(it => ({ ...it, style: it.style.replace(/animation:[^;]*;/, '') }));
-      prompt = q.p;
+      prompt = say(q.p);
       const L = ['A', 'B', 'C'];
       q.opts.forEach((o, i) => {
         if (s.flash === i) { items.push(this.mk(o.c, o.r, 'bad', '', { k: s.wk }), this.mk(o.c, o.r, 'strike', '', { k: s.wk })); return; }

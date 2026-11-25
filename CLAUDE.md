@@ -37,6 +37,11 @@ other sentence is shown; text about what just happened is in the past tense and 
 3-3."); always use Go terms and phrases so the player learns them; no gamification or scolding ("No point for this
 corner."). **Ask the owner before adding any new text to the app.**
 
+**Colors in texts:** every joseki text (`fp`, `tc`, `tb`, `tw`, `ex`, `tryP`, Pick `p`) names the *real* colors of the
+sequence (Black = corner owner). Never write them from the swapped view. When the stones are shown swapped (practising
+White alone), the app swaps the words Black/White itself (`say()` in `renderVals`). A both-colors Train corner is never
+swapped (`mkSched` never sets `white` and `both` together), so the real colors are on the board and in the text.
+
 ## Look: a sensei with a gift for drawing explains it on a sheet of paper
 
 The whole app is drawn in pencil, and all of the following came from the owner's feedback.
