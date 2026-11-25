@@ -224,7 +224,7 @@ class Component extends DCLogic {
   }
   threadRowBg(sx, st) {
     const D = '#4b4f6e', L = '#c9ccd9', X = [14, 72, 132, 190];
-    const g = this.pline(4, 416, 44, L, 2.2, 4);
+    const g = this.pline(4, 264, 44, L, 2.2, 4);
     return 'url(data:image/svg+xml;base64,' + btoa('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 70">' + g + '</svg>') + ')';
   }
   inkBg() {
@@ -365,39 +365,49 @@ class Component extends DCLogic {
     return 'url(data:image/svg+xml;base64,' + btoa(svg) + ')';
   }
   boardBg(E) {
+    // E = [top, bottom, right, left] edge present. Every line is a pencil stroke: a little crooked, with uneven pressure;
+    // where the board continues, lines just stop at slightly different lengths, the pencil lifting off.
     const rn = (n) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x) - 0.5; };
     const f = (v) => v.toFixed(1);
-    let g = '';
-    // a line from a to b along one axis; open ends run out in a few fading, shorter strokes
-    const line = (hor, p, a, b, openA, openB, n, col, w, op) => {
-      const pt = (t, q) => hor ? f(t) + ' ' + f(q) : f(q) + ' ' + f(t);
-      let out = '<path d="M' + pt(a + rn(n) * 2, p + rn(n + 1) * 1.4) + 'Q' + pt((a + b) / 2, p + rn(n + 2) * 3) + ' ' + pt(b + rn(n + 3) * 2, p + rn(n + 5) * 1.4) + '" fill="none" stroke="' + col + '" stroke-width="' + f(w) + '" opacity="' + f(op) + '" stroke-linecap="round"/>';
-      const tail = (from, dir, m) => {
-        let t = from, o = op;
-        for (let k = 0; k < 3; k++) {
-          const len = 5 + (rn(m + k) + 0.5) * 5;
-          o *= 0.55;
-          out += '<path d="M' + pt(t, p + rn(m + k + 9) * 1.4) + 'L' + pt(t + dir * len, p + rn(m + k + 12) * 1.8) + '" fill="none" stroke="' + col + '" stroke-width="' + f(w * (0.85 - k * 0.2)) + '" opacity="' + f(o) + '" stroke-linecap="round"/>';
-          t += dir * (len + 1.5 + (rn(m + k + 20) + 0.5) * 2);
-        }
-      };
-      if (openA) tail(a, -1, n * 3 + 200);
-      if (openB) tail(b, 1, n * 3 + 300);
-      return out;
+    const pen = (hor, p, a, b, n, col, w, op, liftA, liftB) => {
+      const N = Math.max(6, Math.round((b - a) / 22)), bow = rn(n + 1) * 2.2, L = [], R = [];
+      for (let i = 0; i <= N; i++) {
+        const t = i / N, along = a + (b - a) * t;
+        const off = bow * 4 * t * (1 - t) + rn(n + 10 + i) * 0.7 + Math.sin(t * 9 + n) * 0.35;
+        let ww = w * (0.8 + 0.35 * (rn(n + 40 + i) + 0.5));
+        const ea = Math.min(1, t * (b - a) / 9), eb = Math.min(1, (1 - t) * (b - a) / 9);
+        if (liftA) ww *= 0.25 + 0.75 * ea; else ww *= 0.6 + 0.4 * ea;
+        if (liftB) ww *= 0.25 + 0.75 * eb; else ww *= 0.6 + 0.4 * eb;
+        const q = p + off;
+        L.push(hor ? [along, q - ww / 2] : [q - ww / 2, along]);
+        R.push(hor ? [along, q + ww / 2] : [q + ww / 2, along]);
+      }
+      const path = (pts) => { let d = ''; for (let i = 1; i < pts.length; i++) { const m = [(pts[i - 1][0] + pts[i][0]) / 2, (pts[i - 1][1] + pts[i][1]) / 2]; d += 'Q' + f(pts[i - 1][0]) + ' ' + f(pts[i - 1][1]) + ' ' + f(m[0]) + ' ' + f(m[1]); } const z = pts[pts.length - 1]; return d + 'L' + f(z[0]) + ' ' + f(z[1]); };
+      const Rr = R.slice().reverse();
+      return '<path d="M' + f(L[0][0]) + ' ' + f(L[0][1]) + path(L) + 'L' + f(Rr[0][0]) + ' ' + f(Rr[0][1]) + path(Rr) + 'Z" fill="' + col + '" opacity="' + f(op) + '"/>';
     };
+    const endA = (open, n) => open ? 18 - (7 + (rn(n) + 0.5) * 11) : 18 + rn(n) * 1.5;
+    const endB = (open, n) => open ? 322 + (7 + (rn(n) + 0.5) * 11) : 322 + rn(n) * 1.5;
+    let g = '';
     for (let k = 0; k < 9; k++) {
       const p = 18 + k * 38;
-      const w1 = 0.9 + (rn(k * 5 + 40) + 0.5) * 0.9, o1 = 0.45 + (rn(k * 5 + 41) + 0.5) * 0.4, w2 = 0.9 + (rn(k * 5 + 42) + 0.5) * 0.9, o2 = 0.45 + (rn(k * 5 + 43) + 0.5) * 0.4;
-      g += line(true, p, 18, 322, !E[3], !E[2], k * 4, '#7a7e9c', w1, o1);
-      g += line(false, p, 18, 322, !E[0], !E[1], k * 4 + 50, '#7a7e9c', w2, o2);
+      if (!(k === 0 && E[0]) && !(k === 8 && E[1])) g += pen(true, p, endA(!E[3], k + 60), endB(!E[2], k + 61), k * 4, '#7a7e9c', 1.1, 0.5 + (rn(k * 5 + 41) + 0.5) * 0.3, !E[3], !E[2]);
+      if (!(k === 0 && E[3]) && !(k === 8 && E[2])) g += pen(false, p, endA(!E[0], k + 70), endB(!E[1], k + 71), k * 4 + 50, '#7a7e9c', 1.1, 0.5 + (rn(k * 5 + 43) + 0.5) * 0.3, !E[0], !E[1]);
     }
-    const ed = (hor, p, openA, openB, n) => line(hor, p, 18, 322, openA, openB, n, '#4b4f6e', 2.8, 0.9) + line(hor, p + 1.6, 21, 318, false, false, n + 7, '#7a7e9c', 1.1, 0.6);
-    if (E[0]) g += ed(true, 18, !E[3], !E[2], 101);
-    if (E[1]) g += ed(true, 322, !E[3], !E[2], 111);
-    if (E[2]) g += ed(false, 322, !E[0], !E[1], 121);
-    if (E[3]) g += ed(false, 18, !E[0], !E[1], 131);
+    // the real edges: a firm stroke that runs a little past the corner, plus a lighter second pass
+    const ed = (hor, p, n) => {
+      const sA = hor ? E[3] : E[0], sB = hor ? E[2] : E[1];
+      const a = sA ? 18 - (4 + (rn(n + 3) + 0.5) * 4) : endA(true, n + 4), b = sB ? 322 + (4 + (rn(n + 5) + 0.5) * 4) : endB(true, n + 6);
+      return pen(hor, p, a, b, n, '#4b4f6e', 2.7, 0.92, true, true) + pen(hor, p + 1.4, a + 5, b - 9, n + 9, '#4b4f6e', 1, 0.4, true, true);
+    };
+    if (E[0]) g += ed(true, 18, 101);
+    if (E[1]) g += ed(true, 322, 111);
+    if (E[2]) g += ed(false, 322, 121);
+    if (E[3]) g += ed(false, 18, 131);
     return 'url(data:image/svg+xml;base64,' + btoa('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 340">' + g + '</svg>') + ')';
   }
+
+
   thumbBg(id) {
     const J = this.data()[id], f = (v) => v.toFixed(1);
     const rn = (n) => { const x = Math.sin(n * 77.7 + 5.5) * 43758.5453; return x - Math.floor(x) - 0.5; };
@@ -769,10 +779,10 @@ class Component extends DCLogic {
     const card = (o) => 'background:#fffdf7;border:2px solid #4b4f6e;border-width:2px 2.8px 2.4px 2.2px;border-radius:26px 20px 28px 22px/22px 28px 20px 26px;padding:16px;box-shadow:2px 3px 0 rgba(75,79,110,.22);display:flex;flex-direction:column;gap:12px;opacity:' + o;
     const btn = (on) => 'height:46px;border:0;border-radius:23px;font-size:15px;font-weight:800;' + (on ? 'background:#4b4f6e;color:#fff' : 'background:#eceef3;color:#868a9c');
     const inLesson = s.screen === 'lesson';
-    const TX = [222, 264, 306];
-    let sxPos = [14, 72, 132, 190][st];
+    const TX = [204, 234, 264];
+    let sxPos = [14, 72, 132, 178][st];
     const exiting = !!s.exiting;
-    if (st === 3) { const seg = Math.min(cleanTot, 2), a = cleanTot === 0 ? 190 : TX[cleanTot - 1], b = TX[seg]; const pp = par === 2 ? 0 : par; let mine = 0; for (let i = 0; i < Math.min(s.t, 6); i++) if (i % 2 === pp) mine++; sxPos = exiting ? 440 : cleanTot >= 3 ? 306 : a + (b - a) * ((cleanNow || cornerBad) ? 0 : mine / 3); }
+    if (st === 3) { const seg = Math.min(cleanTot, 2), a = cleanTot === 0 ? 178 : TX[cleanTot - 1], b = TX[seg]; const pp = par === 2 ? 0 : par; let mine = 0; for (let i = 0; i < Math.min(s.t, 6); i++) if (i % 2 === pp) mine++; sxPos = exiting ? 440 : cleanTot >= 3 ? 264 : a + (b - a) * ((cleanNow || cornerBad) ? 0 : mine / 3); }
     const hangLen = ({ menu: 100, picker: 50, start: 40, result: 110 })[s.screen] || 60;
     return {
       isThread: thr, isStrip: this.props.row === 'strip',
@@ -782,7 +792,7 @@ class Component extends DCLogic {
       threadInk: 'position:absolute;left:0;top:0;height:70px;overflow:hidden;width:' + sxPos + 'px;transition:width ' + (exiting ? '1.8s ease-in' : '.6s ease') + ';background:' + this.inkBg() + ' left top/420px 70px no-repeat',
       threadKnots: [14, 72, 132].map((x, i) => ({ style: 'position:absolute;top:33px;width:22px;height:22px;left:' + (x - 11) + 'px;background:' + this.web(s.went && s.went[i] ? 2 : (i <= st ? 1 : 0)) + ' center/22px no-repeat' + (s.went && s.went[i] ? ';animation:pop .5s ease-out' : '') })),
       threadLabels: ['Try', 'Watch', 'Decide', 'Transfer'].map((t, i) => ({ t: t, act: stages[i].act, style: 'position:absolute;top:-18px;height:30px;padding:0 4px 3px;border:0;background:' + (i === st ? 'url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTIiIHByZXNlcnZlQXNwZWN0UmF0aW89Im5vbmUiPjxwYXRoIGQ9Ik0xIDYuNkMyNSA1LjYgNjIgNS40IDk5IDEuNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNGI0ZjZlIiBzdHJva2Utd2lkdGg9IjIuMyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBvcGFjaXR5PSIuOTIiLz48cGF0aCBkPSJNNSA3LjRDMzQgNi42IDY0IDYgOTAgMy4yIiBmaWxsPSJub25lIiBzdHJva2U9IiM0YjRmNmUiIHN0cm9rZS13aWR0aD0iLjkiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgb3BhY2l0eT0iLjUiLz48cGF0aCBkPSJNNyAxMC42QzMwIDkuOCA2NiAxMC40IDk5LjUgNS40IiBmaWxsPSJub25lIiBzdHJva2U9IiM0YjRmNmUiIHN0cm9rZS13aWR0aD0iMS44IiBzdHJva2UtbGluZWNhcD0icm91bmQiIG9wYWNpdHk9Ii44NSIvPjxwYXRoIGQ9Ik0xMiAxMS40QzQyIDEwLjYgNzAgMTAuNCA5MSA3LjIiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzRiNGY2ZSIgc3Ryb2tlLXdpZHRoPSIuOCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBvcGFjaXR5PSIuNDUiLz48L3N2Zz4=) center bottom/90% 7px no-repeat' : 'transparent') + ';font-family:\'Patrick Hand\',Nunito,sans-serif;line-height:1;font-size:' + (i === st ? 20 : 16) + 'px;color:' + (i === st ? '#2d3042' : (i < st ? '#6b6f8c' : '#b3b7ca')) + ';' + (i === 0 ? 'left:-4px' : (i === 3 ? 'left:182px' : 'left:' + [14, 72, 132][i] + 'px;transform:translateX(-50%)')) })),
-      threadTangles: [222, 264, 306].map((x, i) => ({ style: 'position:absolute;top:33px;width:22px;height:22px;left:' + (x - 11) + 'px;background:' + this.web(i < cleanTot ? 2 : 0) + ' center/22px no-repeat' + (i < cleanTot ? ';animation:pop .5s ease-out' : '') })),
+      threadTangles: [204, 234, 264].map((x, i) => ({ style: 'position:absolute;top:33px;width:22px;height:22px;left:' + (x - 11) + 'px;background:' + this.web(i < cleanTot ? 2 : 0) + ' center/22px no-repeat' + (i < cleanTot ? ';animation:pop .5s ease-out' : '') })),
       rappelBox: thr ? 'position:absolute;z-index:2;pointer-events:none;top:0;left:calc(50% - 45px);width:90px;display:flex;flex-direction:column;align-items:center;transform-origin:45px 0;animation:swing 3s ease-in-out 2.8s infinite' : 'display:none',
       rappelThread: 'width:6px;background:' + this.threadBg() + ' center top/6px 22px repeat-y;height:370px;animation:rp 2.8s ease-in-out',
       rappelSpider: 'flex:none;width:90px;height:90px;margin-top:-44px;background:' + this.sketchSpider() + ' center/104px no-repeat',
