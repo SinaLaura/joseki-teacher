@@ -169,7 +169,7 @@ class Component extends DCLogic {
     const wrong = { c: 5, r: 5 };
     const P = {
       start: { screen: 'start' },
-      'menu-progress': { screen: 'menu', learned: { j33: true } },
+      'menu-progress': { screen: 'menu', learned: { j44: true } },
       picker: { screen: 'picker' },
       'intro-try': lesson({ stage: 0, intro: true }),
       'intro-watch': lesson({ stage: 1, intro: true, pts: 1 }),
@@ -835,7 +835,7 @@ class Component extends DCLogic {
       barFill: 'position:absolute;left:0;top:29px;height:8px;overflow:hidden;background:' + this.barSvg(true) + ' left top/342px 8px no-repeat;transition:width .5s ease;width:' + barPct + '%',
       markerStyle: s.review ? 'display:none' : 'position:absolute;left:calc(62.5% - 13px);top:20px;width:26px;height:26px;background:' + this.web(webOn ? 2 : (!s.review && s.pts >= 10 ? 1 : 0)) + ' center/26px no-repeat' + (webOn ? ';animation:pop .5s ease-out' : ''),
       walkerStyle: 'position:absolute;top:17px;width:32px;height:32px;transition:left .5s ease;left:calc(' + barPct + '% - 16px);background:' + this.sketchSpider() + ' center/34px no-repeat', gridStyle: 'display:none', edges: [], boardStyle,
-                  josekiList: ['j33', 'j44', 'j34'].map((id, k, arr) => {
+                  josekiList: ['j44', 'j33', 'j34'].map((id, k, arr) => {
         const nextOpen = arr.find(x => !s.learned[x]), isDone = !!s.learned[id], isNext = id === nextOpen;
         const D = this.data()[id], done = !!s.learned[id], open = UNLOCK_ALL || k === 0 || !!s.learned[arr[k - 1]];
         return { thumb: this.thumbBg(id), name: D.title, sub: open ? (done ? 'Ready to review' : D.sub) : 'After ' + this.data()[arr[k - 1]].short, tint: D.tint,
