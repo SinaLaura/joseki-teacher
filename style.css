@@ -25,3 +25,4 @@ button:not([aria-label^="Point"]):not([aria-label^="Option"]):not(.stp):not(.mnu
 @keyframes fade2{to{opacity:0}}
 @keyframes strike{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:none}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+#ver{position:absolute;left:0;right:0;bottom:5px;text-align:center;font:600 11px Nunito,system-ui,sans-serif;color:#9a9eb4;pointer-events:none;z-index:50}

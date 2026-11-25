@@ -664,6 +664,7 @@ class Component extends DCLogic {
   }
 }
 
+document.getElementById('ver').textContent = window.JOSEKI_VERSION || 'dev';
 window.addEventListener('resize', fit);
 fit();
 document.fonts && document.fonts.ready.then(() => {});
