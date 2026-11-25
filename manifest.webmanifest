@@ -1,6 +1,6 @@
 {
-  "name": "Joseki Teacher",
-  "short_name": "Joseki Teacher",
+  "name": "Joseki Spider Sensei",
+  "short_name": "Joseki Spider Sensei",
   "description": "A daily joseki trainer for Go, drawn like a sketch on paper.",
   "start_url": "./",
   "scope": "./",

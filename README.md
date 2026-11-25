@@ -1,4 +1,4 @@
-# Joseki Teacher
+# Joseki Spider Sensei
 
 **A beautiful, low-effort daily joseki trainer for Go. It works like a vocabulary app.**
 
@@ -16,7 +16,7 @@ Vocabulary trainers such as Anki and Duolingo solved this problem for language l
 **spaced repetition**: you get short daily sessions, see each item again just before you'd forget
 it, and build up long-term memory with very little effort.
 
-**Joseki Teacher applies the same principle to joseki:**
+**Joseki Spider Sensei applies the same principle to joseki:**
 
 1. The app shows a corner position.
 2. You play the next move.
