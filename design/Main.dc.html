@@ -891,13 +891,13 @@ class Component extends DCLogic {
     } else {
       const qs = J.qs;
       const q = qs[s.q];
-      swap = !!seq[q.shown].w;
+      swap = false; const ansW = !!seq[q.shown].w;
       items = stoneItems(seq.slice(0, q.shown), -1).map(it => ({ ...it, style: it.style.replace(/animation:[^;]*;/, '') }));
       prompt = say(q.p);
       const L = ['A', 'B', 'C'];
       q.opts.forEach((o, i) => {
-        if (s.flash === i) { items.push(this.mk(o.c, o.r, 'bad', '', { k: s.wk }), this.mk(o.c, o.r, 'strike', '', { k: s.wk })); return; }
-        if (s.answered !== null) { if (i === q.ok) items.push(this.mk(o.c, o.r, 'b', '', { anim: 'drop .4s ease-out, hop .5s ease-in-out .45s 2' })); return; }
+        if (s.flash === i) { items.push(this.mk(o.c, o.r, 'bad', '', { k: s.wk, white: ansW }), this.mk(o.c, o.r, 'strike', '', { k: s.wk })); return; }
+        if (s.answered !== null) { if (i === q.ok) items.push(this.mk(o.c, o.r, ansW ? 'w' : 'b', '', { anim: 'drop .4s ease-out, hop .5s ease-in-out .45s 2' })); return; }
         if (s.elim.includes(i)) return;
         items.push(this.mk(o.c, o.r, 'optb', ''), this.mk(o.c, o.r, 'q', '?'));
       });
