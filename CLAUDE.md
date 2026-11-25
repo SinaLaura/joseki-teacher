@@ -50,9 +50,9 @@ both arrays. The owner keeps all these texts in the Sheet "Train instructions �
 **Every sequence starts with only the first stone** (Try, Learn and every Train corner). Moves of the colour the player
 isn't playing are played automatically after a short pause.
 **Pick asks only Black's moves:** two questions per joseki (after White's 1st and 2nd move), real colors, never swapped.
-Each question plays step by step: White's move drops in, then the text, then the three answer spots (state `ph`).
-The first question adds "How should Black react?" on a second line. A correct answer shows "Good." on line 2.
-The button after the last question says "Well done."
+Each question plays step by step (state `ph`): "White is thinking …", then White's move drops in, then the three answer
+spots. No other text in Pick except the mistake messages. After an answer the next question starts by itself with
+"White is thinking …" (no Next button). After the last question the button "Good." ends Pick.
 
 ## Look: a sensei with a gift for drawing explains it on a sheet of paper
 
