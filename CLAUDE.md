@@ -5,8 +5,9 @@ The owner usually writes in German. **All text in the app is English.**
 
 ## How the project is organized
 
-- `design/Main.dc.html` is the source of the app: template, styles and logic. It is the same file as the Claude
-  design artifact "Joseki – Sketch style".
+- `design/Main.dc.html` is the source of the app: template, styles and logic. It is the same file as
+  `project/Refined.dc.html` in the Claude design artifact "Joseki – Sketch style" (page "Refined", version 3), with
+  `row` defaulting to `thread`. The canvas boards pass props (`variant`, `row`, `start-at`, `demo`) to show screens.
 - `python3 tools/build.py` generates `index.html`, `app.js` and `style.css` from it. **Never edit those three by
   hand.** Change the design file, run the script, commit.
 - Every push to `main` is published to GitHub Pages by `.github/workflows/pages.yml`
@@ -24,8 +25,8 @@ The owner usually writes in German. **All text in the app is English.**
 ## Idea
 
 Every joseki goes through four steps: **Try** (play it, get corrected), **Watch**, **Decide** (pick the right
-move from three), **Transfer** (random corners and roles, sometimes both colors; 10 points to pass, one mistake
-in a corner voids that corner's points). The player always sees themselves as Black; colors are swapped when
+move from three), **Transfer** (random corners and roles, sometimes both colors; pass with 3 clean corners,
+then "Done" or "One more corner"). Try, Watch and Decide can be skipped by tapping a later stage. The player always sees themselves as Black; colors are swapped when
 practicing the white side. Only real, very common joseki. Check every sequence against a source (see
 `RESEARCH.md`) before it goes in. Use proper Go terms (star point, invade, block, extend, hane, ...) and very little text.
 
@@ -47,8 +48,12 @@ The whole app is drawn in pencil, and all of the following came from the owner's
   mouth) and no hatching or inner ring on black stones. After a mistake the previous stone gets a flat `:I` mouth, not a sad one.
 - **Wrong move:** draw the stone, wait a moment, strike it through with one red stroke from bottom left to top right, then
   fade it out. On the second miss the right spot is then sketched lightly (thin outline, light hatching).
-- **Progress bar:** a pencil line with a spider walking along it toward a tangle of thread. When the spider passes it,
-  the tangle turns into a web at once (a hand-drawn web, not too elaborate).
+- **Progress thread:** one pencil thread with the stage names above it. Try, Watch and Decide are small tangles, Transfer
+  has three. Not reached: pale tangle; reached or skipped: bold tangle; done (stage finished, corner clean): web at once.
+  The spider moves only on the player's (Black's) moves and draws a thin dark line behind her. After "Done" she walks
+  out to the right, and the end screen shows her rappelling down above "Well spun." No color coding, little text, no
+  gamification words ("Passed!", "unlocked").
+- **Decide answer spots** stay the soft grey discs.
 - **Spider (Ankabuti mascot):** classic curved legs with staggered lengths, a friendly face. The start screen of each
   joseki has a sketch with spiders that tells the joseki as a little picture.
 - **Layout:** the board must not move when the text above it needs more or fewer lines (the text area has a fixed height).
