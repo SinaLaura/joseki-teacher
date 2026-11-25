@@ -999,7 +999,7 @@ class Component extends DCLogic {
                   josekiList: ['j44', 'j33', 'j34'].map((id, k, arr) => {
         const nextOpen = arr.find(x => !s.learned[x]), isDone = !!s.learned[id], isNext = id === nextOpen;
         const D = this.data()[id], done = !!s.learned[id], open = true; /* TEMP: all unlocked for preview */
-        return { thumb: this.thumbBg(id), name: D.title, sub: open ? (done ? 'Ready to review' : D.sub) : 'After ' + this.data()[arr[k - 1]].short, tint: D.tint,
+        return { thumb: this.thumbBg(id), name: D.title, sub: open ? D.sub : 'After ' + this.data()[arr[k - 1]].short, tint: D.tint,
           chip: done ? 'Learned' : (open ? 'New' : 'Locked'), chipStyle: chip(done ? 'g' : (open ? 'p' : 'x')), markStyle: 'width:32px;height:32px;flex:none;' + ((isDone || isNext) ? 'background:' + this.todoMark(isDone, k + 3) + ' center/32px no-repeat' : ''),
           aria: D.title + (isDone ? ', done' : (isNext ? ', to do' : '')),
           todoStyle: isNext && !isDone ? 'flex:none;font-family:\'Patrick Hand\',Nunito,sans-serif;font-size:19px;color:#6b6f8c;transform:rotate(-8deg);margin-right:-14px;margin-top:-14px;color:#c9772f' : 'display:none',
