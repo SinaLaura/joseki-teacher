@@ -74,6 +74,13 @@ moves, and the opponent can deviate. The plan:
 - Later, add **common mistakes and how to punish them**, plus **context**: when to choose which
   variation, such as which side to block from.
 
+## How the app is built
+
+`design/Main.dc.html` is the design source: the template, styles and logic of the app, and the same file
+as in the Claude design artifact. `python3 tools/build.py` turns it into the files the browser loads
+(`index.html`, `app.js`, `style.css`) and adds the small runtime from `tools/`. So change the design in
+`design/Main.dc.html`, run the build script, then commit. Don't edit the three generated files by hand.
+
 ## Status
 
 🌱 **v0.2: new design.** The app was rebuilt from scratch in a hand-drawn pencil style, as if a sensei
