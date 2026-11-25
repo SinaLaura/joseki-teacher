@@ -1,6 +1,6 @@
 {
-  "name": "Joseki",
-  "short_name": "Joseki",
+  "name": "Joseki Teacher",
+  "short_name": "Joseki Teacher",
   "description": "A daily joseki trainer for Go, drawn like a sketch on paper.",
   "start_url": "./",
   "scope": "./",
