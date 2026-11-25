@@ -30,6 +30,8 @@ jobs:
         run: |
           mkdir _site
           cp index.html app.js style.css sw.js manifest.webmanifest icon.svg icon-192.png icon-512.png apple-touch-icon.png _site/
+          echo "window.JOSEKI_VERSION = 'v${{ github.run_number }} · $(TZ=Europe/Berlin date '+%d.%m. %H:%M')';" > _site/version.js
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
