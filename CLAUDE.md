@@ -41,6 +41,14 @@ corner."). **Ask the owner before adding any new text to the app.**
 sequence (Black = corner owner). Never write them from the swapped view. When the stones are shown swapped (practising
 White alone), the app swaps the words Black/White itself (`say()` in `renderVals`). A both-colors Train corner is never
 swapped (`mkSched` never sets `white` and `both` together), so the real colors are on the board and in the text.
+**Train texts after a mistake:** each joseki has `go` (one instruction per move, no colour: "Take the 3-3 point.") and
+`did` (the same move in the past tense: "Black took the 3-3 point."), both derived from the Learn text `ex`. Playing one
+colour: the opponent's last move (`did`) on one line, then your move (`go`). Playing both colours: only `go`; the first two
+moves name the colour once ("Approach low as White.", "Extend low to the other side as Black."). Every new joseki needs
+both arrays. The owner keeps all these texts in the Sheet "Train instructions – joseki texts"
+(https://claude.ai/artifact/Lg2gJ7zz8HZkKPbGNTZBkP): keep it and the design file in step.
+**Every sequence starts with only the first stone** (Try, Learn and every Train corner). Moves of the colour the player
+isn't playing are played automatically after a short pause.
 **Pick never swaps colors:** all three questions of a joseki show the real colors, so the stones don't change color from
 one question to the next; when the answer is White's move, the answer stone is white.
 

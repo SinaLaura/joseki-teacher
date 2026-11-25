@@ -97,7 +97,7 @@ function fit() {
 class Component extends DCLogic {
   constructor(props) {
     super(props);
-    this.state = { wk: 0, screen: 'menu', review: false, watchOnly: false, elim: [], flash: null, tries: 0, rd: null, sadLast: false, dir: 0, dirSet: false, jid: 'j33', learned: {}, stage: 0, intro: true, n: 2, t: 0, round: 0, w: 1, q: 0, answered: null, pts: 0, msg: '', kind: '', wrong: null };
+    this.state = { wk: 0, screen: 'menu', review: false, watchOnly: false, elim: [], flash: null, tries: 0, rd: null, sadLast: false, dir: 0, dirSet: false, jid: 'j33', learned: {}, stage: 0, intro: true, n: 1, t: 0, round: 0, w: 1, q: 0, answered: null, pts: 0, msg: '', kind: '', wrong: null };
     // Design canvas only: the boards pass start-at to open the app on a fixed screen.
     if (props && props.startAt) Object.assign(this.state, this.preset(props.startAt));
   }
@@ -112,9 +112,11 @@ class Component extends DCLogic {
         tryP: { 2: 'Block on the side you want to build.', 4: 'Extend.' },
         tb: { 2: 'White invades at 3-3. Block on the side you want to build.', 4: 'White crawls along the edge. Extend.' },
         tw: { 1: 'Invade at 3-3 in the {c} corner.', 3: 'Crawl along the edge.', 5: 'Slide with a knight\u2019s move.' },
+        go: ['Play the star point.', 'Invade at 3-3.', 'Block on the side you want to build.', 'Crawl along the edge.', 'Extend.', 'Slide with a knight\u2019s move.'],
+        did: ['Black played the star point.', 'White invaded at 3-3.', 'Black blocked.', 'White crawled along the edge.', 'Black extended.', 'White slid with a knight\u2019s move.'],
         ex: ['Black plays the star point.', 'White invades at 3-3 and has just enough room to live.', 'Black blocks on the side where they want to build.', 'White crawls along the edge to make room for eyes.', 'Black extends and keeps a strong wall.', 'White slides with a knight\u2019s move to settle the corner.'],
         qs: [
-          { shown: 2, opts: [{ c: 5, r: 3 }, { c: 3, r: 4 }, { c: 2, r: 4 }], ok: 1, p: 'White invaded at 3-3.' },
+          { shown: 1, opts: [{ c: 5, r: 3 }, { c: 3, r: 4 }, { c: 2, r: 4 }], ok: 1, p: 'White invaded at 3-3.' },
           { shown: 3, opts: [{ c: 5, r: 3 }, { c: 2, r: 5 }, { c: 4, r: 3 }], ok: 2, p: 'Crawl along the edge.' },
           { shown: 4, opts: [{ c: 6, r: 5 }, { c: 5, r: 4 }, { c: 3, r: 6 }], ok: 1, p: 'White crawled along the edge.' }
         ]
@@ -127,9 +129,11 @@ class Component extends DCLogic {
         tryP: { 2: 'Extend low to the other side.', 4: 'Take the 3-3 point.' },
         tb: { 2: 'White approaches low. Extend low to the other side.', 4: 'White slides to the 2nd line. Take the 3-3 point.' },
         tw: { 1: 'Approach low in the {c} corner.', 3: 'Slide to the 2nd line.', 5: 'Extend along the edge.' },
+        go: ['Play the star point.', 'Approach low.', 'Extend low to the other side.', 'Slide to the 2nd line.', 'Take the 3-3 point.', 'Extend along the edge.'],
+        did: ['Black played the star point.', 'White approached low.', 'Black extended low to the other side.', 'White slid to the 2nd line.', 'Black took the 3-3 point.', 'White extended along the edge.'],
         ex: ['Black plays the star point.', 'White approaches low, a knight\u2019s move away on the 3rd line.', 'Black extends low to the other side, also a knight\u2019s move.', 'White slides onto the 2nd line.', 'Black takes the 3-3 point.', 'White extends along the edge.'],
         qs: [
-          { shown: 2, opts: [{ c: 5, r: 4 }, { c: 3, r: 6 }, { c: 7, r: 3 }], ok: 1, p: 'White made a low approach.' },
+          { shown: 1, opts: [{ c: 5, r: 4 }, { c: 3, r: 6 }, { c: 7, r: 3 }], ok: 1, p: 'White made a low approach.' },
           { shown: 3, opts: [{ c: 6, r: 5 }, { c: 3, r: 2 }, { c: 4, r: 2 }], ok: 2, p: 'Slide to the 2nd line.' },
           { shown: 4, opts: [{ c: 3, r: 3 }, { c: 5, r: 3 }, { c: 4, r: 6 }], ok: 0, p: 'White slid to the 2nd line.' }
         ]
@@ -143,9 +147,11 @@ class Component extends DCLogic {
         tryP: { 2: 'Kick.', 4: 'Extend.' },
         tb: { 2: 'White approaches with a small knight\u2019s move. Kick.', 4: 'White stands. Extend.' },
         tw: { 1: 'Approach with a small knight\u2019s move in the {c} corner.', 3: 'Stand.', 5: 'Extend three spaces.' },
+        go: ['Play the 3-4 point.', 'Approach with a small knight\u2019s move.', 'Kick.', 'Stand.', 'Extend.', 'Extend three spaces.'],
+        did: ['Black played the 3-4 point.', 'White made a small knight approach.', 'Black kicked.', 'White stood.', 'Black extended.', 'White extended three spaces.'],
         ex: ['Black plays the 3-4 point.', 'White approaches with a small knight\u2019s move.', 'Black kicks.', 'White stands.', 'Black extends and keeps sente.', 'White extends three spaces along the edge.'],
         qs: [
-          { shown: 2, opts: [{ c: 5, r: 2 }, { c: 4, r: 3 }, { c: 6, r: 4 }], ok: 1, p: 'White made a small knight approach.' },
+          { shown: 1, opts: [{ c: 5, r: 2 }, { c: 4, r: 3 }, { c: 6, r: 4 }], ok: 1, p: 'White made a small knight approach.' },
           { shown: 3, opts: [{ c: 4, r: 2 }, { c: 3, r: 3 }, { c: 5, r: 4 }], ok: 2, p: 'Stand.' },
           { shown: 4, opts: [{ c: 3, r: 6 }, { c: 6, r: 5 }, { c: 5, r: 5 }], ok: 0, p: 'White stood.' }
         ]
@@ -172,15 +178,18 @@ class Component extends DCLogic {
     const wrong = { c: 5, r: 5 };
     const P = {
       start: { screen: 'start' },
+      'train-help': lesson({ jid: 'j44', stage: 3, t: 1, help: true, clean: 0, sched: [{ mode: 1, white: false }, { mode: 2, white: true }, { mode: 3, white: false, both: true }] }),
+      'train-help-white': lesson({ jid: 'j44', stage: 3, t: 1, help: true, clean: 0, sched: [{ mode: 2, white: true }, { mode: 3, white: false, both: true }, { mode: 1, white: false }] }),
+      'train-help-both': lesson({ jid: 'j44', stage: 3, t: 1, help: true, clean: 0, sched: [{ mode: 3, white: false, both: true }, { mode: 1, white: false }, { mode: 2, white: true }] }),
       'menu-progress': { screen: 'menu', learned: { j44: true } },
       picker: { screen: 'picker' },
       'intro-try': lesson({ stage: 0, intro: true }),
       'intro-watch': lesson({ stage: 1, intro: true, pts: 1 }),
       'intro-decide': lesson({ stage: 2, intro: true, pts: 2 }),
       'intro-transfer': lesson({ stage: 3, intro: true, pts: 3 }),
-      try: lesson({ stage: 0, n: 2 }),
-      'try-wrong': lesson({ stage: 0, n: 2, wrong: wrong, wk: 1, tries: 1, sadLast: true, kind: 'bad', msg: 'Not quite. Try again.' }),
-      'try-hint': lesson({ stage: 0, n: 2, wrong: wrong, wk: 1, tries: 2, sadLast: true, kind: 'bad', msg: 'This is the spot.' }),
+      try: lesson({ stage: 0, n: 1 }),
+      'try-wrong': lesson({ stage: 0, n: 1, wrong: wrong, wk: 1, tries: 1, sadLast: true, kind: 'bad', msg: 'Not quite. Try again.' }),
+      'try-hint': lesson({ stage: 0, n: 1, wrong: wrong, wk: 1, tries: 2, sadLast: true, kind: 'bad', msg: 'This is the spot.' }),
       watch: lesson({ stage: 1, w: 3, pts: 1 }),
       decide: lesson({ stage: 2, q: 0, pts: 2 }),
       'decide-wrong': lesson({ stage: 2, q: 0, pts: 2, flash: 0, elim: [0], wk: 1, kind: 'bad', msg: 'Not quite. Try again.' }),
@@ -698,10 +707,13 @@ class Component extends DCLogic {
     const cleanNow = st === 3 && !s.review && s.t >= 6 && !cornerBad;
     const cleanTot = st === 3 ? (s.clean || 0) + (cleanNow ? 1 : 0) : 0;
     const passed = thr ? cleanTot >= 3 : s.pts >= 10;
+    const autoWait = s.screen === 'lesson' && !s.intro && (st === 0 || st === 3) && nn < 6 && par !== 2 && nn % 2 !== par && !s.wrong;
+    const ak = [s.jid, st, s.round, nn, s.review].join('|');
+    if (autoWait && this._autoKey !== ak) { this._autoKey = ak; setTimeout(() => { const t = this.state, k2 = t.stage === 3 ? 't' : 'n'; if ([t.jid, t.stage, t.round, t[k2], t.review].join('|') === ak && !t.intro && t.screen === 'lesson') this.setState({ [k2]: t[k2] + 1 }); }, 1200); }
     const stagesL = ['Try', 'Learn', 'Pick', 'Train'];
-    const rvStart = (stg) => () => this.setState(Object.assign({ screen: 'lesson', review: true, stage: stg, intro: false, n: 2, t: 0, round: 0, w: 1, q: 0, answered: null, elim: [], flash: null, pts: 0, msg: '', kind: '', wrong: null, tries: 0, rd: null, sadLast: false }, this.dirInit(s.jid, false)));
+    const rvStart = (stg) => () => this.setState(Object.assign({ screen: 'lesson', review: true, stage: stg, intro: false, n: 1, t: 0, round: 0, w: 1, q: 0, answered: null, elim: [], flash: null, pts: 0, msg: '', kind: '', wrong: null, tries: 0, rd: null, sadLast: false }, this.dirInit(s.jid, false)));
     const stages = stagesL.map((l, i) => ({
-      act: s.review ? rvStart(i) : () => { const sc = this.mkSched(); this.setState(Object.assign({ review: false, stage: i, intro: true, n: 2, t: sc[0].white ? 1 : 0, round: 0, sched: sc, w: 1, q: 0, answered: null, elim: [], flash: null, msg: '', kind: '', wrong: null, tries: 0, rd: null, sadLast: false }, this.dirInit(s.jid, i === 3 && sc[0].white))); }, cursor: 'pointer',
+      act: s.review ? rvStart(i) : () => { const sc = this.mkSched(); this.setState(Object.assign({ review: false, stage: i, intro: true, n: 1, t: 1, round: 0, sched: sc, w: 1, q: 0, answered: null, elim: [], flash: null, msg: '', kind: '', wrong: null, tries: 0, rd: null, sadLast: false }, this.dirInit(s.jid, i === 3 && sc[0].white))); }, cursor: 'pointer',
       label: l,
       btn: this.stepBtn(i, st),
       hasLink: this.props.variant === 'b' && i < 3,
@@ -736,6 +748,8 @@ class Component extends DCLogic {
     let swap = false;
     // Joseki texts (fp, tc, tb, tw, ex, tryP) always name the real colors. When the stones are shown swapped
     // (player practises White but sees Black), the words Black/White are swapped too, so text and stones match.
+    // both colours: the first two instructions name the colour once ("Approach low as White."), then plain instructions
+    const asCol = (i, col) => J.go[i].replace(/\.$/, '') + ' as ' + col + '.';
     const say = (t) => !t ? t : (swap ? t.replace(/\b(Black|White|black|white)\b/g, (w) => ({ Black: 'White', White: 'Black', black: 'white', white: 'black' })[w]) : t);
     const stoneItems = (list, sadIdx, hopIdx, numbered) => list.map((m, i) => this.mk(m.c, m.r, m.w !== swap ? 'w' : 'b', '', { num: numbered ? i + 1 : 0, sad: i === sadIdx, anim: i === list.length - 1 || i === hopIdx ? (i === hopIdx && s.kind === 'ok' ? 'drop .4s ease-out, hop .5s ease-in-out .45s 2' : (i === list.length - 1 ? 'drop .4s ease-out' : '')) : '' }));
     const enter = (stage) => ({ w: 1, help: false, went: Object.assign({}, s.went, { [stage - 1]: true }), exiting: false, clean: 0, elim: [], flash: null, tries: 0, rd: null, sadLast: false, stage: stage, intro: true, msg: '', kind: '', wrong: null });
@@ -751,8 +765,8 @@ class Component extends DCLogic {
       const nextCorner = corners[1 + ((s.round + 1) % 3)];
       const waiting = nn < 6 && par !== 2 && nn % 2 !== par;
       if (waiting) prompt = 'White is thinking …';
-      else if (T && both && nn < 6) prompt = nn === 0 ? say(J.fp || 'Play the star point in the {c} corner.').replace('{c}', cornerName) : (nn === 1 ? say(J.tc).replace('{c}', cornerName) : (s.help && J.ex[nn] ? say(J.ex[nn]) : (nn % 2 === 0 ? 'Black\u2019s turn.' : 'White\u2019s turn.')));
-      else if (T && nn < 6) prompt = nn < 2 ? say(white ? J.tc : (J.fp || 'Play the star point in the {c} corner.')).replace('{c}', cornerName) : (s.help ? (say((white ? J.tw[nn] : J.tb[nn]) || J.ex[nn]) || 'Black\u2019s turn.').replace('{c}', cornerName) : 'Black\u2019s turn.');
+      else if (T && both && nn < 6) prompt = nn === 0 ? say(J.fp || 'Play the star point in the {c} corner.').replace('{c}', cornerName) : (nn === 1 ? (J.go ? asCol(1, 'White') : say(J.tc).replace('{c}', cornerName)) : (s.help && J.go ? (nn === 2 ? asCol(2, 'Black') : J.go[nn]) : (s.help && J.ex[nn] ? say(J.ex[nn]) : (nn % 2 === 0 ? 'Black\u2019s turn.' : 'White\u2019s turn.'))));
+      else if (T && nn < 6) prompt = nn < 2 ? say(white ? J.tc : (J.fp || 'Play the star point in the {c} corner.')).replace('{c}', cornerName) : (s.help && J.go ? say(J.did[nn - 1]) + '\n' + J.go[nn] : (s.help ? (say((white ? J.tw[nn] : J.tb[nn]) || J.ex[nn]) || 'Black\u2019s turn.').replace('{c}', cornerName) : 'Black\u2019s turn.'));
       else if (white && nn % 2 === 1) prompt = say(J.tw[nn]).replace('{c}', cornerName);
       else if (nn === 0) prompt = say(J.fp || 'Play the star point in the {c} corner.').replace('{c}', cornerName);
       else if (nn === 2 || nn === 4) prompt = (nn === 2 && st === 0 ? 'Black to play.\n' : '') + say(J.tryP[nn]);
@@ -763,9 +777,9 @@ class Component extends DCLogic {
         showNext = true;
         if (s.review) { nextLabel = 'Done'; nextAction = () => this.setState({ screen: 'picker', msg: '', kind: '', wrong: null, tries: 0, rd: null, sadLast: false }); }
         else if (!T) { nextLabel = 'Continue'; nextAction = () => this.setState(enter(1)); }
-        else if (passed && thr) { nextLabel = 'Done'; nextAction = () => { if (this.state.exiting) return; this.setState({ exiting: true }); setTimeout(() => this.setState({ exiting: false, screen: 'result', msg: '', kind: '', wrong: null, learned: Object.assign({}, this.state.learned, { [s.jid]: true }) }), 1900); }; showMore = true; moreAction = () => this.setState(Object.assign({ tries: 0, rd: null, sadLast: false, t: sched[(s.round + 1) % sched.length].white ? 1 : 0, clean: cleanTot, help: cornerBad, round: s.round + 1, msg: '', kind: '', wrong: null, learned: Object.assign({}, s.learned, { [s.jid]: true }) }, this.dirInit(s.jid, sched[(s.round + 1) % sched.length].both ? 'both' : sched[(s.round + 1) % sched.length].white))); }
-        else if (passed) { nextLabel = 'See result'; nextAction = () => this.setState({ screen: 'result', msg: '', kind: '', wrong: null, learned: Object.assign({}, s.learned, { [s.jid]: true }) }); showMore = true; moreAction = () => this.setState(Object.assign({ tries: 0, rd: null, sadLast: false, t: sched[(s.round + 1) % sched.length].white ? 1 : 0, clean: cleanTot, help: cornerBad, round: s.round + 1, msg: '', kind: '', wrong: null, learned: Object.assign({}, s.learned, { [s.jid]: true }) }, this.dirInit(s.jid, sched[(s.round + 1) % sched.length].both ? 'both' : sched[(s.round + 1) % sched.length].white))); }
-        else { nextLabel = 'Next corner'; nextAction = () => this.setState(Object.assign({ tries: 0, rd: null, sadLast: false, t: sched[(s.round + 1) % sched.length].white ? 1 : 0, clean: cleanTot, help: cornerBad, round: s.round + 1, msg: '', kind: '', wrong: null }, this.dirInit(s.jid, sched[(s.round + 1) % sched.length].both ? 'both' : sched[(s.round + 1) % sched.length].white))); }
+        else if (passed && thr) { nextLabel = 'Done'; nextAction = () => { if (this.state.exiting) return; this.setState({ exiting: true }); setTimeout(() => this.setState({ exiting: false, screen: 'result', msg: '', kind: '', wrong: null, learned: Object.assign({}, this.state.learned, { [s.jid]: true }) }), 1900); }; showMore = true; moreAction = () => this.setState(Object.assign({ tries: 0, rd: null, sadLast: false, t: 1, clean: cleanTot, help: cornerBad, round: s.round + 1, msg: '', kind: '', wrong: null, learned: Object.assign({}, s.learned, { [s.jid]: true }) }, this.dirInit(s.jid, sched[(s.round + 1) % sched.length].both ? 'both' : sched[(s.round + 1) % sched.length].white))); }
+        else if (passed) { nextLabel = 'See result'; nextAction = () => this.setState({ screen: 'result', msg: '', kind: '', wrong: null, learned: Object.assign({}, s.learned, { [s.jid]: true }) }); showMore = true; moreAction = () => this.setState(Object.assign({ tries: 0, rd: null, sadLast: false, t: 1, clean: cleanTot, help: cornerBad, round: s.round + 1, msg: '', kind: '', wrong: null, learned: Object.assign({}, s.learned, { [s.jid]: true }) }, this.dirInit(s.jid, sched[(s.round + 1) % sched.length].both ? 'both' : sched[(s.round + 1) % sched.length].white))); }
+        else { nextLabel = 'Next corner'; nextAction = () => this.setState(Object.assign({ tries: 0, rd: null, sadLast: false, t: 1, clean: cleanTot, help: cornerBad, round: s.round + 1, msg: '', kind: '', wrong: null }, this.dirInit(s.jid, sched[(s.round + 1) % sched.length].both ? 'both' : sched[(s.round + 1) % sched.length].white))); }
       }
     } else if (st === 1) {
       items = stoneItems(seq.slice(0, s.w));
@@ -810,7 +824,7 @@ class Component extends DCLogic {
       if (s.answered !== null) {
         showNext = true;
         nextLabel = s.q < 2 ? 'Next' : 'Continue';
-        nextAction = () => s.q < 2 ? this.setState({ q: s.q + 1, answered: null, elim: [], flash: null, msg: '', kind: '' }) : (s.review ? this.setState({ screen: 'picker', q: 0, answered: null, elim: [], flash: null, msg: '', kind: '' }) : this.setState((() => { const sc = this.mkSched(); return Object.assign(enter(3), { t: sc[0].white ? 1 : 0, round: 0, sched: sc }, this.dirInit(s.jid, sc[0].white)); })()));
+        nextAction = () => s.q < 2 ? this.setState({ q: s.q + 1, answered: null, elim: [], flash: null, msg: '', kind: '' }) : (s.review ? this.setState({ screen: 'picker', q: 0, answered: null, elim: [], flash: null, msg: '', kind: '' }) : this.setState((() => { const sc = this.mkSched(); return Object.assign(enter(3), { t: 1, round: 0, sched: sc }, this.dirInit(s.jid, sc[0].white)); })()));
       }
     }
     const intros = [
@@ -821,7 +835,7 @@ class Component extends DCLogic {
     ];
     const msgBg = s.kind === 'ok' ? '#dff3e7' : (s.kind === 'bad' ? '#ffe3dc' : 'transparent');
     const msgFg = s.kind === 'ok' ? '#1f6b45' : '#a8402a';
-    const fresh = { help: false, went: {}, clean: 0, exiting: false, tries: 0, rd: null, sadLast: false, screen: 'lesson', review: false, stage: 0, intro: true, n: 2, t: 0, round: 0, w: 1, q: 0, answered: null, pts: 0, msg: '', kind: '', wrong: null };
+    const fresh = { help: false, went: {}, clean: 0, exiting: false, tries: 0, rd: null, sadLast: false, screen: 'lesson', review: false, stage: 0, intro: true, n: 1, t: 0, round: 0, w: 1, q: 0, answered: null, pts: 0, msg: '', kind: '', wrong: null };
     const chip = (k) => 'flex:none;border:1.6px solid currentColor;border-radius:14px 10px 13px 9px/10px 13px 9px 14px;padding:3px 10px;font-size:12px;font-weight:800;' + ({ g: 'background:#dff3e7;color:#1f6b45', p: 'background:#e9ebf1;color:#3f4366', b: 'background:#e6eaf2;color:#2d4f8f', x: 'background:#eceef3;color:#6e7285' })[k];
     const card = (o) => 'background:#fffdf7;border:2px solid #4b4f6e;border-width:2px 2.8px 2.4px 2.2px;border-radius:26px 20px 28px 22px/22px 28px 20px 26px;padding:16px;box-shadow:2px 3px 0 rgba(75,79,110,.22);display:flex;flex-direction:column;gap:12px;opacity:' + o;
     const btn = (on) => 'height:46px;border:0;border-radius:23px;font-size:15px;font-weight:800;' + (on ? 'background:#4b4f6e;color:#fff' : 'background:#eceef3;color:#868a9c');
