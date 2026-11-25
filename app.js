@@ -116,8 +116,7 @@ class Component extends DCLogic {
         did: ['Black played the star point.', 'White invaded at 3-3.', 'Black blocked.', 'White crawled along the edge.', 'Black extended.', 'White slid with a knight\u2019s move.'],
         ex: ['Black plays the star point.', 'White invades at 3-3 and has just enough room to live.', 'Black blocks on the side where they want to build.', 'White crawls along the edge to make room for eyes.', 'Black extends and keeps a strong wall.', 'White slides with a knight\u2019s move to settle the corner.'],
         qs: [
-          { shown: 1, opts: [{ c: 5, r: 3 }, { c: 3, r: 4 }, { c: 2, r: 4 }], ok: 1, p: 'White invaded at 3-3.' },
-          { shown: 3, opts: [{ c: 5, r: 3 }, { c: 2, r: 5 }, { c: 4, r: 3 }], ok: 2, p: 'Crawl along the edge.' },
+          { shown: 2, opts: [{ c: 5, r: 3 }, { c: 3, r: 4 }, { c: 2, r: 4 }], ok: 1, p: 'White invaded at 3-3.' },
           { shown: 4, opts: [{ c: 6, r: 5 }, { c: 5, r: 4 }, { c: 3, r: 6 }], ok: 1, p: 'White crawled along the edge.' }
         ]
       },
@@ -133,8 +132,7 @@ class Component extends DCLogic {
         did: ['Black played the star point.', 'White approached low.', 'Black extended low to the other side.', 'White slid to the 2nd line.', 'Black took the 3-3 point.', 'White extended along the edge.'],
         ex: ['Black plays the star point.', 'White approaches low, a knight\u2019s move away on the 3rd line.', 'Black extends low to the other side, also a knight\u2019s move.', 'White slides onto the 2nd line.', 'Black takes the 3-3 point.', 'White extends along the edge.'],
         qs: [
-          { shown: 1, opts: [{ c: 5, r: 4 }, { c: 3, r: 6 }, { c: 7, r: 3 }], ok: 1, p: 'White made a low approach.' },
-          { shown: 3, opts: [{ c: 6, r: 5 }, { c: 3, r: 2 }, { c: 4, r: 2 }], ok: 2, p: 'Slide to the 2nd line.' },
+          { shown: 2, opts: [{ c: 5, r: 4 }, { c: 3, r: 6 }, { c: 7, r: 3 }], ok: 1, p: 'White made a low approach.' },
           { shown: 4, opts: [{ c: 3, r: 3 }, { c: 5, r: 3 }, { c: 4, r: 6 }], ok: 0, p: 'White slid to the 2nd line.' }
         ]
       },
@@ -151,8 +149,7 @@ class Component extends DCLogic {
         did: ['Black played the 3-4 point.', 'White made a small knight approach.', 'Black kicked.', 'White stood.', 'Black extended.', 'White extended three spaces.'],
         ex: ['Black plays the 3-4 point.', 'White approaches with a small knight\u2019s move.', 'Black kicks.', 'White stands.', 'Black extends and keeps sente.', 'White extends three spaces along the edge.'],
         qs: [
-          { shown: 1, opts: [{ c: 5, r: 2 }, { c: 4, r: 3 }, { c: 6, r: 4 }], ok: 1, p: 'White made a small knight approach.' },
-          { shown: 3, opts: [{ c: 4, r: 2 }, { c: 3, r: 3 }, { c: 5, r: 4 }], ok: 2, p: 'Stand.' },
+          { shown: 2, opts: [{ c: 5, r: 2 }, { c: 4, r: 3 }, { c: 6, r: 4 }], ok: 1, p: 'White made a small knight approach.' },
           { shown: 4, opts: [{ c: 3, r: 6 }, { c: 6, r: 5 }, { c: 5, r: 5 }], ok: 0, p: 'White stood.' }
         ]
       }
@@ -793,7 +790,7 @@ class Component extends DCLogic {
       const q = qs[s.q];
       swap = false; const ansW = !!seq[q.shown].w;
       items = stoneItems(seq.slice(0, q.shown), -1).map(it => ({ ...it, style: it.style.replace(/animation:[^;]*;/, '') }));
-      prompt = say(q.p);
+      prompt = say(q.p) + (s.q === 0 ? '\nHow should Black react?' : '');
       const L = ['A', 'B', 'C'];
       q.opts.forEach((o, i) => {
         if (s.flash === i) { items.push(this.mk(o.c, o.r, 'bad', '', { k: s.wk, white: ansW }), this.mk(o.c, o.r, 'strike', '', { k: s.wk })); return; }
@@ -823,8 +820,8 @@ class Component extends DCLogic {
       });
       if (s.answered !== null) {
         showNext = true;
-        nextLabel = s.q < 2 ? 'Next' : 'Continue';
-        nextAction = () => s.q < 2 ? this.setState({ q: s.q + 1, answered: null, elim: [], flash: null, msg: '', kind: '' }) : (s.review ? this.setState({ screen: 'picker', q: 0, answered: null, elim: [], flash: null, msg: '', kind: '' }) : this.setState((() => { const sc = this.mkSched(); return Object.assign(enter(3), { t: 1, round: 0, sched: sc }, this.dirInit(s.jid, sc[0].white)); })()));
+        nextLabel = s.q < qs.length - 1 ? 'Next' : 'Continue';
+        nextAction = () => s.q < qs.length - 1 ? this.setState({ q: s.q + 1, answered: null, elim: [], flash: null, msg: '', kind: '' }) : (s.review ? this.setState({ screen: 'picker', q: 0, answered: null, elim: [], flash: null, msg: '', kind: '' }) : this.setState((() => { const sc = this.mkSched(); return Object.assign(enter(3), { t: 1, round: 0, sched: sc }, this.dirInit(s.jid, sc[0].white)); })()));
       }
     }
     const intros = [
