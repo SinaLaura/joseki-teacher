@@ -81,10 +81,13 @@ function mount(root, Comp) {
   draw();
 }
 
+const MIN_H = 660; // the tallest screen needs about this much room (in design pixels)
 function fit() {
   const el = document.getElementById('fit');
-  const s = Math.min(window.innerWidth / 390, window.innerHeight / 844, 1.5);
-  el.style.transform = 'translate(-50%,-50%) scale(' + s.toFixed(4) + ')';
+  const iw = window.innerWidth, ih = window.innerHeight;
+  const s = Math.min(iw / 390, ih / MIN_H, 2.4);
+  el.style.height = (ih / s).toFixed(1) + 'px';
+  el.style.transform = 'translate(' + ((iw - 390 * s) / 2).toFixed(1) + 'px,0) scale(' + s.toFixed(4) + ')';
 }
 
 
