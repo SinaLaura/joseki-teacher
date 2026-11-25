@@ -38,7 +38,7 @@ button:not([aria-label^="Point"]):not([aria-label^="Option"]):not(.stp):not(.mnu
 
 <sc-if value="{{ isMenu }}" hint-placeholder-val="{{ false }}">
 <div style="height:100%;box-sizing:border-box;padding:56px 24px 24px;display:flex;flex-direction:column;gap:16px;overflow:auto">
-<h1 style="margin:0;padding-right:64px;font-size:26px;line-height:1.2;font-weight:800;letter-spacing:-0.5px">{{tagline}}</h1>
+<h1 style="margin:0;font-size:30px;font-weight:800;letter-spacing:-0.5px">Your joseki</h1>
 <sc-for list="{{josekiList}}" as="j" hint-placeholder-count="4">
 <div style="{{j.card}}">
 <div style="display:flex;align-items:center;gap:12px">
@@ -441,10 +441,21 @@ class Component extends DCLogic {
     const rn = (n) => { const x = Math.sin((n + seed) * 91.3 + 7.7) * 43758.5453; return x - Math.floor(x) - 0.5; };
     const f = (v) => v.toFixed(1);
     const x0 = 3 + rn(1) * 3, y0 = 30.5 + rn(2) * 3, x3 = 31 + rn(3) * 3, y3 = 3.5 + rn(4) * 3;
-    const bow = (rn(5) < 0 ? -1 : 1) * (1.6 + Math.abs(rn(5)) * 3);
-    const d = 'M' + f(x0) + ' ' + f(y0) + 'Q' + f((x0 + x3) / 2 - bow * 0.7 + rn(6) * 1.2) + " " + f((y0 + y3) / 2 + bow * 0.7 + rn(7) * 1.2) + ' ' + f(x3) + ' ' + f(y3);
-    const stroke = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 34 34"><path d="' + d + '" fill="none" stroke="#c4513f" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" opacity=".92" stroke-dasharray="70" stroke-dashoffset="70"><animate attributeName="stroke-dashoffset" from="70" to="0" begin="0.2s" dur="0.45s" calcMode="spline" keyTimes="0;1" keySplines="0.3 0 0.6 1" fill="freeze"/></path></svg>';
-    return 'url(data:image/svg+xml;base64,' + btoa(stroke.replace('<path', '<!--' + k + '--><path')) + ') center/34px 34px no-repeat';
+    const dx = x3 - x0, dy = y3 - y0, len = Math.sqrt(dx * dx + dy * dy), nx = -dy / len, ny = dx / len;
+    const bow = (rn(5) < 0 ? -1 : 1) * (0.3 + Math.abs(rn(5)) * 1.2);
+    const N = 14, c = [], L = [], R = [];
+    for (let i = 0; i <= N; i++) {
+      const t = i / N, wob = Math.sin(t * 6 + seed) * 0.3 + Math.sin(t * 13 + seed * 2) * 0.12;
+      const off = bow * 4 * t * (1 - t) + wob * Math.sin(Math.PI * t);
+      const px = x0 + dx * t + nx * off, py = y0 + dy * t + ny * off;
+      const w = 0.4 + 0.45 * Math.pow(Math.sin(Math.PI * Math.min(1, t * 0.9 + 0.05)), 0.6) + 0.1 * Math.sin(t * 7 + seed);
+      c.push([px, py]); L.push([px + nx * w, py + ny * w]); R.push([px - nx * w, py - ny * w]);
+    }
+    const sm = (pts, first) => { let d = ''; for (let i = 0; i < pts.length - 1; i++) { const m = [(pts[i][0] + pts[i + 1][0]) / 2, (pts[i][1] + pts[i + 1][1]) / 2]; d += (i === 0 && first ? 'M' + f(pts[0][0]) + ' ' + f(pts[0][1]) : '') + 'Q' + f(pts[i][0]) + ' ' + f(pts[i][1]) + ' ' + f(m[0]) + ' ' + f(m[1]); } return d + 'L' + f(pts[pts.length - 1][0]) + ' ' + f(pts[pts.length - 1][1]); };
+    const shape = sm(L, true) + sm(R.slice().reverse(), false).replace(/^/, '') + 'Z';
+    const center = sm(c, true);
+    const stroke = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 34 34"><defs><mask id="m" maskUnits="userSpaceOnUse" x="0" y="0" width="34" height="34"><path d="' + center + '" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" stroke-dasharray="70" stroke-dashoffset="70"><animate attributeName="stroke-dashoffset" from="70" to="0" begin="0.2s" dur="0.45s" fill="freeze"/></path></mask></defs><path d="' + shape + '" fill="#c4513f" opacity=".92" mask="url(#m)"/></svg>';
+    return 'url(data:image/svg+xml;base64,' + btoa(stroke.replace('<defs>', '<!--' + k + '--><defs>')) + ') center/34px 34px no-repeat';
   }
   hintBg(seed) {
     const rn = (n) => { const x = Math.sin((n + seed) * 91.3 + 7.7) * 43758.5453; return x - Math.floor(x) - 0.5; };
@@ -559,28 +570,7 @@ class Component extends DCLogic {
     this.setState(upd);
     if (n + 1 < 6 && par !== 2) setTimeout(() => { if (this.state[key] === n + 1) this.setState({ [key]: n + 2 }); }, 1500);
   }
-  tagline() {
-    // Shown at the top of the joseki overview. A new line is picked each time the overview opens,
-    // never the same one twice in a row.
-    const lines = [
-      'Learn joseki from an eight-legged master (me)',
-      'Spin your way through joseki',
-      "I'm your friendly neighborhood joseki master",
-      'Weaving your way to better Go',
-      "Don't get tangled in joseki",
-      'Welcome to my web of joseki wisdom',
-      'The corner is my domain'
-    ];
-    if (this.state.screen === 'menu' && this._lastScreen !== 'menu') {
-      let k;
-      do { k = Math.floor(Math.random() * lines.length); } while (k === this._tag);
-      this._tag = k;
-    }
-    this._lastScreen = this.state.screen;
-    return lines[this._tag || 0];
-  }
   renderVals() {
-    const tagline = this.tagline();
     const s = this.state, st = s.stage, J = this.data()[s.jid], seq = this.seq(st === 0 || st === 3 ? s.dir : 0);
     const sched = s.sched || [{ mode: 1, white: false }];
     const rnd = sched[s.round % sched.length];
@@ -719,7 +709,6 @@ class Component extends DCLogic {
     const inLesson = s.screen === 'lesson';
     const hangLen = ({ menu: 50, picker: 50, start: 40, result: 110 })[s.screen] || 60;
     return {
-      tagline,
       isMenu: s.screen === 'menu', isPicker: s.screen === 'picker', isStart: s.screen === 'start', isIntro: inLesson && s.intro, isLesson: inLesson && !s.intro, isResult: s.screen === 'result',
       stepsInfo: [{ t: 'Try', txt: 'font-size:17px;font-weight:800;color:#2d3042', dot: 'width:22px;height:22px;box-sizing:border-box;border-radius:11px;background:#fff;border:4px solid ' + '#c9ccd9' }, { t: 'Watch', txt: 'font-size:17px;font-weight:700;color:#868a9c', dot: 'width:22px;height:22px;box-sizing:border-box;border-radius:11px;background:#fff;border:4px solid ' + '#c9ccd9' }, { t: 'Decide', txt: 'font-size:17px;font-weight:700;color:#868a9c', dot: 'width:22px;height:22px;box-sizing:border-box;border-radius:11px;background:#fff;border:4px solid ' + '#c9ccd9' }, { t: 'Transfer', txt: 'font-size:17px;font-weight:700;color:#868a9c', dot: 'width:26px;height:26px;box-sizing:border-box;border-radius:13px;background:#fff;border:4px solid ' + '#4b4f6e' }],
       begin: () => this.setState(Object.assign({}, fresh, this.dirInit(s.jid, false))),
