@@ -495,13 +495,13 @@ class Component extends DCLogic {
     // Shown at the top of the joseki overview. A new line is picked each time the overview opens,
     // never the same one twice in a row.
     const lines = [
-      'Learn joseki from an eight-legged master',
+      'Learn joseki from an eight-legged master (me)',
       'Spin your way through joseki',
-      'Your friendly neighborhood joseki master',
+      "I'm your friendly neighborhood joseki master",
       'Weaving your way to better Go',
       "Don't get tangled in joseki",
-      'A web of joseki wisdom',
-      'The corner is our domain'
+      'Welcome to my web of joseki wisdom',
+      'The corner is my domain'
     ];
     if (this.state.screen === 'menu' && this._lastScreen !== 'menu') {
       let k;
