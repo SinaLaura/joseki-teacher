@@ -85,8 +85,10 @@ The whole app is drawn in pencil, and all of the following came from the owner's
   word large and the rest of the sentence on the same line ("**Try** to find the joseki.", "**Learn** how it's played.",
   "**Pick** the right move.", "**Train** until it sticks."); the board is hidden meanwhile. After 2.5 s, or a tap anywhere,
   the board fades in and the stage starts. Learn starts with the first stone already played and its explanation.
-- **First Try prompt of every joseki:** "Black to play." on its own line, then the joseki's hint (e.g. "Black to play. /
-  Extend low to the other side."). This is built into the logic, so it applies to every new joseki.
+- **First Try prompt of every joseki:** the joseki's `tryW` line in the present tense on its own line, then its hint
+  (e.g. "White approaches Black's corner. / Extend low to the other side."). Every new joseki needs a `tryW` that fits on
+  one line. The end of Try says "That's it!".
+- **Long titles:** a joseki name that needs two lines pushes the board down; never shorten common names.
 - **The spider always hangs right on her string**, wherever she hangs (menu, end screen). When fixing something in one
   place, check every other place where the same thing appears.
 - **Play screens:** "Menu" small at the top left, the joseki name below it as the page title (header X), then the larger thread.

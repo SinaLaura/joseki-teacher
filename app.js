@@ -84,7 +84,7 @@ function mount(root, Comp) {
   draw();
 }
 
-const MIN_H = 660; // the tallest screen needs about this much room (in design pixels)
+const MIN_H = 790; // the tallest screen (a lesson with a two-line title) needs about this much room (in design pixels)
 function fit() {
   const el = document.getElementById('fit');
   const iw = window.innerWidth, ih = window.innerHeight;
@@ -109,6 +109,7 @@ class Component extends DCLogic {
         seq: [B(4, 4), W(3, 3), B(3, 4), W(4, 3), B(5, 4), W(6, 2)],
         why: 'White takes the corner and lives small. Black gets a strong wall.',
         tc: 'Invade the {c} corner.',
+        tryW: 'White is invading Black\u2019s corner.',
         tryP: { 2: 'Block on the side you want to build.', 4: 'Extend.' },
         tb: { 2: 'White invades at 3-3. Block on the side you want to build.', 4: 'White crawls along the edge. Extend.' },
         tw: { 1: 'Invade at 3-3 in the {c} corner.', 3: 'Crawl along the edge.', 5: 'Slide with a knight\u2019s move.' },
@@ -125,6 +126,7 @@ class Component extends DCLogic {
         seq: [B(4, 4), W(6, 3), B(3, 6), W(4, 2), B(3, 3), W(9, 3)],
         why: 'A classic: White approaches, Black builds a base and extends.',
         tc: 'Approach the {c} corner.',
+        tryW: 'White approaches Black\u2019s corner.',
         tryP: { 2: 'Extend low to the other side.', 4: 'Take the 3-3 point.' },
         tb: { 2: 'White approaches low. Extend low to the other side.', 4: 'White slides to the 2nd line. Take the 3-3 point.' },
         tw: { 1: 'Approach low in the {c} corner.', 3: 'Slide to the 2nd line.', 5: 'Extend along the edge.' },
@@ -142,6 +144,7 @@ class Component extends DCLogic {
         why: 'Black kicks, so White settles on top and Black keeps sente.',
         fp: 'Play the 3-4 point in the {c} corner.',
         tc: 'Approach the 3-4 point in the {c} corner.',
+        tryW: 'White approaches Black\u2019s corner.',
         tryP: { 2: 'Kick.', 4: 'Extend.' },
         tb: { 2: 'White approaches with a small knight\u2019s move. Kick.', 4: 'White stands. Extend.' },
         tw: { 1: 'Approach with a small knight\u2019s move in the {c} corner.', 3: 'Stand.', 5: 'Extend three spaces.' },
@@ -766,8 +769,8 @@ class Component extends DCLogic {
       else if (T && nn < 6) prompt = nn < 2 ? say(white ? J.tc : (J.fp || 'Play the star point in the {c} corner.')).replace('{c}', cornerName) : (s.help && J.go ? say(J.did[nn - 1]) + '\n' + J.go[nn] : (s.help ? (say((white ? J.tw[nn] : J.tb[nn]) || J.ex[nn]) || 'Black\u2019s turn.').replace('{c}', cornerName) : 'Black\u2019s turn.'));
       else if (white && nn % 2 === 1) prompt = say(J.tw[nn]).replace('{c}', cornerName);
       else if (nn === 0) prompt = say(J.fp || 'Play the star point in the {c} corner.').replace('{c}', cornerName);
-      else if (nn === 2 || nn === 4) prompt = (nn === 2 && st === 0 ? 'Black to play.\n' : '') + say(J.tryP[nn]);
-      else if (!T) prompt = 'Well done!';
+      else if (nn === 2 || nn === 4) prompt = (nn === 2 && st === 0 ? say(J.tryW) + '\n' : '') + say(J.tryP[nn]);
+      else if (!T) prompt = 'That\u2019s it!';
       else if (s.review) prompt = 'Done!';
       else prompt = thr ? '' : (passed ? 'Joseki passed!' : '');
       if (nn >= 6) {

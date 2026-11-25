@@ -84,7 +84,7 @@ function mount(root, Comp) {
   draw();
 }
 
-const MIN_H = 660; // the tallest screen needs about this much room (in design pixels)
+const MIN_H = 790; // the tallest screen (a lesson with a two-line title) needs about this much room (in design pixels)
 function fit() {
   const el = document.getElementById('fit');
   const iw = window.innerWidth, ih = window.innerHeight;
