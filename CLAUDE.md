@@ -64,7 +64,8 @@ The whole app is drawn in pencil, and all of the following came from the owner's
 - **Board:** crooked pencil lines with uneven pressure; where the board continues they stop at slightly different lengths,
   the pencil lifting off. Real edges are a firm stroke running a little past the corner. The star point is a soft pencil dot.
 - **Wrong move:** draw the stone, wait a moment, strike it through with one red stroke from bottom left to top right, then
-  fade it out. On the second miss the right spot fades in as a soft grey disc ("Try the sketched spot.").
+  fade it out. On the second miss the right spot is sketched lightly (thin outline, light hatching, drawn in after the strike;
+  "Try the sketched spot."). It has no colour on purpose; the grey disc is only for the Pick answer spots.
 - **Progress thread:** one pencil thread with the stage names above it. Try, Learn and Pick are small tangles, Train
   has three (all tangles the same size, Train's centred under the word). Not reached: pale tangle; reached or skipped: bold tangle; done (stage finished, corner clean): web at once.
   The spider moves only on the player's (Black's) moves and draws a thin dark line behind her. After "Done" she walks
@@ -72,7 +73,7 @@ The whole app is drawn in pencil, and all of the following came from the owner's
   gamification words ("Passed!", "unlocked").
 - **Pick answer spots** stay the soft grey discs, each with a small, slightly tilted handwritten "?".
 - **Stage start:** no separate intro screen. The play screen shows the board pale and, in the prompt area, the stage
-  word large and the rest of the sentence on the same line ("**Try** to find the joseki.", "**Learn** why it's played.",
+  word large and the rest of the sentence on the same line ("**Try** to find the joseki.", "**Learn** how it's played.",
   "**Pick** the right move.", "**Train** until it sticks."); the board is hidden meanwhile. After 2.5 s, or a tap anywhere,
   the board fades in and the stage starts. Learn starts with the first stone already played and its explanation.
 - **First Try prompt of every joseki:** "Black to play." on its own line, then the joseki's hint (e.g. "Black to play. /

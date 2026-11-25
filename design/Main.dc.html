@@ -743,7 +743,7 @@ class Component extends DCLogic {
     else if (kind === 'bad' || kind === 'wrong') s += 'border-radius:0;background:' + this.stoneBg(!!o.white, c + r, false, true) + ';animation:' + (o.k % 2 ? 'fade' : 'fade2') + ' .35s .95s forwards;';
     else if (kind === 'strike') s += 'border-radius:0;pointer-events:none;background:' + this.strokeBg(c + r, o.k) + ';animation:' + (o.k % 2 ? 'fade' : 'fade2') + ' .35s .95s forwards;';
     else if (kind === 'q') s += 'pointer-events:none;border-radius:0;font-family:\'Patrick Hand\',Nunito,sans-serif;font-weight:400;font-size:24px;line-height:1;color:#4b4f6e;transform:rotate(' + ((c * 7 + r * 3) % 3 - 1) * 6 + 'deg);padding-bottom:2px;';
-    else if (kind === 'hint') s += 'border-radius:0;pointer-events:none;opacity:0;background:' + this.stoneBg(false, 1, false, true) + ';animation:hintin .5s ease-out 1.35s forwards;';
+    else if (kind === 'hint') s += 'border-radius:0;pointer-events:none;background:' + this.hintBg(c * 3 + r) + ';';
     else if (kind === 'ghost') s += 'border-radius:0;background:' + this.scribbleBg(c * 5 + r) + ';';
     return { style: s, eyes: eyes, mouth: mouth, label: label || '', num: o.num && (kind === 'b' || kind === 'w') ? String(o.num) : '', numStyle: o.num && (kind === 'b' || kind === 'w') ? 'position:absolute;right:-6px;top:-10px;z-index:2;font-family:\'Patrick Hand\',Nunito,sans-serif;font-size:15px;line-height:1;color:#4b4f6e;background:#faf6ec;padding:0 2px;border-radius:4px' : 'display:none' };
   }
@@ -972,8 +972,8 @@ class Component extends DCLogic {
       headThumb: 'width:46px;height:46px;flex:none;background:' + this.thumbBg(s.jid) + ' center/46px 46px no-repeat',
       preview: inLesson && s.intro && (this.props.intro || 'board') === 'board', noPreview: !(inLesson && s.intro && (this.props.intro || 'board') === 'board'),
       boardWrap: 'flex:none;display:flex;justify-content:center;transition:opacity .4s;' + (inLesson && s.intro && (this.props.intro || 'board') === 'board' ? 'opacity:0' : ''),
-      introLine: ['Try to find the joseki.', 'Learn why it\u2019s played.', 'Pick the right move.', 'Train until it sticks.'][st] || '',
-      introWord: (['Try to find the joseki.', 'Learn why it\u2019s played.', 'Pick the right move.', 'Train until it sticks.'][st] || '').split(' ')[0], introRest: (['Try to find the joseki.', 'Learn why it\u2019s played.', 'Pick the right move.', 'Train until it sticks.'][st] || '').split(' ').slice(1).join(' '),
+      introLine: ['Try to find the joseki.', 'Learn how it\u2019s played.', 'Pick the right move.', 'Train until it sticks.'][st] || '',
+      introWord: (['Try to find the joseki.', 'Learn how it\u2019s played.', 'Pick the right move.', 'Train until it sticks.'][st] || '').split(' ')[0], introRest: (['Try to find the joseki.', 'Learn how it\u2019s played.', 'Pick the right move.', 'Train until it sticks.'][st] || '').split(' ').slice(1).join(' '),
       introCalm: this.props.intro === 'calm', introBtn: this.props.intro !== 'calm',
       isDemo: !!this.props.demo, demoNext: () => this.demoStep(),
       tagline, vA: this.props.variant !== 'b', pkClass: this.props.variant === 'b' ? 'pkb' : 'pk', ruleStyle: 'height:8px;flex:none;margin:8px 0;background:' + this.trackBg() + ' center/100% 6px no-repeat',
