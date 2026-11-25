@@ -85,6 +85,9 @@ device.
 It covers two joseki so far (3-3 invasion and low approach). It's a plain HTML/CSS/JS web app with no
 build step and no libraries, and works as an installable PWA on a phone.
 
+**Online:** every push to `main` is published to GitHub Pages by `.github/workflows/pages.yml`
+(https://sinalaura.github.io/joseki-teacher/).
+
 **Try it locally:** run `python3 -m http.server` in this folder and open http://localhost:8000.
 Add `?reset` to the URL to wipe your progress. To unlock the joseki one after another, set
 `UNLOCK_ALL` to `false` at the top of `app.js`.
