@@ -1,5 +1,5 @@
 // Network first, so updates show up right away; the cache is the offline fallback.
-const CACHE = "joseki-v1";
+const CACHE = "joseki-v2";
 const FILES = ["./", "index.html", "app.js", "style.css", "manifest.webmanifest", "icon.svg", "icon-192.png", "icon-512.png", "apple-touch-icon.png"];
 
 self.addEventListener("install", (e) => {
