@@ -49,8 +49,8 @@ both arrays. The owner keeps all these texts in the Sheet "Train instructions â€
 (https://claude.ai/artifact/Lg2gJ7zz8HZkKPbGNTZBkP): keep it and the design file in step.
 **Every sequence starts with only the first stone** (Try, Learn and every Train corner). Moves of the colour the player
 isn't playing are played automatically after a short pause.
-**Pick never swaps colors:** all three questions of a joseki show the real colors, so the stones don't change color from
-one question to the next; when the answer is White's move, the answer stone is white.
+**Pick asks only Black's moves:** two questions per joseki (after White's 1st and 2nd move), real colors, never swapped.
+The first question adds "How should Black react?" on a second line.
 
 ## Look: a sensei with a gift for drawing explains it on a sheet of paper
 
