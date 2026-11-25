@@ -135,15 +135,15 @@ class Component extends DCLogic {
         ]
       },
       j34: {
-        d: 0, title: 'Komoku: small knight approach', short: 'Small knight approach', sub: 'Kick, stand, extend', tint: '#dff3e7',
+        d: 0, title: '3-4 point: small knight approach', short: 'Small knight approach', sub: 'Kick, stand, extend', tint: '#dff3e7',
         seq: [B(3, 4), W(5, 3), B(4, 3), W(5, 4), B(3, 6), W(9, 3)],
         why: 'Black kicks, so White settles on top and Black keeps sente.',
-        fp: 'Play the komoku in the {c} corner.',
-        tc: 'Approach the komoku in the {c} corner.',
+        fp: 'Play the 3-4 point in the {c} corner.',
+        tc: 'Approach the 3-4 point in the {c} corner.',
         tryP: { 2: 'Kick.', 4: 'Extend.' },
         tb: { 2: 'White approaches with a small knight\u2019s move. Kick.', 4: 'White stands. Extend.' },
         tw: { 1: 'Approach with a small knight\u2019s move in the {c} corner.', 3: 'Stand.', 5: 'Extend three spaces.' },
-        ex: ['Black plays the komoku.', 'White approaches with a small knight\u2019s move.', 'Black kicks.', 'White stands.', 'Black extends and keeps sente.', 'White extends three spaces along the edge.'],
+        ex: ['Black plays the 3-4 point.', 'White approaches with a small knight\u2019s move.', 'Black kicks.', 'White stands.', 'Black extends and keeps sente.', 'White extends three spaces along the edge.'],
         qs: [
           { shown: 2, opts: [{ c: 5, r: 2 }, { c: 4, r: 3 }, { c: 6, r: 4 }], ok: 1, p: 'Black\u2019s kick?' },
           { shown: 3, opts: [{ c: 4, r: 2 }, { c: 3, r: 3 }, { c: 5, r: 4 }], ok: 2, p: 'Stand.' },
@@ -835,7 +835,7 @@ class Component extends DCLogic {
       barFill: 'position:absolute;left:0;top:29px;height:8px;overflow:hidden;background:' + this.barSvg(true) + ' left top/342px 8px no-repeat;transition:width .5s ease;width:' + barPct + '%',
       markerStyle: s.review ? 'display:none' : 'position:absolute;left:calc(62.5% - 13px);top:20px;width:26px;height:26px;background:' + this.web(webOn ? 2 : (!s.review && s.pts >= 10 ? 1 : 0)) + ' center/26px no-repeat' + (webOn ? ';animation:pop .5s ease-out' : ''),
       walkerStyle: 'position:absolute;top:17px;width:32px;height:32px;transition:left .5s ease;left:calc(' + barPct + '% - 16px);background:' + this.sketchSpider() + ' center/34px no-repeat', gridStyle: 'display:none', edges: [], boardStyle,
-                  josekiList: ['j33', 'j44'].map((id, k, arr) => {
+                  josekiList: ['j33', 'j44', 'j34'].map((id, k, arr) => {
         const nextOpen = arr.find(x => !s.learned[x]), isDone = !!s.learned[id], isNext = id === nextOpen;
         const D = this.data()[id], done = !!s.learned[id], open = UNLOCK_ALL || k === 0 || !!s.learned[arr[k - 1]];
         return { thumb: this.thumbBg(id), name: D.title, sub: open ? (done ? 'Ready to review' : D.sub) : 'After ' + this.data()[arr[k - 1]].short, tint: D.tint,
