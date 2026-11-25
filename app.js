@@ -95,6 +95,8 @@ class Component extends DCLogic {
   constructor(props) {
     super(props);
     this.state = { wk: 0, screen: 'menu', review: false, watchOnly: false, elim: [], flash: null, tries: 0, rd: null, sadLast: false, dir: 0, dirSet: false, jid: 'j33', learned: {}, stage: 0, intro: true, n: 2, t: 0, round: 0, w: 0, q: 0, answered: null, pts: 0, msg: '', kind: '', wrong: null };
+    // Design canvas only: the boards pass start-at to open the app on a fixed screen.
+    if (props && props.startAt) Object.assign(this.state, this.preset(props.startAt));
   }
   data() {
     const B = (c, r) => ({ c: c, r: r, w: false }), W = (c, r) => ({ c: c, r: r, w: true });
@@ -158,6 +160,27 @@ class Component extends DCLogic {
       out.push({ mode: m, white: w, both: i > 0 && Math.random() < 0.2 });
     }
     return out;
+  }
+  preset(name) {
+    const lesson = (o) => Object.assign({ screen: 'lesson', intro: false, review: false }, o);
+    const wrong = { c: 5, r: 5 };
+    const P = {
+      start: { screen: 'start' },
+      picker: { screen: 'picker' },
+      'intro-try': lesson({ stage: 0, intro: true }),
+      'intro-watch': lesson({ stage: 1, intro: true, pts: 1 }),
+      'intro-decide': lesson({ stage: 2, intro: true, pts: 2 }),
+      'intro-transfer': lesson({ stage: 3, intro: true, pts: 3 }),
+      try: lesson({ stage: 0, n: 2 }),
+      'try-wrong': lesson({ stage: 0, n: 2, wrong: wrong, wk: 1, tries: 1, sadLast: true, kind: 'bad', msg: 'Not quite. Try again.' }),
+      'try-hint': lesson({ stage: 0, n: 2, wrong: wrong, wk: 1, tries: 2, sadLast: true, kind: 'bad', msg: 'This is the spot.' }),
+      watch: lesson({ stage: 1, w: 3, pts: 1 }),
+      decide: lesson({ stage: 2, q: 0, pts: 2 }),
+      'decide-wrong': lesson({ stage: 2, q: 0, pts: 2, flash: 0, elim: [0], wk: 1, kind: 'bad', msg: 'Not quite. Try again.' }),
+      transfer: lesson({ stage: 3, t: 2, pts: 5 }),
+      result: { screen: 'result', pts: 10, learned: { j33: true } }
+    };
+    return P[name] || {};
   }
   dirInit(jid, userWhite) {
     if (userWhite === 'both') return { dir: 0, dirSet: false };
