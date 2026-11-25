@@ -2,37 +2,148 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#2b2420">
-  <meta name="color-scheme" content="dark">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#f8f4e9">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>Joseki Teacher</title>
+  <meta name="apple-mobile-web-app-title" content="Joseki">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>Joseki</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800&family=Patrick+Hand&display=swap">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <main id="home" class="screen">
-    <h1>Joseki Teacher</h1>
-    <p id="summary" class="summary">Loading…</p>
-    <button id="start" class="primary" hidden>Start</button>
-    <button id="more" class="more" hidden>I want more</button>
-  </main>
+<div id="fit"><div id="app"></div></div>
+<template id="tpl">
+<div style="width:390px;height:844px;box-sizing:border-box;background:url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIj48ZmlsdGVyIGlkPSJuIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjkiIG51bU9jdGF2ZXM9IjIiIHNlZWQ9IjQiLz48ZmVDb2xvck1hdHJpeCB2YWx1ZXM9IjAgMCAwIDAgLjQ1ICAwIDAgMCAwIC40ICAwIDAgMCAwIC4zICAwIDAgMCAuMDkgMCIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWx0ZXI9InVybCgjbikiLz48L3N2Zz4=) #f8f4e9;overflow:hidden;position:relative">
+<div style="{{hangStyle}}"><div style="{{threadStyle}}"></div><div style="{{bugStyle}}"></div></div>
 
-  <main id="train" class="screen" hidden>
-    <header>
-      <div id="title" class="title"></div>
-      <div id="subtitle" class="subtitle"></div>
-    </header>
-    <svg id="board" viewBox="0 0 420 432" role="img" aria-label="Go board, upper-right corner"></svg>
-    <section class="panel">
-      <p id="text" class="text"></p>
-      <div id="actions" class="actions"></div>
-    </section>
-  </main>
+<sc-if value="{{ isMenu }}" hint-placeholder-val="{{ false }}">
+<div style="height:100%;box-sizing:border-box;padding:56px 24px 24px;display:flex;flex-direction:column;gap:16px;overflow:auto">
+<h1 style="margin:0;font-size:30px;font-weight:800;letter-spacing:-0.5px">Your joseki</h1>
+<sc-for list="{{josekiList}}" as="j" hint-placeholder-count="4">
+<div style="{{j.card}}">
+<div style="display:flex;align-items:center;gap:12px">
+<div style="width:50px;height:50px;flex:none;background:{{j.thumb}} center/50px 50px no-repeat"></div>
+<div style="flex:1;min-width:0"><div style="font-size:16px;font-weight:800">{{j.name}}</div><div style="font-size:13px;font-weight:600;color:#7a7e90">{{j.sub}}</div></div>
+<div style="{{j.chipStyle}}">{{j.chip}}</div>
+</div>
+<div style="display:flex;gap:8px">
+<button onClick="{{j.act}}" style="flex:1;{{j.btnStyle}}">{{j.btn}}</button>
+<sc-if value="{{ j.hasWatch }}" hint-placeholder-val="{{ false }}">
+<button onClick="{{j.watch}}" style="flex:1;{{j.btn2Style}}">Watch</button>
+</sc-if>
+</div>
+</div>
+</sc-for>
+</div>
+</sc-if>
 
-  <script src="app.js"></script>
+<sc-if value="{{ isPicker }}" hint-placeholder-val="{{ false }}">
+<div style="height:100%;box-sizing:border-box;padding:56px 24px 24px;display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;justify-content:space-between;align-items:center">
+<button class="mnu" onClick="{{toMenuFromPicker}}">Menu</button>
+</div>
+<h1 style="margin:0;font-size:30px;font-weight:800;letter-spacing:-0.5px">{{josekiTitle}}</h1>
+<sc-for list="{{pickerList}}" as="k" hint-placeholder-count="4">
+<button onClick="{{k.act}}" style="display:flex;align-items:center;gap:14px;height:76px;padding:0 20px;border:0;border-radius:24px;background:#fff;box-shadow:0 1px 0 #ebe5da;text-align:left;font-size:20px;font-weight:800;color:#2d3042"><div style="width:40px;height:40px;border-radius:20px;background:{{k.tint}};flex:none"></div>{{k.label}}</button>
+</sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{ isStart }}" hint-placeholder-val="{{ true }}">
+<div style="height:100%;box-sizing:border-box;padding:56px 24px 32px;display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;align-items:center;gap:10px">
+<div style="flex:1"></div>
+<button class="mnu" onClick="{{toMenu}}">Menu</button>
+</div>
+<div>
+<h1 style="margin:2px 0 0;font-size:32px;font-weight:800;letter-spacing:-0.5px">{{josekiTitle}}</h1>
+</div>
+<div style="font-size:17px;line-height:1.45;color:#454a5f">{{josekiWhy}}</div>
+<div style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center"><div style="{{thinkSpider}}"></div></div>
+<button class="pri" onClick="{{begin}}" style="height:56px">Start</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ isIntro }}" hint-placeholder-val="{{ false }}">
+<div style="height:100%;box-sizing:border-box;padding:24px 25px 28px;display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+<button class="mnu" onClick="{{toMenu}}" aria-label="Back to menu">Menu</button>
+</div>
+<div style="display:flex;align-items:center">
+<sc-for list="{{stages}}" as="s" hint-placeholder-count="4">
+<button class="stp" onClick="{{s.act}}" style="{{s.btn}}">{{s.label}}</button>
+<sc-if value="{{ s.hasLink }}" hint-placeholder-val="{{ true }}"><div style="{{s.link}}"></div></sc-if>
+</sc-for>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px">
+<div style="{{heroSpider}}"></div>
+<button class="pri ttl" onClick="{{startStage}}">{{introTitle}}</button>
+<div style="font-size:17px;line-height:1.5;color:#454a5f;max-width:310px">{{introText}}</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isLesson }}" hint-placeholder-val="{{ false }}">
+<div style="height:100%;box-sizing:border-box;padding:24px 25px 20px;display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+<button class="mnu" onClick="{{toMenu}}" aria-label="Back to menu">Menu</button>
+<div style="font-size:16px;font-weight:800;flex:1;text-align:center">{{lessonTitle}}</div>
+<div style="min-width:64px"></div>
+</div>
+<div style="display:flex;align-items:center">
+<sc-for list="{{stages}}" as="s" hint-placeholder-count="4">
+<button class="stp" onClick="{{s.act}}" style="{{s.btn}}">{{s.label}}</button>
+<sc-if value="{{ s.hasLink }}" hint-placeholder-val="{{ true }}"><div style="{{s.link}}"></div></sc-if>
+</sc-for>
+</div>
+<div style="height:44px;display:flex;align-items:center"><div style="{{barBox}}"><div style="{{barFill}}"></div><div style="{{markerStyle}}"></div><div style="{{walkerStyle}}"></div></div></div>
+<div style="display:flex;gap:10px;align-items:flex-start;height:56px;flex:none"><div style="{{promptStyle}}">{{shownPrompt}}</div></div>
+<div style="{{boardStyle}}">
+<div style="{{gridStyle}}"></div>
+<sc-for list="{{edges}}" as="e" hint-placeholder-count="2">
+<div style="{{e.style}}"></div>
+</sc-for>
+<sc-for list="{{stones}}" as="st" hint-placeholder-count="2">
+<div style="{{st.style}}"><div style="{{st.eyes}}"></div><div style="{{st.mouth}}"></div>{{st.label}}<div style="{{st.numStyle}}">{{st.num}}</div></div>
+</sc-for>
+<sc-for list="{{cells}}" as="cell" hint-placeholder-count="0">
+<button aria-label="{{cell.label}}" onClick="{{cell.tap}}" style="{{cell.style}}"></button>
+</sc-for>
+</div>
+<sc-if value="{{ showOptions }}" hint-placeholder-val="{{ false }}">
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px">
+<sc-for list="{{options}}" as="o" hint-placeholder-count="3">
+<button onClick="{{o.pick}}" style="{{o.style}}">{{o.l}}</button>
+</sc-for>
+</div>
+</sc-if>
+<sc-if value="{{ showMore }}" hint-placeholder-val="{{ false }}">
+<button onClick="{{moreAction}}" style="height:44px;border:0;border-radius:22px;background:#eceef3;color:#3b3f58;font-size:15px;font-weight:800">One more corner</button>
+</sc-if>
+<sc-if value="{{ showNext }}" hint-placeholder-val="{{ false }}">
+<button class="pri" onClick="{{nextAction}}" style="height:52px">{{nextLabel}}</button>
+</sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ isResult }}" hint-placeholder-val="{{ false }}">
+<div style="height:100%;box-sizing:border-box;padding:56px 24px 32px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px">
+<div style="{{resultSpider}}"></div>
+<h1 style="margin:0;font-size:34px;font-weight:800">{{resultTitle}}</h1>
+<div style="width:100%;max-width:300px"><div style="{{barBox}}"><div style="{{barFill}}"></div><div style="{{markerStyle}}"></div><div style="{{walkerStyle}}"></div></div></div>
+<div style="font-size:16px;line-height:1.5;color:#555a6e;max-width:300px">{{resultText}}</div>
+<button class="pri" onClick="{{resultAction}}" style="margin-top:12px;height:54px;padding:0 36px">{{resultButton}}</button>
+</div>
+</sc-if>
+
+</div>
+</template>
+<script src="app.js"></script>
 </body>
 </html>

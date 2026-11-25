@@ -1,14 +1,6 @@
 // Network first, so updates show up right away; the cache is the offline fallback.
-const CACHE = "joseki-teacher-v0.1.2";
-const FILES = [
-  "./",
-  "index.html",
-  "app.js",
-  "style.css",
-  "manifest.webmanifest",
-  "icon.svg",
-  "content/joseki/33-invasion.sgf",
-];
+const CACHE = "joseki-v1";
+const FILES = ["./", "index.html", "app.js", "style.css", "manifest.webmanifest", "icon.svg", "icon-192.png", "icon-512.png", "apple-touch-icon.png"];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(FILES)));
@@ -16,9 +8,7 @@ self.addEventListener("install", (e) => {
 });
 
 self.addEventListener("activate", (e) => {
-  e.waitUntil(
-    caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
-  );
+  e.waitUntil(caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))));
   self.clients.claim();
 });
 

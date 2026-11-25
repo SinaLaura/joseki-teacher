@@ -76,13 +76,18 @@ moves, and the opponent can deviate. The plan:
 
 ## Status
 
-🌱 **v0.1: first playable version.** It covers the 3-3 invasion (knight's move first; the double hane
-and push unlock later), with the watch, guided and recall stages, both colors, Leitner review boxes,
-and "done for today". It's a plain HTML/CSS/JS web app with no build step and no libraries, and
-progress is saved on the device.
+🌱 **v0.2: new design.** The app was rebuilt from scratch in a hand-drawn pencil style, as if a sensei
+with a gift for drawing were explaining it to you on a sheet of paper. Every joseki goes through four
+steps: **Try, Watch, Decide, Transfer**. Transfer uses random corners and roles (and sometimes both
+colors) and needs 10 points to pass. Wrong moves are crossed out in red pencil. Progress is saved on the
+device.
+
+It covers two joseki so far (3-3 invasion and low approach). It's a plain HTML/CSS/JS web app with no
+build step and no libraries, and works as an installable PWA on a phone.
 
 **Try it locally:** run `python3 -m http.server` in this folder and open http://localhost:8000.
-Add `?reset` to the URL to wipe your progress.
+Add `?reset` to the URL to wipe your progress. To unlock the joseki one after another, set
+`UNLOCK_ALL` to `false` at the top of `app.js`.
 
 See [IDEAS.md](IDEAS.md) for the plan, [RESEARCH.md](RESEARCH.md) for the checked joseki lines, and
-[content/joseki](content/joseki/README.md) for the content format.
+[content/joseki](content/joseki/README.md) for the content format of the earlier version.
