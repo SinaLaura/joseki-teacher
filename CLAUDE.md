@@ -41,6 +41,8 @@ corner."). **Ask the owner before adding any new text to the app.**
 sequence (Black = corner owner). Never write them from the swapped view. When the stones are shown swapped (practising
 White alone), the app swaps the words Black/White itself (`say()` in `renderVals`). A both-colors Train corner is never
 swapped (`mkSched` never sets `white` and `both` together), so the real colors are on the board and in the text.
+**Pick never swaps colors:** all three questions of a joseki show the real colors, so the stones don't change color from
+one question to the next; when the answer is White's move, the answer stone is white.
 
 ## Look: a sensei with a gift for drawing explains it on a sheet of paper
 
