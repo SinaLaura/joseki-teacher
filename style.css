@@ -12,6 +12,8 @@ button.pri:not(.a):not(.b):not(.c):not(.d){background:url(data:image/svg+xml;bas
 button.pri.ttl:not(.a):not(.b):not(.c):not(.d){font-size:44px !important;padding:0 12px 6px !important;background-size:100% 14px !important}
 button:not([aria-label^="Point"]):not([aria-label^="Option"]):not(.stp):not(.mnu){border:2px solid #4b4f6e !important;border-width:2px 2.8px 2.3px 2.5px !important;border-radius:24px 30px 26px 28px/28px 24px 30px 25px !important;box-shadow:2px 2.5px 0 rgba(75,79,110,.28) !important}
 @keyframes drop{0%{transform:translateY(-22px) scale(1.25);opacity:0}65%{transform:translateY(2px) scale(.94);opacity:1}100%{transform:none;opacity:1}}
+@keyframes dropb{0%{transform:translateY(-22px) scale(1.25);opacity:0}65%{transform:translateY(2px) scale(.94);opacity:.4}100%{transform:none;opacity:.4}}
+@keyframes dropr{0%{transform:translateY(-22px) scale(1.25) rotate(var(--rot));opacity:0}65%{transform:translateY(2px) scale(.94) rotate(var(--rot));opacity:1}100%{transform:rotate(var(--rot));opacity:1}}
 @keyframes hop{0%,100%{transform:translateY(0)}40%{transform:translateY(-8px)}}
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
 @keyframes blink{0%,90%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
