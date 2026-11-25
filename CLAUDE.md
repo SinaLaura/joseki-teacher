@@ -67,7 +67,8 @@ The whole app is drawn in pencil, and all of the following came from the owner's
   fade it out. On the second miss the right spot is sketched lightly (thin outline, light hatching, drawn in after the strike;
   "Try the sketched spot."). It has no colour on purpose; the grey disc is only for the Pick answer spots.
 - **Progress thread:** one pencil thread with the stage names above it. Try, Learn and Pick are small tangles, Train
-  has three (all tangles the same size, Train's centred under the word). Not reached: pale tangle; reached or skipped: bold tangle; done (stage finished, corner clean): web at once.
+  has three (all tangles the same size). The four words stand at even distances; Train's three tangles are spread out to
+  near the right edge, where the thread ends. Not reached: pale tangle; reached or skipped: bold tangle; done (stage finished, corner clean): web at once.
   The spider moves only on the player's (Black's) moves and draws a thin dark line behind her. After "Done" she walks
   out to the right, and the end screen shows her rappelling down above "Well spun." No color coding, little text, no
   gamification words ("Passed!", "unlocked").
