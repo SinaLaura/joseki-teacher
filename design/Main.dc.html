@@ -45,13 +45,12 @@ button.pri.rt:not(.a):not(.b):not(.c):not(.d){margin-right:0 !important;margin-l
 <div style="height:100%;box-sizing:border-box;padding:64px 28px 32px;display:flex;flex-direction:column;gap:6px;overflow:auto">
 <h1 style="margin:0 0 18px;padding-right:70px;font-size:32px;line-height:1.15;color:#2d3042">{{tagline}}</h1>
 <sc-for list="{{josekiList}}" as="j" hint-placeholder-count="2">
-<div style="{{j.rowStyle}}">
-<div style="display:flex;align-items:center;gap:16px">
+<button class="pk" onClick="{{j.act}}" aria-label="{{j.aria}}" style="{{j.rowStyle}}">
 <div style="width:58px;height:58px;flex:none;background:{{j.thumb}} center/58px 58px no-repeat"></div>
 <div style="flex:1;min-width:0"><div style="font-family:'Patrick Hand',Nunito,sans-serif;font-size:26px;line-height:1.1;color:#2d3042">{{j.name}}</div><div style="margin-top:4px;font-size:13px;font-weight:600;color:#7a7e90">{{j.sub}}</div></div>
-</div>
-<div style="display:flex;justify-content:flex-end;margin-top:4px"><button class="pri rt" onClick="{{j.act}}">{{j.btn}}</button></div>
-</div>
+<div style="{{j.todoStyle}}">to do</div>
+<div style="{{j.markStyle}}"></div>
+</button>
 <sc-if value="{{ vA }}" hint-placeholder-val="{{ true }}"><div style="{{ruleStyle}}"></div></sc-if>
 </sc-for>
 </div>
@@ -82,11 +81,26 @@ button.pri.rt:not(.a):not(.b):not(.c):not(.d){margin-right:0 !important;margin-l
 
 <sc-if value="{{ isIntro }}" hint-placeholder-val="{{ false }}">
 <div style="height:100%;box-sizing:border-box;padding:56px 25px 40px;display:flex;flex-direction:column">
+<sc-if value="{{ hdCur }}" hint-placeholder-val="{{ true }}">
 <div style="display:flex;justify-content:space-between;align-items:center;height:28px;flex:none">
 <button class="mnu" onClick="{{toMenu}}" aria-label="Back to menu">Menu</button>
 <div style="font-family:'Patrick Hand',Nunito,sans-serif;font-size:22px;flex:1;text-align:center;color:#2d3042">{{lessonTitle}}</div>
 <div style="min-width:48px"></div>
 </div>
+</sc-if>
+<sc-if value="{{ hdX }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;align-items:flex-start;gap:8px;flex:none">
+<button class="mnu" onClick="{{toMenu}}" aria-label="Back to menu">Menu</button>
+<div style="font-family:'Patrick Hand',Nunito,sans-serif;font-size:31px;line-height:1.1;color:#2d3042">{{headTitle}}</div>
+</div>
+</sc-if>
+<sc-if value="{{ hdY }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;align-items:center;gap:12px;height:48px;flex:none">
+<div style="{{headThumb}}"></div>
+<div style="flex:1;min-width:0;font-family:'Patrick Hand',Nunito,sans-serif;font-size:25px;line-height:1.1;color:#2d3042">{{headTitle}}</div>
+<button class="mnu" onClick="{{toMenu}}" aria-label="Back to menu">Menu</button>
+</div>
+</sc-if>
 <sc-if value="{{ isThread }}" hint-placeholder-val="{{ false }}">
 <div style="{{threadBox}}">
 <div style="{{threadInk}}"></div>
@@ -112,11 +126,26 @@ button.pri.rt:not(.a):not(.b):not(.c):not(.d){margin-right:0 !important;margin-l
 
 <sc-if value="{{ isLesson }}" hint-placeholder-val="{{ false }}">
 <div style="height:100%;box-sizing:border-box;padding:56px 25px 28px;display:flex;flex-direction:column">
+<sc-if value="{{ hdCur }}" hint-placeholder-val="{{ true }}">
 <div style="display:flex;justify-content:space-between;align-items:center;height:28px;flex:none">
 <button class="mnu" onClick="{{toMenu}}" aria-label="Back to menu">Menu</button>
 <div style="font-family:'Patrick Hand',Nunito,sans-serif;font-size:22px;flex:1;text-align:center;color:#2d3042">{{lessonTitle}}</div>
 <div style="min-width:48px"></div>
 </div>
+</sc-if>
+<sc-if value="{{ hdX }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;align-items:flex-start;gap:8px;flex:none">
+<button class="mnu" onClick="{{toMenu}}" aria-label="Back to menu">Menu</button>
+<div style="font-family:'Patrick Hand',Nunito,sans-serif;font-size:31px;line-height:1.1;color:#2d3042">{{headTitle}}</div>
+</div>
+</sc-if>
+<sc-if value="{{ hdY }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;align-items:center;gap:12px;height:48px;flex:none">
+<div style="{{headThumb}}"></div>
+<div style="flex:1;min-width:0;font-family:'Patrick Hand',Nunito,sans-serif;font-size:25px;line-height:1.1;color:#2d3042">{{headTitle}}</div>
+<button class="mnu" onClick="{{toMenu}}" aria-label="Back to menu">Menu</button>
+</div>
+</sc-if>
 <sc-if value="{{ isThread }}" hint-placeholder-val="{{ false }}">
 <div style="{{threadBox}}">
 <div style="{{threadInk}}"></div>
@@ -263,6 +292,7 @@ class Component extends DCLogic {
     const wrong = { c: 5, r: 5 };
     const P = {
       start: { screen: 'start' },
+      'menu-progress': { screen: 'menu', learned: { j33: true } },
       picker: { screen: 'picker' },
       'intro-try': lesson({ stage: 0, intro: true }),
       'intro-watch': lesson({ stage: 1, intro: true, pts: 1 }),
@@ -318,7 +348,7 @@ class Component extends DCLogic {
   }
   threadRowBg(sx, st) {
     const D = '#4b4f6e', L = '#c9ccd9', X = [14, 72, 132, 190];
-    const g = this.pline(4, 264, 44, L, 2.2, 4);
+    const g = this.pline(4, this.props.hd !== 'cur' ? 308 : 264, 44, L, 2.2, 4);
     return 'url(data:image/svg+xml;base64,' + btoa('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 70">' + g + '</svg>') + ')';
   }
   inkBg() {
@@ -355,6 +385,15 @@ class Component extends DCLogic {
     for (let k = 0; k < 7; k++) { const o = -6 + k * 5.2 + R(20 + k) * 0.8; h += '<path d="M' + f(o) + ' 34L' + f(o + 20) + ' 0" stroke="#8d91ab" stroke-width=".9" stroke-linecap="round" opacity=".55"/>'; }
     const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 34 34"><defs><clipPath id="c"><circle cx="17" cy="17" r="12.6"/></clipPath></defs><g clip-path="url(#c)">' + h + '</g><path d="' + d + 'Z" fill="none" stroke="#4b4f6e" stroke-width="1.5" stroke-linejoin="round" opacity=".8"/></svg>';
     return 'url(data:image/svg+xml;base64,' + btoa(svg) + ')';
+  }
+  todoMark(done, seed) {
+    const R = (k) => { const v = Math.sin(k * 12.9898 + seed * 78.233) * 43758.5453; return (v - Math.floor(v)) * 2 - 1; };
+    const f = (v) => Math.round(v * 10) / 10;
+    let d = '';
+    for (let k = 0; k <= 15; k++) { const a = -1.9 + k / 14 * Math.PI * 2.08, r = 11 + R(k) * 0.6; d += (k ? 'L' : 'M') + f(15 + r * Math.cos(a)) + ' ' + f(15 + r * Math.sin(a)); }
+    let g = '<path d="' + d + '" fill="none" stroke="#4b4f6e" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>';
+    if (done) g += '<path d="M8.5 15.5Q11 17.5 13.5 21.5Q18 10 26.5 4.5" fill="none" stroke="#3f8f5f" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>';
+    return 'url(data:image/svg+xml;base64,' + btoa('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30">' + g + '</svg>') + ')';
   }
   dirInit(jid, userWhite) {
     if (userWhite === 'both') return { dir: 0, dirSet: false };
@@ -873,20 +912,21 @@ class Component extends DCLogic {
     const card = (o) => 'background:#fffdf7;border:2px solid #4b4f6e;border-width:2px 2.8px 2.4px 2.2px;border-radius:26px 20px 28px 22px/22px 28px 20px 26px;padding:16px;box-shadow:2px 3px 0 rgba(75,79,110,.22);display:flex;flex-direction:column;gap:12px;opacity:' + o;
     const btn = (on) => 'height:46px;border:0;border-radius:23px;font-size:15px;font-weight:800;' + (on ? 'background:#4b4f6e;color:#fff' : 'background:#eceef3;color:#868a9c');
     const inLesson = s.screen === 'lesson';
-    const TX = [204, 234, 264];
-    let sxPos = [14, 72, 132, 178][st];
+    const big = this.props.hd !== 'cur', tz = big ? 30 : 22;
+    const TX = big ? [236, 272, 308] : [204, 234, 264], KX = big ? [16, 86, 160, 212] : [14, 72, 132, 178];
+    let sxPos = KX[st];
     const exiting = !!s.exiting;
-    if (st === 3) { const seg = Math.min(cleanTot, 2), a = cleanTot === 0 ? 178 : TX[cleanTot - 1], b = TX[seg]; const pp = par === 2 ? 0 : par; let mine = 0; for (let i = 0; i < Math.min(s.t, 6); i++) if (i % 2 === pp) mine++; sxPos = exiting ? 440 : cleanTot >= 3 ? 264 : a + (b - a) * ((cleanNow || cornerBad) ? 0 : mine / 3); }
+    if (st === 3) { const seg = Math.min(cleanTot, 2), a = cleanTot === 0 ? KX[3] : TX[cleanTot - 1], b = TX[seg]; const pp = par === 2 ? 0 : par; let mine = 0; for (let i = 0; i < Math.min(s.t, 6); i++) if (i % 2 === pp) mine++; sxPos = exiting ? 440 : cleanTot >= 3 ? TX[2] : a + (b - a) * ((cleanNow || cornerBad) ? 0 : mine / 3); }
     const hangLen = ({ menu: 100, picker: 50, start: 40, result: 110 })[s.screen] || 60;
     return {
       isThread: thr, isStrip: this.props.row === 'strip',
       stageRowStyle: thr ? 'display:none' : (this.props.row === 'strip' ? 'display:flex;align-items:stretch;height:44px;flex:none;margin-top:14px;background:' + this.stripBg(st) + ' center/340px 44px no-repeat' : 'display:flex;align-items:center;margin-top:14px;flex:none'),
-      threadBox: 'position:relative;width:340px;height:70px;flex:none;margin-top:56px;background:' + this.threadRowBg(sxPos, st) + ' left top/420px 70px no-repeat',
-      threadWalker: 'position:absolute;top:22px;width:44px;height:44px;transition:left ' + (exiting ? '1.8s ease-in' : '.6s ease') + ';left:' + (sxPos - 22) + 'px;background:' + this.sketchSpider() + ' center/48px no-repeat',
+      threadBox: 'position:relative;width:340px;height:70px;flex:none;margin-top:' + ((this.props.hd || 'x') === 'x' ? 52 : 56) + 'px;background:' + this.threadRowBg(sxPos, st) + ' left top/420px 70px no-repeat',
+      threadWalker: 'position:absolute;top:' + (big ? 16 : 22) + 'px;width:' + (big ? 56 : 44) + 'px;height:' + (big ? 56 : 44) + 'px;transition:left ' + (exiting ? '1.8s ease-in' : '.6s ease') + ';left:' + (sxPos - (big ? 28 : 22)) + 'px;background:' + this.sketchSpider() + ' center/' + (big ? 62 : 48) + 'px no-repeat',
       threadInk: 'position:absolute;left:0;top:0;height:70px;overflow:hidden;width:' + sxPos + 'px;transition:width ' + (exiting ? '1.8s ease-in' : '.6s ease') + ';background:' + this.inkBg() + ' left top/420px 70px no-repeat',
-      threadKnots: [14, 72, 132].map((x, i) => ({ style: 'position:absolute;top:33px;width:22px;height:22px;left:' + (x - 11) + 'px;background:' + this.web(s.went && s.went[i] ? 2 : (i <= st ? 1 : 0)) + ' center/22px no-repeat' + (s.went && s.went[i] ? ';animation:pop .5s ease-out' : '') })),
-      threadLabels: ['Try', 'Watch', 'Decide', 'Transfer'].map((t, i) => ({ t: t, act: stages[i].act, style: 'position:absolute;top:-18px;height:30px;padding:0 4px 3px;border:0;background:' + (i === st ? 'url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTIiIHByZXNlcnZlQXNwZWN0UmF0aW89Im5vbmUiPjxwYXRoIGQ9Ik0xIDYuNkMyNSA1LjYgNjIgNS40IDk5IDEuNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNGI0ZjZlIiBzdHJva2Utd2lkdGg9IjIuMyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBvcGFjaXR5PSIuOTIiLz48cGF0aCBkPSJNNSA3LjRDMzQgNi42IDY0IDYgOTAgMy4yIiBmaWxsPSJub25lIiBzdHJva2U9IiM0YjRmNmUiIHN0cm9rZS13aWR0aD0iLjkiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgb3BhY2l0eT0iLjUiLz48cGF0aCBkPSJNNyAxMC42QzMwIDkuOCA2NiAxMC40IDk5LjUgNS40IiBmaWxsPSJub25lIiBzdHJva2U9IiM0YjRmNmUiIHN0cm9rZS13aWR0aD0iMS44IiBzdHJva2UtbGluZWNhcD0icm91bmQiIG9wYWNpdHk9Ii44NSIvPjxwYXRoIGQ9Ik0xMiAxMS40QzQyIDEwLjYgNzAgMTAuNCA5MSA3LjIiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzRiNGY2ZSIgc3Ryb2tlLXdpZHRoPSIuOCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBvcGFjaXR5PSIuNDUiLz48L3N2Zz4=) center bottom/90% 7px no-repeat' : 'transparent') + ';font-family:\'Patrick Hand\',Nunito,sans-serif;line-height:1;font-size:' + (i === st ? 20 : 16) + 'px;color:' + (i === st ? '#2d3042' : (i < st ? '#6b6f8c' : '#b3b7ca')) + ';' + (i === 0 ? 'left:-4px' : (i === 3 ? 'left:182px' : 'left:' + [14, 72, 132][i] + 'px;transform:translateX(-50%)')) })),
-      threadTangles: [204, 234, 264].map((x, i) => ({ style: 'position:absolute;top:33px;width:22px;height:22px;left:' + (x - 11) + 'px;background:' + this.web(i < cleanTot ? 2 : 0) + ' center/22px no-repeat' + (i < cleanTot ? ';animation:pop .5s ease-out' : '') })),
+      threadKnots: KX.slice(0, 3).map((x, i) => ({ style: 'position:absolute;top:' + (big ? 30 : 33) + 'px;width:' + tz + 'px;height:' + tz + 'px;left:' + (x - tz / 2) + 'px;background:' + this.web(s.went && s.went[i] ? 2 : (i <= st ? 1 : 0)) + ' center/22px no-repeat' + (s.went && s.went[i] ? ';animation:pop .5s ease-out' : '') })),
+      threadLabels: ['Try', 'Watch', 'Decide', 'Transfer'].map((t, i) => ({ t: t, act: stages[i].act, style: 'position:absolute;top:' + (big ? -26 : -18) + 'px;height:34px;padding:0 4px 3px;border:0;background:' + (i === st ? 'url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTIiIHByZXNlcnZlQXNwZWN0UmF0aW89Im5vbmUiPjxwYXRoIGQ9Ik0xIDYuNkMyNSA1LjYgNjIgNS40IDk5IDEuNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNGI0ZjZlIiBzdHJva2Utd2lkdGg9IjIuMyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBvcGFjaXR5PSIuOTIiLz48cGF0aCBkPSJNNSA3LjRDMzQgNi42IDY0IDYgOTAgMy4yIiBmaWxsPSJub25lIiBzdHJva2U9IiM0YjRmNmUiIHN0cm9rZS13aWR0aD0iLjkiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgb3BhY2l0eT0iLjUiLz48cGF0aCBkPSJNNyAxMC42QzMwIDkuOCA2NiAxMC40IDk5LjUgNS40IiBmaWxsPSJub25lIiBzdHJva2U9IiM0YjRmNmUiIHN0cm9rZS13aWR0aD0iMS44IiBzdHJva2UtbGluZWNhcD0icm91bmQiIG9wYWNpdHk9Ii44NSIvPjxwYXRoIGQ9Ik0xMiAxMS40QzQyIDEwLjYgNzAgMTAuNCA5MSA3LjIiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzRiNGY2ZSIgc3Ryb2tlLXdpZHRoPSIuOCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBvcGFjaXR5PSIuNDUiLz48L3N2Zz4=) center bottom/90% 7px no-repeat' : 'transparent') + ';font-family:\'Patrick Hand\',Nunito,sans-serif;line-height:1;font-size:' + (big ? (i === st ? 26 : 21) : (i === st ? 20 : 16)) + 'px;color:' + (i === st ? '#2d3042' : (i < st ? '#6b6f8c' : '#b3b7ca')) + ';' + (i === 0 ? 'left:-4px' : (i === 3 ? 'left:' + (big ? 214 : 182) + 'px' : 'left:' + KX[i] + 'px;transform:translateX(-50%)')) })),
+      threadTangles: TX.map((x, i) => ({ style: 'position:absolute;top:' + (big ? 30 : 33) + 'px;width:' + tz + 'px;height:' + tz + 'px;left:' + (x - tz / 2) + 'px;background:' + this.web(i < cleanTot ? 2 : 0) + ' center/' + tz + 'px no-repeat' + (i < cleanTot ? ';animation:pop .5s ease-out' : '') })),
       rappelBox: thr ? 'position:absolute;z-index:2;pointer-events:none;top:0;left:calc(50% - 45px);width:90px;display:flex;flex-direction:column;align-items:center;transform-origin:45px 0;animation:swing 3s ease-in-out 2.8s infinite' : 'display:none',
       rappelThread: 'width:6px;background:' + this.threadBg() + ' center top/6px 22px repeat-y;height:370px;animation:rp 2.8s ease-in-out',
       rappelSpider: 'flex:none;width:90px;height:90px;margin-top:-44px;background:' + this.sketchSpider() + ' center/104px no-repeat',
@@ -894,6 +934,9 @@ class Component extends DCLogic {
       barWrap: thr ? 'display:none' : 'height:44px;display:flex;align-items:center;flex:none',
       resultTextStyle: thr ? 'display:none' : 'font-size:16px;line-height:1.5;color:#5a5f74;max-width:300px',
       resultWrap: 'position:relative;height:100%;box-sizing:border-box;padding:' + (thr ? '0' : '56px') + ' 28px 40px;display:flex;flex-direction:column;align-items:center;justify-content:' + (thr ? 'flex-start' : 'center') + ';text-align:center;gap:16px',
+      hdCur: this.props.hd === 'cur', hdX: (this.props.hd || 'x') === 'x', hdY: this.props.hd === 'y',
+      headTitle: s.review ? 'Review · ' + J.short : J.title,
+      headThumb: 'width:46px;height:46px;flex:none;background:' + this.thumbBg(s.jid) + ' center/46px 46px no-repeat',
       isDemo: !!this.props.demo, demoNext: () => this.demoStep(),
       tagline, vA: this.props.variant !== 'b', pkClass: this.props.variant === 'b' ? 'pkb' : 'pk', ruleStyle: 'height:8px;flex:none;margin:8px 0;background:' + this.trackBg() + ' center/100% 6px no-repeat',
       isMenu: s.screen === 'menu', isPicker: s.screen === 'picker', isStart: s.screen === 'start', isIntro: inLesson && s.intro, isLesson: inLesson && !s.intro, isResult: s.screen === 'result',
@@ -916,9 +959,13 @@ class Component extends DCLogic {
       markerStyle: s.review ? 'display:none' : 'position:absolute;left:calc(62.5% - 13px);top:20px;width:26px;height:26px;background:' + this.web(webOn ? 2 : (!s.review && s.pts >= 10 ? 1 : 0)) + ' center/26px no-repeat' + (webOn ? ';animation:pop .5s ease-out' : ''),
       walkerStyle: 'position:absolute;top:17px;width:32px;height:32px;transition:left .5s ease;left:calc(' + barPct + '% - 16px);background:' + this.sketchSpider() + ' center/34px no-repeat', gridStyle: 'display:none', edges: [], boardStyle,
                   josekiList: ['j33', 'j44'].map((id, k, arr) => {
+        const nextOpen = arr.find(x => !s.learned[x]), isDone = !!s.learned[id], isNext = id === nextOpen;
         const D = this.data()[id], done = !!s.learned[id], open = true; /* TEMP: all unlocked for preview */
         return { thumb: this.thumbBg(id), name: D.title, sub: open ? (done ? 'Ready to review' : D.sub) : 'After ' + this.data()[arr[k - 1]].short, tint: D.tint,
-          chip: done ? 'Learned' : (open ? 'New' : 'Locked'), chipStyle: chip(done ? 'g' : (open ? 'p' : 'x')), rowStyle: (this.props.variant === 'b' ? 'display:flex;flex-direction:column;padding:16px 18px 10px;margin-bottom:16px;background:#fffdf7;border:2px solid #4b4f6e;border-width:2px 2.7px 2.4px 2.2px;border-radius:26px 20px 28px 22px/22px 28px 20px 26px;' : 'display:flex;flex-direction:column;padding:6px 0 2px;') + 'opacity:' + (open ? 1 : 0.55),
+          chip: done ? 'Learned' : (open ? 'New' : 'Locked'), chipStyle: chip(done ? 'g' : (open ? 'p' : 'x')), markStyle: 'width:32px;height:32px;flex:none;' + ((isDone || isNext) ? 'background:' + this.todoMark(isDone, k + 3) + ' center/32px no-repeat' : ''),
+          aria: D.title + (isDone ? ', done' : (isNext ? ', to do' : '')),
+          todoStyle: isNext && !isDone ? 'flex:none;font-family:\'Patrick Hand\',Nunito,sans-serif;font-size:19px;color:#6b6f8c;transform:rotate(-8deg);margin-right:-8px;margin-top:-14px' : 'display:none',
+          rowStyle: (this.props.variant === 'b' ? 'display:flex;flex-direction:column;padding:16px 18px 10px;margin-bottom:16px;background:#fffdf7;border:2px solid #4b4f6e;border-width:2px 2.7px 2.4px 2.2px;border-radius:26px 20px 28px 22px/22px 28px 20px 26px;' : 'display:flex;align-items:center;gap:14px;width:100%;padding:10px 0;background:transparent;font-family:inherit;') + 'opacity:' + (open ? 1 : 0.55),
           btn: done ? 'Review' : (open ? 'Start' : 'Locked'), btnStyle: btn(open), hasWatch: false, btn2Style: '', watch: () => this.setState({ screen: 'lesson', jid: id, review: true, watchOnly: true, stage: 1, intro: false, w: 0, q: 0, answered: null, pts: 0, msg: '', kind: '', wrong: null, tries: 0, rd: null, sadLast: false }),
           act: !open ? () => {} : () => this.setState({ screen: 'start', jid: id, pts: 0, review: false }) };
       }),
