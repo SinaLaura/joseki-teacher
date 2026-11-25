@@ -45,7 +45,8 @@ It can grow into something for others later, but it doesn't have to.
 - **High effect over time.** Spaced repetition builds knowledge that lasts.
 - **No pressure.** No streaks, XP or badges. There's just today's session and a quiet "done for
   today".
-- **Looks nice.** A classic wooden board, slate and shell stones, a soft stone sound. It should be a
+- **Looks nice.** Everything is drawn in pencil, as if a sensei with a gift for drawing explained it on a
+  sheet of paper. A friendly spider (the Ankabuti mascot) walks along the progress thread. It should be a
   pleasure to open.
 - **Understanding over rote memory.** Every move has a one-line explanation of its purpose.
 
@@ -53,11 +54,11 @@ It can grow into something for others later, but it doesn't have to.
 
 The first version covers **three of the most common joseki**, introduced one after another:
 
-1. **4-4 point (hoshi): 3-3 invasion.** This is probably the most frequent joseki in modern
-   play, at every level.
-2. **4-4 point: low approach, knight's move response.** A classic that teaches the basic ideas
-   of approach, base and extension.
-3. **3-4 point (komoku): small knight approach.** This is the most common joseki from the other
+1. **Star point: low approach.** Approach, low extension, slide, 3-3 point. A classic that teaches
+   the basic ideas of approach, base and extension.
+2. **Star point: 3-3 invasion.** Invade, block, crawl, extend. Probably the most frequent joseki in
+   modern play, at every level.
+3. **3-4 point: small knight approach.** Kick, stand, extend. The most common joseki from the other
    main corner point.
 
 Each one starts with only its main line. More joseki come much later (see [IDEAS.md](IDEAS.md)).
@@ -77,27 +78,33 @@ moves, and the opponent can deviate. The plan:
 ## How the app is built
 
 `design/Main.dc.html` is the design source: the template, styles and logic of the app, and the same file
-as in the Claude design artifact. `python3 tools/build.py` turns it into the files the browser loads
+as `project/Refined.dc.html` in the Claude design artifact "Joseki – Sketch style". `python3 tools/build.py` turns it into the files the browser loads
 (`index.html`, `app.js`, `style.css`) and adds the small runtime from `tools/`. So change the design in
 `design/Main.dc.html`, run the build script, then commit. Don't edit the three generated files by hand.
 
 ## Status
 
-🌱 **v0.2: new design.** The app was rebuilt from scratch in a hand-drawn pencil style, as if a sensei
-with a gift for drawing were explaining it to you on a sheet of paper. Every joseki goes through four
-steps: **Try, Watch, Decide, Transfer**. Transfer uses random corners and roles (and sometimes both
-colors) and needs 10 points to pass. Wrong moves are crossed out in red pencil. Progress is saved on the
-device.
+🌱 **v0.3: refined pencil design, three joseki.** Every joseki goes through four steps:
 
-It covers two joseki so far (3-3 invasion and low approach). It's a plain HTML/CSS/JS web app with no
-build step and no libraries, and works as an installable PWA on a phone.
+- **Try:** play it yourself and get corrected. A wrong move is crossed out in red pencil; after the second
+  miss the right spot appears as a soft grey disc.
+- **Learn:** step through the moves, each with a one-line explanation of why it's played.
+- **Pick:** pick the right move out of three spots marked with a handwritten "?".
+- **Train:** play it in random corners and roles, sometimes both colors. Three clean corners pass the joseki;
+  after a mistake the explanations come back until the next clean corner.
+
+A spider walks along one pencil thread through the four steps, tangles turn into webs as you go, and at the
+end she rappels down. Progress is saved on the device. Spaced repetition and variations are still to come
+(see "Not built yet" in [CLAUDE.md](CLAUDE.md)).
+
+It's a plain HTML/CSS/JS web app with no libraries, and works as an installable PWA on a phone.
 
 **Online:** every push to `main` is published to GitHub Pages by `.github/workflows/pages.yml`
 (https://sinalaura.github.io/joseki-teacher/).
 
 **Try it locally:** run `python3 -m http.server` in this folder and open http://localhost:8000.
 Add `?reset` to the URL to wipe your progress. To unlock the joseki one after another, set
-`UNLOCK_ALL` to `false` at the top of `app.js`.
+`UNLOCK_ALL` to `false` in `tools/runtime.js` and rebuild.
 
 See [IDEAS.md](IDEAS.md) for the plan, [RESEARCH.md](RESEARCH.md) for the checked joseki lines,
 [JOSEKI-RESOURCES.md](JOSEKI-RESOURCES.md) for resources and candidates for the next joseki, and
