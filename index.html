@@ -23,7 +23,24 @@
 <div style="width:100%;height:100%;box-sizing:border-box;background:url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIj48ZmlsdGVyIGlkPSJuIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjkiIG51bU9jdGF2ZXM9IjIiIHNlZWQ9IjQiLz48ZmVDb2xvck1hdHJpeCB2YWx1ZXM9IjAgMCAwIDAgLjQ1ICAwIDAgMCAwIC40ICAwIDAgMCAwIC4zICAwIDAgMCAuMDkgMCIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWx0ZXI9InVybCgjbikiLz48L3N2Zz4=) #f8f4e9;overflow:hidden;position:relative">
 <div style="{{hangStyle}}"><div style="{{threadStyle}}"></div><div style="{{bugStyle}}"></div></div>
 
+<sc-if value="{{ isMixPage }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;inset:0;box-sizing:border-box;padding:96px 28px 32px;display:flex;flex-direction:column;gap:6px;overflow:auto">
+<h1 style="margin:0;padding-right:70px;font-size:32px;line-height:1.15;color:#2d3042">Train freely with the joseki you know.</h1>
+<div style="margin:4px 0 14px;font-size:16px;line-height:1.5;color:#5a5f74">Tick the ones to train.</div>
+<sc-for list="{{mixList}}" as="m" hint-placeholder-count="2">
+<button class="pk" onClick="{{m.act}}" aria-label="{{m.aria}}" style="{{m.rowStyle}}">
+<div style="width:58px;height:58px;flex:none;background:{{m.thumb}} center/58px 58px no-repeat"></div>
+<div style="flex:1;min-width:0"><div style="font-family:'Patrick Hand',Nunito,sans-serif;font-size:26px;line-height:1.1;color:#2d3042">{{m.name}}</div><div style="margin-top:4px;font-size:13px;font-weight:600;color:#7a7e90">{{m.sub}}</div></div>
+<div style="{{m.markStyle}}"></div>
+</button>
+<div style="{{ruleStyle}}"></div>
+</sc-for>
+<sc-if value="{{ mixReady }}" hint-placeholder-val="{{ false }}"><button class="pri" onClick="{{mixStart}}" style="margin-top:18px">Start</button></sc-if>
+</div>
+<button class="stp" aria-label="Turn back to the menu" onClick="{{mixBack}}" style="{{backTurnerStyle}}"></button>
+</sc-if>
 <sc-if value="{{ isMenu }}" hint-placeholder-val="{{ false }}">
+<div style="{{menuPage}}">
 <div style="height:100%;box-sizing:border-box;padding:64px 28px 32px;display:flex;flex-direction:column;gap:6px;overflow:auto">
 <h1 style="margin:0 0 18px;padding-right:70px;font-size:32px;line-height:1.15;color:#2d3042">{{tagline}}</h1>
 <sc-for list="{{josekiList}}" as="j" hint-placeholder-count="2">
@@ -35,6 +52,8 @@
 </button>
 <sc-if value="{{ vA }}" hint-placeholder-val="{{ true }}"><div style="{{ruleStyle}}"></div></sc-if>
 </sc-for>
+</div>
+<button class="stp" aria-label="Turn the page" onClick="{{toMix}}" style="{{turnerStyle}}"></button>
 </div>
 </sc-if>
 
@@ -146,12 +165,12 @@
 </sc-for>
 </div>
 <div style="{{barWrap}}"><div style="{{barBox}}"><div style="{{barFill}}"></div><div style="{{markerStyle}}"></div><div style="{{walkerStyle}}"></div></div></div>
-<div style="position:relative;flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;justify-content:safe center">
+<div style="{{lessonBody}}">
 <sc-if value="{{ preview }}" hint-placeholder-val="{{ false }}">
 <div style="display:flex;align-items:flex-end;height:76px;flex:none;margin-bottom:24px"><div style="font-family:'Patrick Hand',Nunito,sans-serif;font-size:28px;line-height:1.1;color:#2d3042;white-space:nowrap"><span style="font-size:44px;line-height:1">{{introWord}}</span> {{introRest}}</div></div>
 </sc-if>
 <sc-if value="{{ noPreview }}" hint-placeholder-val="{{ true }}">
-<div style="display:flex;align-items:flex-end;height:76px;flex:none;margin-bottom:24px"><div style="{{promptStyle}}">{{shownPrompt}}</div></div>
+<div style="{{promptBox}}"><div style="{{promptStyle}}">{{shownPrompt}}</div></div>
 </sc-if>
 <div style="{{boardWrap}}">
 <div style="{{boardStyle}}">
@@ -167,6 +186,13 @@
 </sc-for>
 </div>
 </div>
+<sc-if value="{{ showQuiz }}" hint-placeholder-val="{{ false }}">
+<div style="{{quizWrap}}">
+<sc-for list="{{quizItems}}" as="qz" hint-placeholder-count="4">
+<button class="stp" aria-label="{{qz.name}}" onClick="{{qz.act}}" style="{{qz.style}}"><div style="{{qz.pic}}"></div><div style="{{qz.nameStyle}}">{{qz.name}}</div><div style="{{qz.mark}}"></div></button>
+</sc-for>
+</div>
+</sc-if>
 <sc-if value="{{ preview }}" hint-placeholder-val="{{ false }}"><button class="stp" aria-label="Start {{introTitle}}" onClick="{{startStage}}" style="position:absolute;inset:0;border:0;background:transparent;padding:0;z-index:5"></button></sc-if>
 <sc-if value="{{ showOptions }}" hint-placeholder-val="{{ false }}">
 <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;flex:none">
