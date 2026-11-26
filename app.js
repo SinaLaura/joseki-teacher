@@ -158,20 +158,21 @@ class Component extends DCLogic {
       },
       j34h: {
         d: 0, title: '3-4 point: high approach', short: 'High approach', sub: 'Attach, hane, draw back', tint: '#fbefd6',
-        seq: [B(3, 4), W(5, 4), B(5, 3), W(6, 3), B(4, 3), W(6, 4)],
+        seq: [B(3, 4), W(5, 4), B(5, 3), W(6, 3), B(4, 3), W(6, 4), B(3, 6), W(10, 4)],
         why: 'Black takes the corner, White takes the outside.',
         fp: 'Play the 3-4 point in the {c} corner.',
         tc: 'Approach high in the {c} corner.',
         tryW: 'White makes a high approach.',
-        tryP: { 2: 'Attach underneath.', 4: 'Draw back.' },
-        tb: { 2: 'White approaches high. Attach underneath.', 4: 'White plays a hane. Draw back.' },
-        tw: { 1: 'Approach high in the {c} corner.', 3: 'Hane.', 5: 'Connect solidly.' },
-        go: ['Play the 3-4 point.', 'Approach high.', 'Attach underneath.', 'Hane.', 'Draw back.', 'Connect solidly.'],
-        did: ['Black played the 3-4 point.', 'White approached high.', 'Black attached underneath.', 'White played a hane.', 'Black drew back.', 'White connected solidly.'],
-        ex: ['Black plays the 3-4 point.', 'White approaches high, one space away on the 4th line.', 'Black attaches underneath to protect the corner.', 'White plays a hane and takes the outside.', 'Black draws back and secures the corner.', 'White connects solidly so Black can’t cut.'],
+        tryP: { 2: 'Attach underneath.', 4: 'Draw back.', 6: 'Jump one space along the side.' },
+        tb: { 2: 'White approaches high. Attach underneath.', 4: 'White plays a hane. Draw back.', 6: 'White connects solidly. Jump one space along the side.' },
+        tw: { 1: 'Approach high in the {c} corner.', 3: 'Hane.', 5: 'Connect solidly.', 7: 'Extend three spaces.' },
+        go: ['Play the 3-4 point.', 'Approach high.', 'Attach underneath.', 'Hane.', 'Draw back.', 'Connect solidly.', 'Jump one space along the side.', 'Extend three spaces.'],
+        did: ['Black played the 3-4 point.', 'White approached high.', 'Black attached underneath.', 'White played a hane.', 'Black drew back.', 'White connected solidly.', 'Black jumped one space along the side.', 'White extended three spaces.'],
+        ex: ['Black plays the 3-4 point.', 'White approaches high, one space away on the 4th line.', 'Black attaches underneath to protect the corner.', 'White plays a hane and takes the outside.', 'Black draws back and secures the corner.', 'White connects solidly so Black can’t cut.', 'Black jumps one space and takes the side too.', 'White extends three spaces and settles.'],
         qs: [
           { shown: 2, opts: [{ c: 4, r: 2 }, { c: 6, r: 5 }, { c: 5, r: 3 }], ok: 2, p: 'White made a high approach.' },
-          { shown: 4, opts: [{ c: 4, r: 3 }, { c: 4, r: 4 }, { c: 7, r: 4 }], ok: 0, p: 'White played a hane.' }
+          { shown: 4, opts: [{ c: 4, r: 3 }, { c: 4, r: 4 }, { c: 7, r: 4 }], ok: 0, p: 'White played a hane.' },
+          { shown: 6, opts: [{ c: 5, r: 6 }, { c: 3, r: 6 }, { c: 2, r: 5 }], ok: 1, p: 'White connected solidly.' }
         ]
       }
     };
@@ -311,10 +312,18 @@ class Component extends DCLogic {
     const J = this.data()[jid], opp = J.seq[J.d].w !== userWhite;
     return { dir: opp && Math.random() < 0.5 ? 1 : 0, dirSet: opp };
   }
+  // Lines drawn from the corner: as many as the joseki needs, with at least one empty line
+  // between its outermost stone (or Pick answer spot) and the open side of the board.
+  gridN(jid) {
+    const J = this.data()[jid || this.state.jid];
+    const pts = J.seq.concat(...J.qs.map(q => q.opts));
+    return Math.max(7, Math.max.apply(null, pts.map(m => Math.max(m.c, m.r))) + 1);
+  }
   tf(m, mode) {
-    if (mode === 1) return { c: 10 - m.c, r: 10 - m.r, w: m.w };
-    if (mode === 2) return { c: m.c, r: 10 - m.r, w: m.w };
-    if (mode === 3) return { c: 10 - m.c, r: m.r, w: m.w };
+    const M = this.gridN() + 1;
+    if (mode === 1) return { c: M - m.c, r: M - m.r, w: m.w };
+    if (mode === 2) return { c: m.c, r: M - m.r, w: m.w };
+    if (mode === 3) return { c: M - m.c, r: m.r, w: m.w };
     return m;
   }
   web(state) {
@@ -435,7 +444,9 @@ class Component extends DCLogic {
     const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="-24 -22 48 44"><path d="' + lg + '" fill="none" stroke="' + D + '" stroke-width="1.5" stroke-linecap="round"/><circle r="' + r + '" fill="#fff" stroke="' + D + '" stroke-width="1.6"/><circle cx="' + (-r * 0.38) + '" cy="' + (-r * 0.1) + '" r="1.3" fill="' + D + '"/><circle cx="' + (r * 0.38) + '" cy="' + (-r * 0.1) + '" r="1.3" fill="' + D + '"/><path d="M' + (-r * 0.25) + ' ' + (r * 0.35) + 'Q0 ' + (r * 0.62) + ' ' + (r * 0.25) + ' ' + (r * 0.35) + '" fill="none" stroke="' + D + '" stroke-width="1.1" stroke-linecap="round"/></svg>';
     return 'url(data:image/svg+xml;base64,' + btoa(svg) + ')';
   }
-  boardBg(E) {
+  boardBg(E, N) {
+    N = N || 9;
+    const S = 36 + (N - 1) * 38, Z = S - 18;
     // E = [top, bottom, right, left] edge present. Every line is a pencil stroke: a little crooked, with uneven pressure;
     // where the board continues, lines just stop at slightly different lengths, the pencil lifting off.
     const rn = (n) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x) - 0.5; };
@@ -458,21 +469,21 @@ class Component extends DCLogic {
       return '<path d="M' + f(L[0][0]) + ' ' + f(L[0][1]) + path(L) + 'L' + f(Rr[0][0]) + ' ' + f(Rr[0][1]) + path(Rr) + 'Z" fill="' + col + '" opacity="' + f(op) + '"/>';
     };
     const endA = (open, n) => open ? 18 - (7 + (rn(n) + 0.5) * 11) : 18 + rn(n) * 1.5;
-    const endB = (open, n) => open ? 322 + (7 + (rn(n) + 0.5) * 11) : 322 + rn(n) * 1.5;
+    const endB = (open, n) => open ? Z + (7 + (rn(n) + 0.5) * 11) : Z + rn(n) * 1.5;
     let g = '';
-    for (let k = 0; k < 9; k++) {
+    for (let k = 0; k < N; k++) {
       const p = 18 + k * 38;
-      if (!(k === 0 && E[0]) && !(k === 8 && E[1])) g += pen(true, p, endA(!E[3], k + 60), endB(!E[2], k + 61), k * 4, '#7a7e9c', 1.1, 0.5 + (rn(k * 5 + 41) + 0.5) * 0.3, !E[3], !E[2]);
-      if (!(k === 0 && E[3]) && !(k === 8 && E[2])) g += pen(false, p, endA(!E[0], k + 70), endB(!E[1], k + 71), k * 4 + 50, '#7a7e9c', 1.1, 0.5 + (rn(k * 5 + 43) + 0.5) * 0.3, !E[0], !E[1]);
+      if (!(k === 0 && E[0]) && !(k === N - 1 && E[1])) g += pen(true, p, endA(!E[3], k + 60), endB(!E[2], k + 61), k * 4, '#7a7e9c', 1.1, 0.5 + (rn(k * 5 + 41) + 0.5) * 0.3, !E[3], !E[2]);
+      if (!(k === 0 && E[3]) && !(k === N - 1 && E[2])) g += pen(false, p, endA(!E[0], k + 70), endB(!E[1], k + 71), k * 4 + 50, '#7a7e9c', 1.1, 0.5 + (rn(k * 5 + 43) + 0.5) * 0.3, !E[0], !E[1]);
     }
     // the real edges: a firm stroke that runs a little past the corner, plus a lighter second pass
     const ed = (hor, p, n) => {
       const sA = hor ? E[3] : E[0], sB = hor ? E[2] : E[1];
-      const a = sA ? 18 - (4 + (rn(n + 3) + 0.5) * 4) : endA(true, n + 4), b = sB ? 322 + (4 + (rn(n + 5) + 0.5) * 4) : endB(true, n + 6);
+      const a = sA ? 18 - (4 + (rn(n + 3) + 0.5) * 4) : endA(true, n + 4), b = sB ? Z + (4 + (rn(n + 5) + 0.5) * 4) : endB(true, n + 6);
       return pen(hor, p, a, b, n, '#4b4f6e', 2.7, 0.92, true, true) + pen(hor, p + 1.4, a + 5, b - 9, n + 9, '#4b4f6e', 1, 0.4, true, true);
     };
     // star point (4-4): a soft pencil dot, a few small overlapping strokes
-    const hc = E[3] ? 4 : (E[2] ? 6 : 0), hr = E[0] ? 4 : (E[1] ? 6 : 0);
+    const hc = E[3] ? 4 : (E[2] ? N - 3 : 0), hr = E[0] ? 4 : (E[1] ? N - 3 : 0);
     if (hc && hr) {
       const hx = 18 + (hc - 1) * 38, hy = 18 + (hr - 1) * 38;
       let d = '';
@@ -480,10 +491,10 @@ class Component extends DCLogic {
       g += '<circle cx="' + f(hx + rn(420) * 0.4) + '" cy="' + f(hy + rn(421) * 0.4) + '" r="4" fill="#4b4f6e" opacity=".25"/><path d="' + d + '" fill="none" stroke="#4b4f6e" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" opacity=".6"/>';
     }
     if (E[0]) g += ed(true, 18, 101);
-    if (E[1]) g += ed(true, 322, 111);
-    if (E[2]) g += ed(false, 322, 121);
+    if (E[1]) g += ed(true, Z, 111);
+    if (E[2]) g += ed(false, Z, 121);
     if (E[3]) g += ed(false, 18, 131);
-    return 'url(data:image/svg+xml;base64,' + btoa('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 340">' + g + '</svg>') + ')';
+    return 'url(data:image/svg+xml;base64,' + btoa('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + S + ' ' + S + '">' + g + '</svg>') + ')';
   }
 
 
@@ -491,7 +502,7 @@ class Component extends DCLogic {
     const J = this.data()[id], f = (v) => v.toFixed(1);
     const rn = (n) => { const x = Math.sin(n * 77.7 + 5.5) * 43758.5453; return x - Math.floor(x) - 0.5; };
     // crop: from the corner edges to one line beyond the outermost stone, nothing else
-    const cmax = Math.min(9, Math.max.apply(null, J.seq.map(m => m.c)) + 1), rmax = Math.min(9, Math.max.apply(null, J.seq.map(m => m.r)) + 1);
+    const cmax = Math.max.apply(null, J.seq.map(m => m.c)) + 1, rmax = Math.max.apply(null, J.seq.map(m => m.r)) + 1;
     const n = Math.max(cmax, rmax) - 1, cell = 40 / n, x0 = 5 + (40 - (cmax - 1) * cell) / 2, y0 = 5 + (40 - (rmax - 1) * cell) / 2;
     const px = (c) => x0 + (c - 1) * cell, py = (r) => y0 + (r - 1) * cell;
     let g = '<path d="M' + f(px(1)) + ' ' + f(py(1) + 0.4) + 'L' + f(px(cmax) + 3) + ' ' + f(py(1) - 0.3) + 'M' + f(px(1) + 0.4) + ' ' + f(py(1)) + 'L' + f(px(1) - 0.3) + ' ' + f(py(rmax) + 3) + '" fill="none" stroke="#4b4f6e" stroke-width="1.7" stroke-linecap="round"/>';
@@ -675,7 +686,7 @@ class Component extends DCLogic {
     const mk = (dir) => this.seq(dir).map(m => this.tf(m, mode));
     const seq = mk(s.dir);
     const n = s[key];
-    if (n >= 6 || (par !== 2 && n % 2 !== par)) return;
+    if (n >= J.seq.length || (par !== 2 && n % 2 !== par)) return;
     if (seq.slice(0, n).some(m => m.c === c && m.r === r)) return;
     let ok = seq[n].c === c && seq[n].r === r, dir = s.dir;
     if (!ok && n === J.d && !s.dirSet) { const alt = mk(1 - s.dir)[n]; if (alt.c === c && alt.r === r) { ok = true; dir = 1 - s.dir; } }
@@ -741,10 +752,10 @@ class Component extends DCLogic {
     const par = both ? 2 : (white ? 1 : 0);
     const thr = (this.props.row || 'thread') === 'thread';
     const cornerBad = st === 3 && !!(s.rd && s.rd.r === s.round && s.rd.bad);
-    const cleanNow = st === 3 && !s.review && s.t >= 6 && !cornerBad;
+    const cleanNow = st === 3 && !s.review && s.t >= J.seq.length && !cornerBad;
     const cleanTot = st === 3 ? (s.clean || 0) + (cleanNow ? 1 : 0) : 0;
     const passed = thr ? cleanTot >= 3 : s.pts >= 10;
-    const autoWait = s.screen === 'lesson' && !s.intro && (st === 0 || st === 3) && nn < 6 && par !== 2 && nn % 2 !== par && !s.wrong;
+    const autoWait = s.screen === 'lesson' && !s.intro && (st === 0 || st === 3) && nn < J.seq.length && par !== 2 && nn % 2 !== par && !s.wrong;
     const ak = [s.jid, st, s.round, nn, s.review].join('|');
     if (autoWait) this.later('auto', ak, 1200, () => { const t = this.state, k2 = t.stage === 3 ? 't' : 'n'; if ([t.jid, t.stage, t.round, t[k2], t.review].join('|') === ak && !t.intro && t.screen === 'lesson') this.setState({ [k2]: t[k2] + 1 }); }); else this.stopTimer('auto');
     const stagesL = ['Try', 'Learn', 'Pick', 'Train'];
@@ -772,12 +783,14 @@ class Component extends DCLogic {
       E[2] ? { style: eb + 'left:320px;top:16px;width:4px;height:308px' } : null,
       E[3] ? { style: eb + 'left:16px;top:16px;width:4px;height:308px' } : null
     ].filter(Boolean);
-    const boardStyle = 'width:340px;height:340px;position:relative;flex:none;background:' + this.boardBg(E) + ' center/340px 340px no-repeat';
+    const gN = this.gridN(), gS = 36 + (gN - 1) * 38, L = J.seq.length;
+    // The board is laid out on a 38 px grid of gN lines and then scaled to the usual 340 px.
+    const boardStyle = 'width:' + gS + 'px;height:' + gS + 'px;zoom:' + (340 / gS).toFixed(4) + ';position:relative;flex:none;background:' + this.boardBg(E, gN) + ' center/' + gS + 'px ' + gS + 'px no-repeat';
     const gridStyle0 = 'position:absolute;left:18px;top:18px;width:304px;height:304px;box-sizing:border-box;border:1px solid #a98a4e;background-image:linear-gradient(#a98a4e 1px,transparent 1px),linear-gradient(90deg,#a98a4e 1px,transparent 1px);background-size:38px 38px';
     let showMore = false, moreAction = null, items = [], cells = [], prompt = '', showNext = false, nextLabel = '', nextAction = null, showOptions = false, options = [];
     const mkCells = () => {
       const out = [];
-      for (let r = 1; r <= 9; r++) for (let c = 1; c <= 9; c++) {
+      for (let r = 1; r <= gN; r++) for (let c = 1; c <= gN; c++) {
         out.push({ label: 'Point column ' + c + ', row ' + r, tap: () => this.tap(key, mode, par, c, r), style: 'position:absolute;border:0;background:transparent;padding:0;width:38px;height:38px;left:' + (18 + (c - 1) * 38 - 19) + 'px;top:' + (18 + (r - 1) * 38 - 19) + 'px' });
       }
       return out;
@@ -796,21 +809,21 @@ class Component extends DCLogic {
       const lastUser = par === 2 || nn % 2 !== par ? nn - 1 : nn - 2;
       items = stoneItems(list, s.sadLast ? lastUser : -1, s.kind === 'ok' && !s.sadLast ? lastUser : -1);
       if (s.wrong && !list.some(m => m.c === s.wrong.c && m.r === s.wrong.r)) { const ww = seq[Math.min(nn, seq.length - 1)].w !== swap; items.push(this.mk(s.wrong.c, s.wrong.r, 'wrong', '', { white: ww, k: s.wk }), this.mk(s.wrong.c, s.wrong.r, 'strike', '', { k: s.wk })); }
-      if (nn < 6) cells = mkCells();
-      if (s.tries >= 2 && nn < 6 && (par === 2 || nn % 2 === par)) { const g = this.tf(seq[nn], mode); items.push(this.mk(g.c, g.r, 'hint')); }
+      if (nn < L) cells = mkCells();
+      if (s.tries >= 2 && nn < L && (par === 2 || nn % 2 === par)) { const g = this.tf(seq[nn], mode); items.push(this.mk(g.c, g.r, 'hint')); }
       const T = st === 3;
       const nextCorner = corners[1 + ((s.round + 1) % 3)];
-      const waiting = nn < 6 && par !== 2 && nn % 2 !== par;
+      const waiting = nn < L && par !== 2 && nn % 2 !== par;
       if (waiting) prompt = 'White is thinking …';
-      else if (T && both && nn < 6) prompt = nn === 0 ? say(J.fp || 'Play the star point in the {c} corner.').replace('{c}', cornerName) : (nn === 1 ? (J.go ? asCol(1, 'White') : say(J.tc).replace('{c}', cornerName)) : (s.help && J.go ? (nn === 2 ? asCol(2, 'Black') : J.go[nn]) : (s.help && J.ex[nn] ? say(J.ex[nn]) : (nn % 2 === 0 ? 'Black\u2019s turn.' : 'White\u2019s turn.'))));
-      else if (T && nn < 6) prompt = nn < 2 ? say(white ? J.tc : (J.fp || 'Play the star point in the {c} corner.')).replace('{c}', cornerName) : (s.help && J.go ? say(J.did[nn - 1]) + '\n' + J.go[nn] : (s.help ? (say((white ? J.tw[nn] : J.tb[nn]) || J.ex[nn]) || 'Black\u2019s turn.').replace('{c}', cornerName) : 'Black\u2019s turn.'));
+      else if (T && both && nn < L) prompt = nn === 0 ? say(J.fp || 'Play the star point in the {c} corner.').replace('{c}', cornerName) : (nn === 1 ? (J.go ? asCol(1, 'White') : say(J.tc).replace('{c}', cornerName)) : (s.help && J.go ? (nn === 2 ? asCol(2, 'Black') : J.go[nn]) : (s.help && J.ex[nn] ? say(J.ex[nn]) : (nn % 2 === 0 ? 'Black\u2019s turn.' : 'White\u2019s turn.'))));
+      else if (T && nn < L) prompt = nn < 2 ? say(white ? J.tc : (J.fp || 'Play the star point in the {c} corner.')).replace('{c}', cornerName) : (s.help && J.go ? say(J.did[nn - 1]) + '\n' + J.go[nn] : (s.help ? (say((white ? J.tw[nn] : J.tb[nn]) || J.ex[nn]) || 'Black\u2019s turn.').replace('{c}', cornerName) : 'Black\u2019s turn.'));
       else if (white && nn % 2 === 1) prompt = say(J.tw[nn]).replace('{c}', cornerName);
       else if (nn === 0) prompt = say(J.fp || 'Play the star point in the {c} corner.').replace('{c}', cornerName);
-      else if (nn === 2 || nn === 4) prompt = (nn === 2 && st === 0 ? say(J.tryW) + '\n' : '') + say(J.tryP[nn]);
+      else if (nn < L) prompt = (nn === 2 && st === 0 ? say(J.tryW) + '\n' : '') + say(J.tryP[nn] || 'Black\u2019s turn.');
       else if (!T) prompt = 'That\u2019s it!';
       else if (s.review) prompt = 'Done!';
       else prompt = thr ? '' : (passed ? 'Joseki passed!' : '');
-      if (nn >= 6) {
+      if (nn >= L) {
         showNext = true;
         if (s.review) { nextLabel = 'Done'; nextAction = () => this.setState({ screen: 'picker', msg: '', kind: '', wrong: null, tries: 0, rd: null, sadLast: false }); }
         else if (!T) { nextLabel = 'Continue'; nextAction = () => this.setState(enter(1)); }
@@ -823,8 +836,8 @@ class Component extends DCLogic {
       const ex = J.ex;
       prompt = s.w === 0 ? '' : ex[s.w - 1];
       showNext = true;
-      nextLabel = s.w < 6 ? 'Next' : (s.review ? 'Done' : 'Continue');
-      nextAction = () => s.w < 6 ? this.setState({ w: s.w + 1 }) : s.review ? this.setState({ screen: 'picker', w: 1 }) : this.setState(Object.assign(enter(2), { q: 0, answered: null, pts: s.pts + 1 }));
+      nextLabel = s.w < L ? 'Next' : (s.review ? 'Done' : 'Continue');
+      nextAction = () => s.w < L ? this.setState({ w: s.w + 1 }) : s.review ? this.setState({ screen: 'picker', w: 1 }) : this.setState(Object.assign(enter(2), { q: 0, answered: null, pts: s.pts + 1 }));
     } else {
       const qs = J.qs;
       const q = qs[s.q];
@@ -962,7 +975,7 @@ class Component extends DCLogic {
           act: !open ? () => {} : () => this.setState({ screen: 'start', jid: id, pts: 0, review: false }) };
       }),
       shownPrompt: s.kind === 'bad' && s.msg ? s.msg : prompt, stages, prompt, stones: items, cells, showMore: showMore && !(inLesson && s.intro), moreAction, showNext: showNext && !(inLesson && s.intro), nextLabel, nextAction, showOptions, options,
-      promptStyle: 'flex:1;box-sizing:border-box;font-family:\'Patrick Hand\',Nunito,sans-serif;font-size:26px;font-weight:400;line-height:1.15;border-radius:14px;white-space:pre-line;' + (s.kind === 'bad' && s.msg ? 'flex:none;width:fit-content;min-height:0;color:#b5483a;padding-bottom:2px;background:url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAiIHByZXNlcnZlQXNwZWN0UmF0aW89Im5vbmUiPjxwYXRoIGQ9Ik0xIDVDMTQgMyAyMiA3LjQgMzggNC42UzYyIDYuOCA3OCAzLjggOTYgNS40IDk5LjUgMy4yIiBmaWxsPSJub25lIiBzdHJva2U9IiNkOTU1M2IiIHN0cm9rZS13aWR0aD0iMS44IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48cGF0aCBkPSJNNiA3LjZDMzAgNi40IDYwIDguMiA5MiA2LjIiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2Q5NTUzYiIgc3Ryb2tlLXdpZHRoPSIuOSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBvcGFjaXR5PSIuNTUiLz48L3N2Zz4=) left bottom/100% 9px no-repeat;' : '') + ((st === 0 || st === 3) && nn < 6 && par !== 2 && nn % 2 !== par ? 'animation:pulse 1.1s ease-in-out infinite;color:#7a7e90;' : ''),
+      promptStyle: 'flex:1;box-sizing:border-box;font-family:\'Patrick Hand\',Nunito,sans-serif;font-size:26px;font-weight:400;line-height:1.15;border-radius:14px;white-space:pre-line;' + (s.kind === 'bad' && s.msg ? 'flex:none;width:fit-content;min-height:0;color:#b5483a;padding-bottom:2px;background:url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAiIHByZXNlcnZlQXNwZWN0UmF0aW89Im5vbmUiPjxwYXRoIGQ9Ik0xIDVDMTQgMyAyMiA3LjQgMzggNC42UzYyIDYuOCA3OCAzLjggOTYgNS40IDk5LjUgMy4yIiBmaWxsPSJub25lIiBzdHJva2U9IiNkOTU1M2IiIHN0cm9rZS13aWR0aD0iMS44IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48cGF0aCBkPSJNNiA3LjZDMzAgNi40IDYwIDguMiA5MiA2LjIiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2Q5NTUzYiIgc3Ryb2tlLXdpZHRoPSIuOSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBvcGFjaXR5PSIuNTUiLz48L3N2Zz4=) left bottom/100% 9px no-repeat;' : '') + ((st === 0 || st === 3) && nn < J.seq.length && par !== 2 && nn % 2 !== par ? 'animation:pulse 1.1s ease-in-out infinite;color:#7a7e90;' : ''),
       msg: s.msg, msgStyle: 'min-height:44px;box-sizing:border-box;border-radius:16px 12px 18px 13px/13px 18px 12px 16px;' + (s.msg ? 'border:1.8px solid ' + (s.kind === 'ok' ? '#2f9e6a' : '#d9553b') + ';' : '') + 'padding:' + (s.msg ? '10px 14px' : '0') + ';font-size:14px;font-weight:700;line-height:1.35;background:' + msgBg + ';color:' + msgFg,
       resultTitle: thr ? 'Well spun.' : (s.review ? 'Review done!' : 'Passed!'),
       resultText: s.review ? 'Refreshed.' : J.title,
