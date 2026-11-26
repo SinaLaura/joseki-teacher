@@ -2,12 +2,14 @@
 // rendered from Component.renderVals() and patched into the live DOM (so CSS animations keep running).
 const UNLOCK_ALL = true; // set to false to unlock the joseki one after another
 const STORE = 'joseki.learned';
+const MIX_STORE = 'joseki.mix'; // which joseki are ticked for Train freely
 
 class DCLogic {
   constructor(props) { this.props = props || {}; this.state = {}; this._render = null; }
   setState(p) {
     Object.assign(this.state, typeof p === 'function' ? p(this.state) : p);
     if (p && p.learned) { try { localStorage.setItem(STORE, JSON.stringify(this.state.learned)); } catch (e) { /* private mode */ } }
+    if (p && p.mixOn) { try { localStorage.setItem(MIX_STORE, JSON.stringify(this.state.mixOn)); } catch (e) { /* private mode */ } }
     if (this._render) this._render();
   }
 }
@@ -70,8 +72,9 @@ function morphChildren(oldP, newP) {
 
 function mount(root, Comp) {
   const comp = new Comp({}), tpl = document.getElementById('tpl');
-  if (location.search.includes('reset')) { try { localStorage.removeItem(STORE); } catch (e) { /* ignore */ } }
+  if (location.search.includes('reset')) { try { localStorage.removeItem(STORE); localStorage.removeItem(MIX_STORE); } catch (e) { /* ignore */ } }
   try { const saved = JSON.parse(localStorage.getItem(STORE) || 'null'); if (saved) comp.state.learned = saved; } catch (e) { /* ignore */ }
+  try { const mix = JSON.parse(localStorage.getItem(MIX_STORE) || 'null'); if (mix) comp.state.mixOn = mix; } catch (e) { /* ignore */ }
   const draw = () => {
     const vals = comp.renderVals(), tmp = document.createElement('div');
     tpl.content.childNodes.forEach((n, i) => build(n, vals, tmp, String(i), false));
@@ -303,6 +306,65 @@ class Component extends DCLogic {
     if (done) g += '<path d="M8.5 15.5Q11 17.5 13.5 21.5Q18 10 26.5 4.5" fill="none" stroke="#3f8f5f" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>';
     return 'url(data:image/svg+xml;base64,' + btoa('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30">' + g + '</svg>') + ')';
   }
+  turnerBg() {
+    // dog-ear: the corner of the page folded up, the next page showing underneath
+    const D = '#4b4f6e', f = (x) => Math.round(x * 10) / 10;
+    const rn = (n) => { const x = Math.sin(n * 91.7 + 13.1) * 43758.5453; return x - Math.floor(x) - 0.5; };
+    const p1 = [132, 70], p2 = [70, 132], tip = [86 + rn(1) * 1.5, 85 + rn(2) * 1.5];
+    const mid = (a, b, bow) => [f((a[0] + b[0]) / 2 + bow), f((a[1] + b[1]) / 2 + bow)];
+    const c1 = mid(p1, tip, 1.2), c2 = mid(tip, p2, 1.2);
+    let g = '<path d="M' + p1.join(' ') + 'L132 132L' + p2.join(' ') + 'Z" fill="#ebe4d2"/>';
+    g += '<path d="M' + p1.join(' ') + 'Q' + c1.join(' ') + ' ' + tip.join(' ') + 'Q' + c2.join(' ') + ' ' + p2.join(' ') + 'Z" fill="#fffdf7"/>';
+    for (let k = 0; k < 5; k++) { const t = 0.2 + k * 0.15, a = [p1[0] + (p2[0] - p1[0]) * t, p1[1] + (p2[1] - p1[1]) * t]; g += '<path d="M' + f(a[0] - 2.5) + ' ' + f(a[1] - 2.5) + 'L' + f(a[0] - 8 - rn(k + 20) * 3) + ' ' + f(a[1] - 8 - rn(k + 30) * 3) + '" stroke="#8d91ab" stroke-width=".8" stroke-linecap="round" opacity=".5"/>'; }
+    const edge = (a, c, b, w, op, dx) => '<path d="M' + f(a[0] + dx) + ' ' + f(a[1] + dx) + 'Q' + f(c[0] + dx) + ' ' + f(c[1] + dx) + ' ' + f(b[0] + dx) + ' ' + f(b[1] + dx) + '" fill="none" stroke="' + D + '" stroke-width="' + w + '" stroke-linecap="round" opacity="' + op + '"/>';
+    g += edge(p1, c1, tip, 1.8, 0.9, 0) + edge(p1, c1, tip, 0.7, 0.4, 0.7) + edge(tip, c2, p2, 1.6, 0.9, 0) + edge(tip, c2, p2, 0.7, 0.4, 0.7);
+    g += edge([p1[0] + 1, p1[1] - 0.5], mid(p1, p2, 0.6), [p2[0] - 0.5, p2[1] + 1], 1.1, 0.6, 0);
+    return 'url(data:image/svg+xml;base64,' + btoa('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 132 132">' + g + '</svg>') + ')';
+  }
+  tickBox(on, seed) {
+    const D = '#4b4f6e', f = (x) => Math.round(x * 10) / 10;
+    const rn = (n) => { const x = Math.sin((n + seed) * 61.7 + 4.3) * 43758.5453; return x - Math.floor(x) - 0.5; };
+    // a small square drawn in pencil: four slightly crooked sides that overshoot a little at the corners
+    const c = [[6 + rn(1), 7 + rn(2)], [27 + rn(3), 6 + rn(4)], [28 + rn(5), 28 + rn(6)], [7 + rn(7), 27.5 + rn(8)]];
+    let g = '';
+    for (let k = 0; k < 4; k++) {
+      const a = c[k], b = c[(k + 1) % 4], dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy), ux = dx / L, uy = dy / L;
+      const s0 = [a[0] - ux * (0.8 + rn(10 + k)), a[1] - uy * (0.8 + rn(10 + k))], s1 = [b[0] + ux * (1.2 + rn(20 + k)), b[1] + uy * (1.2 + rn(20 + k))];
+      const m = [(s0[0] + s1[0]) / 2 - uy * rn(30 + k) * 1.6, (s0[1] + s1[1]) / 2 + ux * rn(30 + k) * 1.6];
+      g += '<path d="M' + f(s0[0]) + ' ' + f(s0[1]) + 'Q' + f(m[0]) + ' ' + f(m[1]) + ' ' + f(s1[0]) + ' ' + f(s1[1]) + '" fill="none" stroke="' + D + '" stroke-width="' + f(1.5 + rn(40 + k) * 0.5) + '" stroke-linecap="round" opacity=".85"/>';
+    }
+    // the tick: one quick pencil stroke, drawn in when the box is ticked
+    if (on) g += '<path d="M9.5 17.5Q12.5 20 15 25.5Q20 12 31 3.5" pathLength="100" fill="none" stroke="' + D + '" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="100" stroke-dashoffset="100"><animate attributeName="stroke-dashoffset" from="100" to="0" dur=".35s" fill="freeze"/></path>';
+    return 'url(data:image/svg+xml;base64,' + btoa('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 34 34">' + g + '</svg>') + ')';
+  }
+  // Train freely: every ticked joseki in both mirror images is a line; a move is right if it continues a line
+  // that fits all stones so far. The computer picks at random among the lines still possible.
+  mixLines(mode, played) {
+    const D = this.data(), out = [];
+    this.state.mix.set.forEach(id => [0, 1].forEach(dir => {
+      const q = D[id].seq.map(m => this.tf(dir ? { c: m.r, r: m.c, w: m.w } : m, mode));
+      if (q.length > played.length && played.every((m, i) => q[i].c === m.c && q[i].r === m.r)) out.push({ jid: id, dir: dir, q: q });
+    }));
+    return out;
+  }
+  mixPlayed(mode) { const s = this.state; return this.seq(s.dir).slice(0, s.t).map(m => this.tf(m, mode)); }
+  mixSched(set) {
+    const out = [];
+    let pm = -1, pj = null;
+    for (let i = 0; i < 16; i++) {
+      let m, j;
+      do { m = 1 + Math.floor(Math.random() * 3); } while (m === pm);
+      do { j = set[Math.floor(Math.random() * set.length)]; } while (set.length > 1 && j === pj);
+      pm = m; pj = j;
+      out.push({ mode: m, white: Math.random() < 0.5, jid: j });
+    }
+    return out;
+  }
+  mixCorner(sched, round) { const c = sched[round % sched.length]; return { jid: c.jid, dir: Math.random() < 0.5 ? 1 : 0, dirSet: true }; }
+  quizTick() {
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30"><path d="M8.5 15.5Q11 17.5 13.5 21.5Q18 10 26.5 4.5" pathLength="100" fill="none" stroke="#3f8f5f" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="100" stroke-dashoffset="100"><animate attributeName="stroke-dashoffset" from="100" to="0" dur=".35s" fill="freeze"/></path></svg>';
+    return 'url(data:image/svg+xml;base64,' + btoa(svg) + ')';
+  }
   stoneFaces() {
     // Faces on the stones are switched off for now; set to true (or pass faces="1" on a board) to bring them back.
     return !!this.props.faces;
@@ -315,6 +377,7 @@ class Component extends DCLogic {
   // Lines drawn from the corner: as many as the joseki needs, with at least one empty line
   // between its outermost stone (or Pick answer spot) and the open side of the board.
   gridN(jid) {
+    if (!jid && this.state.mix) return Math.max.apply(null, this.state.mix.set.map(id => this.gridN(id)));
     const J = this.data()[jid || this.state.jid];
     const pts = J.seq.concat(...J.qs.map(q => q.opts));
     return Math.max(7, Math.max.apply(null, pts.map(m => Math.max(m.c, m.r))) + 1);
@@ -682,6 +745,10 @@ class Component extends DCLogic {
     return { style: s, eyes: eyes, mouth: mouth, label: label || '', num: o.num && (kind === 'b' || kind === 'w') ? String(o.num) : '', numStyle: o.num && (kind === 'b' || kind === 'w') ? 'position:absolute;right:-6px;top:-10px;z-index:2;font-family:\'Patrick Hand\',Nunito,sans-serif;font-size:15px;line-height:1;color:#4b4f6e;background:#faf6ec;padding:0 2px;border-radius:4px' : 'display:none' };
   }
   tap(key, mode, par, c, r) {
+    if (this.state.mix && key === 't') {
+      const n0 = this.state.t, fit = this.mixLines(mode, this.mixPlayed(mode)).filter(l => l.q[n0].c === c && l.q[n0].r === r);
+      if (fit.length) { const l = fit[Math.floor(Math.random() * fit.length)]; Object.assign(this.state, { jid: l.jid, dir: l.dir, dirSet: true }); }
+    }
     const s = this.state, J = this.data()[s.jid];
     const mk = (dir) => this.seq(dir).map(m => this.tf(m, mode));
     const seq = mk(s.dir);
@@ -694,7 +761,7 @@ class Component extends DCLogic {
       const tries = s.tries + 1;
       const rd0 = key === 't' && s.rd && s.rd.r === s.round ? s.rd : { r: s.round, p: 0, bad: false };
       const lose = key === 't' && !rd0.bad;
-      this.setState(Object.assign({ help: key === 't' ? true : s.help, wk: (s.wk || 0) + 1, tries: tries, wrong: { c: c, r: r }, kind: 'bad', msg: tries >= 2 ? 'Try the sketched spot.' : 'Not quite. Try again.' }, key === 't' ? { rd: { r: s.round, p: 0, bad: true }, pts: s.pts - (lose ? rd0.p : 0) } : {}));
+      this.setState(Object.assign({ help: key === 't' ? true : s.help, wk: (s.wk || 0) + 1, tries: tries, wrong: { c: c, r: r }, kind: 'bad', msg: tries >= 2 ? 'Try the sketched spot.' : (s.mix ? 'That’s not one of your joseki.' : 'Not quite. Try again.') }, key === 't' ? { rd: { r: s.round, p: 0, bad: true }, pts: s.pts - (lose ? rd0.p : 0) } : {}));
       setTimeout(() => { const w = this.state.wrong; if (w && w.c === c && w.r === r) this.setState({ wrong: null }); }, 1400);
       return;
     }
@@ -728,7 +795,7 @@ class Component extends DCLogic {
       'Welcome to my web of joseki wisdom',
       'The corner is my domain'
     ];
-    if (this.state.screen === 'menu' && this._lastScreen !== 'menu') {
+    if (this.state.screen === 'menu' && this._lastScreen !== 'menu' && this._lastScreen !== 'mix') {
       let k;
       do { k = Math.floor(Math.random() * lines.length); } while (k === this._tag);
       this._tag = k;
@@ -757,7 +824,7 @@ class Component extends DCLogic {
     const passed = thr ? cleanTot >= 3 : s.pts >= 10;
     const autoWait = s.screen === 'lesson' && !s.intro && (st === 0 || st === 3) && nn < J.seq.length && par !== 2 && nn % 2 !== par && !s.wrong;
     const ak = [s.jid, st, s.round, nn, s.review].join('|');
-    if (autoWait) this.later('auto', ak, 1200, () => { const t = this.state, k2 = t.stage === 3 ? 't' : 'n'; if ([t.jid, t.stage, t.round, t[k2], t.review].join('|') === ak && !t.intro && t.screen === 'lesson') this.setState({ [k2]: t[k2] + 1 }); }); else this.stopTimer('auto');
+    if (autoWait) this.later('auto', ak, 1200, () => { const t = this.state, k2 = t.stage === 3 ? 't' : 'n'; if ([t.jid, t.stage, t.round, t[k2], t.review].join('|') === ak && !t.intro && t.screen === 'lesson') { if (t.mix && k2 === 't') { const ls = this.mixLines(mode, this.mixPlayed(mode)); const l = ls[Math.floor(Math.random() * ls.length)]; if (l) Object.assign(this.state, { jid: l.jid, dir: l.dir }); } this.setState({ [k2]: t[k2] + 1 }); } }); else this.stopTimer('auto');
     const stagesL = ['Try', 'Learn', 'Pick', 'Train'];
     const rvStart = (stg) => () => this.setState(Object.assign({ screen: 'lesson', review: true, stage: stg, intro: false, n: 1, t: 0, round: 0, w: 1, q: 0, ph: 0, answered: null, elim: [], flash: null, pts: 0, msg: '', kind: '', wrong: null, tries: 0, rd: null, sadLast: false }, this.dirInit(s.jid, false)));
     const stages = stagesL.map((l, i) => ({
@@ -787,7 +854,7 @@ class Component extends DCLogic {
     // The board is laid out on a 38 px grid of gN lines and then scaled to the usual 340 px.
     const boardStyle = 'width:' + gS + 'px;height:' + gS + 'px;zoom:' + (340 / gS).toFixed(4) + ';position:relative;flex:none;background:' + this.boardBg(E, gN) + ' center/' + gS + 'px ' + gS + 'px no-repeat';
     const gridStyle0 = 'position:absolute;left:18px;top:18px;width:304px;height:304px;box-sizing:border-box;border:1px solid #a98a4e;background-image:linear-gradient(#a98a4e 1px,transparent 1px),linear-gradient(90deg,#a98a4e 1px,transparent 1px);background-size:38px 38px';
-    let showMore = false, moreAction = null, items = [], cells = [], prompt = '', showNext = false, nextLabel = '', nextAction = null, showOptions = false, options = [];
+    let showQuiz = false, quizItems = [], showMore = false, moreAction = null, items = [], cells = [], prompt = '', showNext = false, nextLabel = '', nextAction = null, showOptions = false, options = [];
     const mkCells = () => {
       const out = [];
       for (let r = 1; r <= gN; r++) for (let c = 1; c <= gN; c++) {
@@ -803,6 +870,7 @@ class Component extends DCLogic {
     const say = (t) => !t ? t : (swap ? t.replace(/\b(Black|White|black|white)\b/g, (w) => ({ Black: 'White', White: 'Black', black: 'white', white: 'black' })[w]) : t);
     const stoneItems = (list, sadIdx, hopIdx, numbered) => list.map((m, i) => this.mk(m.c, m.r, m.w !== swap ? 'w' : 'b', '', { num: numbered ? i + 1 : 0, sad: i === sadIdx, anim: i === list.length - 1 || i === hopIdx ? (i === hopIdx && s.kind === 'ok' ? 'drop .4s ease-out, hop .5s ease-in-out .45s 2' : (i === list.length - 1 ? 'drop .4s ease-out' : '')) : '' }));
     const enter = (stage) => ({ w: 1, ph: 0, help: false, went: Object.assign({}, s.went, { [stage - 1]: true }), exiting: false, clean: 0, elim: [], flash: null, tries: 0, rd: null, sadLast: false, stage: stage, intro: true, msg: '', kind: '', wrong: null });
+    const mixNext = (extra) => this.setState(Object.assign({ quiz: null, tries: 0, rd: null, sadLast: false, t: 1, clean: cleanTot, help: cornerBad, round: s.round + 1, msg: '', kind: '', wrong: null }, this.mixCorner(sched, s.round + 1), extra || {}));
     if (st === 0 || st === 3) {
       swap = white;
       const list = seq.slice(0, nn).map(m => this.tf(m, mode));
@@ -816,6 +884,8 @@ class Component extends DCLogic {
       const waiting = nn < L && par !== 2 && nn % 2 !== par;
       if (waiting) prompt = 'White is thinking …';
       else if (T && both && nn < L) prompt = nn === 0 ? say(J.fp || 'Play the star point in the {c} corner.').replace('{c}', cornerName) : (nn === 1 ? (J.go ? asCol(1, 'White') : say(J.tc).replace('{c}', cornerName)) : (s.help && J.go ? (nn === 2 ? asCol(2, 'Black') : J.go[nn]) : (s.help && J.ex[nn] ? say(J.ex[nn]) : (nn % 2 === 0 ? 'Black\u2019s turn.' : 'White\u2019s turn.'))));
+      else if (T && nn < L && s.mix) prompt = say(J.did[nn - 1]) + (nn === (white ? 1 : 2) ? '\nHow do you want to respond?' : '');
+      else if (s.mix) prompt = s.quiz ? 'Which joseki was it?' : '';
       else if (T && nn < L) prompt = nn < 2 ? say(white ? J.tc : (J.fp || 'Play the star point in the {c} corner.')).replace('{c}', cornerName) : (s.help && J.go ? say(J.did[nn - 1]) + '\n' + J.go[nn] : (s.help ? (say((white ? J.tw[nn] : J.tb[nn]) || J.ex[nn]) || 'Black\u2019s turn.').replace('{c}', cornerName) : 'Black\u2019s turn.'));
       else if (white && nn % 2 === 1) prompt = say(J.tw[nn]).replace('{c}', cornerName);
       else if (nn === 0) prompt = say(J.fp || 'Play the star point in the {c} corner.').replace('{c}', cornerName);
@@ -827,6 +897,25 @@ class Component extends DCLogic {
         showNext = true;
         if (s.review) { nextLabel = 'Done'; nextAction = () => this.setState({ screen: 'picker', msg: '', kind: '', wrong: null, tries: 0, rd: null, sadLast: false }); }
         else if (!T) { nextLabel = 'Continue'; nextAction = () => this.setState(enter(1)); }
+        else if (s.mix) {
+          showNext = !!(s.quiz && s.quiz.ok);
+          nextLabel = 'Next corner'; nextAction = () => mixNext();
+          const qk = s.round + '|' + s.jid;
+          if (!s.quiz && s.screen === 'lesson') this.later('quiz', qk, 1100, () => { const t = this.state; if (t.screen === 'lesson' && t.mix && !t.quiz && t.round + '|' + t.jid === qk) this.setState({ quiz: { wrong: [], ok: false } }); });
+          if (s.quiz) {
+            // every ticked joseki whose moves are exactly the ones on the board counts as right
+            const played = list, fits = s.mix.set.filter(id => [0, 1].some(dir => { const q = this.data()[id].seq.map(m => this.tf(dir ? { c: m.r, r: m.c, w: m.w } : m, mode)); return q.length === played.length && q.every((m, i) => m.c === played[i].c && m.r === played[i].r); }));
+            showQuiz = true;
+            quizItems = s.mix.set.map((id, k) => {
+              const bad = s.quiz.wrong.includes(id), good = s.quiz.ok === id;
+              return { name: this.data()[id].short, style: 'position:relative;border:0;background:transparent;padding:0;width:170px;display:flex;flex-direction:column;align-items:center;cursor:pointer',
+                pic: 'width:168px;height:124px;background:' + this.sketch(id) + ' center/contain no-repeat;' + (bad ? 'opacity:.4' : ''),
+                nameStyle: "font-family:'Patrick Hand',Nunito,sans-serif;font-size:21px;white-space:nowrap;line-height:1.1;margin-top:2px;color:" + (bad ? '#9a9eb8' : '#2d3042'),
+                mark: bad ? 'position:absolute;left:calc(50% - 60px);top:2px;width:120px;height:120px;pointer-events:none;background:' + this.strokeBg(k * 5 + 3, 'q' + k).replace(/ center\/34px 34px no-repeat$/, ' center/120px 120px no-repeat') : (good ? 'position:absolute;right:4px;top:-4px;width:46px;height:46px;pointer-events:none;background:' + this.quizTick() + ' center/46px no-repeat' : 'display:none'),
+                act: () => { const q = this.state.quiz; if (!q || q.ok || q.wrong.includes(id)) return; this.setState({ quiz: fits.includes(id) ? { wrong: q.wrong, ok: id } : { wrong: q.wrong.concat(id), ok: false } }); } };
+            });
+          }
+        }
         else if (passed && thr) { nextLabel = 'Done'; nextAction = () => { if (this.state.exiting) return; this.setState({ exiting: true }); setTimeout(() => this.state.exiting && this.state.screen === 'lesson' && this.setState({ exiting: false, screen: 'result', msg: '', kind: '', wrong: null, learned: Object.assign({}, this.state.learned, { [s.jid]: true }) }), 1900); }; showMore = true; moreAction = () => this.setState(Object.assign({ tries: 0, rd: null, sadLast: false, t: 1, clean: cleanTot, help: cornerBad, round: s.round + 1, msg: '', kind: '', wrong: null, learned: Object.assign({}, s.learned, { [s.jid]: true }) }, this.dirInit(s.jid, sched[(s.round + 1) % sched.length].both ? 'both' : sched[(s.round + 1) % sched.length].white))); }
         else if (passed) { nextLabel = 'See result'; nextAction = () => this.setState({ screen: 'result', msg: '', kind: '', wrong: null, learned: Object.assign({}, s.learned, { [s.jid]: true }) }); showMore = true; moreAction = () => this.setState(Object.assign({ tries: 0, rd: null, sadLast: false, t: 1, clean: cleanTot, help: cornerBad, round: s.round + 1, msg: '', kind: '', wrong: null, learned: Object.assign({}, s.learned, { [s.jid]: true }) }, this.dirInit(s.jid, sched[(s.round + 1) % sched.length].both ? 'both' : sched[(s.round + 1) % sched.length].white))); }
         else { nextLabel = 'Next corner'; nextAction = () => this.setState(Object.assign({ tries: 0, rd: null, sadLast: false, t: 1, clean: cleanTot, help: cornerBad, round: s.round + 1, msg: '', kind: '', wrong: null }, this.dirInit(s.jid, sched[(s.round + 1) % sched.length].both ? 'both' : sched[(s.round + 1) % sched.length].white))); }
@@ -900,7 +989,7 @@ class Component extends DCLogic {
     ];
     const msgBg = s.kind === 'ok' ? '#dff3e7' : (s.kind === 'bad' ? '#ffe3dc' : 'transparent');
     const msgFg = s.kind === 'ok' ? '#1f6b45' : '#a8402a';
-    const fresh = { ph: 0, help: false, went: {}, clean: 0, exiting: false, tries: 0, rd: null, sadLast: false, screen: 'lesson', review: false, stage: 0, intro: true, n: 1, t: 0, round: 0, w: 1, q: 0, answered: null, pts: 0, msg: '', kind: '', wrong: null };
+    const fresh = { mix: null, ph: 0, help: false, went: {}, clean: 0, exiting: false, tries: 0, rd: null, sadLast: false, screen: 'lesson', review: false, stage: 0, intro: true, n: 1, t: 0, round: 0, w: 1, q: 0, answered: null, pts: 0, msg: '', kind: '', wrong: null };
     const chip = (k) => 'flex:none;border:1.6px solid currentColor;border-radius:14px 10px 13px 9px/10px 13px 9px 14px;padding:3px 10px;font-size:12px;font-weight:800;' + ({ g: 'background:#dff3e7;color:#1f6b45', p: 'background:#e9ebf1;color:#3f4366', b: 'background:#e6eaf2;color:#2d4f8f', x: 'background:#eceef3;color:#6e7285' })[k];
     const card = (o) => 'background:#fffdf7;border:2px solid #4b4f6e;border-width:2px 2.8px 2.4px 2.2px;border-radius:26px 20px 28px 22px/22px 28px 20px 26px;padding:16px;box-shadow:2px 3px 0 rgba(75,79,110,.22);display:flex;flex-direction:column;gap:12px;opacity:' + o;
     const btn = (on) => 'height:46px;border:0;border-radius:23px;font-size:15px;font-weight:800;' + (on ? 'background:#4b4f6e;color:#fff' : 'background:#eceef3;color:#868a9c');
@@ -917,9 +1006,9 @@ class Component extends DCLogic {
     // Train: she sits on the tangle of the corner being played (the first one as soon as Train starts),
     // stays on it while its web is spun, then moves on to the next tangle with the next corner.
     if (st === 3) sxPos = exiting ? 440 : cleanNow ? TX[cleanTot - 1] : TX[Math.min(cleanTot, 2)];
-    const hangLen = ({ menu: 100, picker: 50, start: 40, result: 110 })[s.screen] || 60;
+    const hangLen = ({ menu: 100, mix: 100, picker: 50, start: 40, result: 110 })[s.screen] || 60;
     return {
-      isThread: thr, isStrip: this.props.row === 'strip',
+      isThread: thr && !s.mix, isStrip: this.props.row === 'strip',
       stageRowStyle: thr ? 'display:none' : (this.props.row === 'strip' ? 'display:flex;align-items:stretch;height:44px;flex:none;margin-top:14px;background:' + this.stripBg(st) + ' center/340px 44px no-repeat' : 'display:flex;align-items:center;margin-top:14px;flex:none'),
       threadBox: 'position:relative;width:340px;height:70px;flex:none;margin-top:' + ((this.props.hd || 'x') === 'x' ? 52 : 56) + 'px;background:' + this.threadRowBg(sxPos, st) + ' left top/420px 70px no-repeat',
       threadWalker: 'position:absolute;top:' + (big ? 16 : 22) + 'px;width:' + (big ? 56 : 44) + 'px;height:' + (big ? 56 : 44) + 'px;transition:left ' + (exiting ? '1.8s ease-in' : '.6s ease') + ';left:' + (sxPos - (big ? 28 : 22)) + 'px;background:' + this.sketchSpider() + ' center/' + (big ? 62 : 48) + 'px no-repeat',
@@ -935,26 +1024,39 @@ class Component extends DCLogic {
       resultTextStyle: thr ? 'display:none' : 'font-size:16px;line-height:1.5;color:#5a5f74;max-width:300px',
       resultWrap: 'position:relative;height:100%;box-sizing:border-box;padding:' + (thr ? '0' : '56px') + ' 28px 40px;display:flex;flex-direction:column;align-items:center;justify-content:' + (thr ? 'flex-start' : 'center') + ';text-align:center;gap:16px',
       hdCur: this.props.hd === 'cur', hdX: (this.props.hd || 'x') === 'x', hdY: this.props.hd === 'y',
-      headTitle: s.review ? 'Review · ' + J.short : J.title,
+      headTitle: s.mix ? '' : s.review ? 'Review · ' + J.short : J.title,
       headThumb: 'width:46px;height:46px;flex:none;background:' + this.thumbBg(s.jid) + ' center/46px 46px no-repeat',
       preview: inLesson && s.intro && (this.props.intro || 'board') === 'board', noPreview: !(inLesson && s.intro && (this.props.intro || 'board') === 'board'),
-      boardWrap: 'flex:none;display:flex;justify-content:center;transition:opacity .4s;' + (inLesson && s.intro && (this.props.intro || 'board') === 'board' ? 'opacity:0' : ''),
+      quizWrap: 'width:340px;flex:none;align-self:center;margin:16px 0 6px;display:flex;flex-wrap:wrap;justify-content:center;gap:14px 0;animation:fadein .5s ease .35s both',
+      showQuiz, quizItems,
+      promptBox: 'display:flex;flex:none;transition:height .5s ease;height:' + (s.mix && showQuiz ? 32 : 76) + 'px;margin-bottom:' + (s.mix ? (showQuiz ? '0;' : '12px;') + 'align-items:flex-start' : '24px;align-items:flex-end'),
+      lessonBody: 'position:relative;flex:1;min-height:0;display:flex;flex-direction:column;' + (s.mix ? 'justify-content:flex-start;padding-top:18px' : 'justify-content:center;justify-content:safe center'),
+      boardWrap: 'flex:none;display:flex;justify-content:center;align-items:flex-start;transition:opacity .4s,height .5s ease;' + (s.mix ? 'height:' + (showQuiz ? 120 : 340) + 'px;' + (showQuiz ? 'order:-1;margin-bottom:16px;' : '') : '') + (inLesson && s.intro && (this.props.intro || 'board') === 'board' ? 'opacity:0' : ''),
       introLine: ['Try to find the joseki.', 'Learn how it\u2019s played.', 'Pick the right move.', 'Train until it sticks.'][st] || '',
       introWord: (['Try to find the joseki.', 'Learn how it\u2019s played.', 'Pick the right move.', 'Train until it sticks.'][st] || '').split(' ')[0], introRest: (['Try to find the joseki.', 'Learn how it\u2019s played.', 'Pick the right move.', 'Train until it sticks.'][st] || '').split(' ').slice(1).join(' '),
       introCalm: this.props.intro === 'calm', introBtn: this.props.intro !== 'calm',
       isDemo: !!this.props.demo, demoNext: () => this.demoStep(),
+      backTurnerStyle: 'position:absolute;left:0;top:0;z-index:3;width:132px;height:132px;padding:0;border:0;box-shadow:none;border-radius:0;transform:rotate(180deg);background:' + this.turnerBg() + ' right bottom/132px 132px no-repeat',
+      mixList: ['j33', 'j44', 'j34', 'j34h'].filter(id => s.learned && s.learned[id]).map(id => { const D = this.data()[id]; return { thumb: this.thumbBg(id), name: D.title, sub: D.sub, aria: D.title, act: () => this.setState({ mixOn: Object.assign({}, s.mixOn, { [id]: !(s.mixOn && s.mixOn[id]) }) }), markStyle: 'width:36px;height:36px;flex:none;background:' + this.tickBox(!!(s.mixOn && s.mixOn[id]), id.length * 7 + id.charCodeAt(1)) + ' center/36px 36px no-repeat', rowStyle: 'display:flex;align-items:center;gap:14px;width:100%;padding:10px 0;background:transparent;font-family:inherit' }; }),
+      mixStart: () => { const set = ['j33', 'j44', 'j34', 'j34h'].filter(k => s.mixOn && s.mixOn[k] && s.learned && s.learned[k]); const sc = this.mixSched(set); this.setState(Object.assign({ screen: 'lesson', mix: { set: set }, quiz: null, review: false, stage: 3, intro: false, t: 1, round: 0, sched: sc, clean: 0, went: {}, help: false, exiting: false, pts: 0, n: 1, w: 1, q: 0, ph: 0, answered: null, elim: [], flash: null, msg: '', kind: '', wrong: null, tries: 0, rd: null, sadLast: false }, this.mixCorner(sc, 0))); },
+      mixReady: Object.keys(s.mixOn || {}).filter(k => s.mixOn[k] && s.learned && s.learned[k]).length >= 2,
+      isMixPage: s.screen === 'mix' || !!s.turn,
+      menuPage: 'position:absolute;inset:0;z-index:4;background:url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIj48ZmlsdGVyIGlkPSJuIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjkiIG51bU9jdGF2ZXM9IjIiIHNlZWQ9IjQiLz48ZmVDb2xvck1hdHJpeCB2YWx1ZXM9IjAgMCAwIDAgLjQ1ICAwIDAgMCAwIC40ICAwIDAgMCAwIC4zICAwIDAgMCAuMDkgMCIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWx0ZXI9InVybCgjbikiLz48L3N2Zz4=) #f8f4e9;transform-origin:0 100%;' + (s.turn === 'off' ? 'animation:pgoff .65s ease-in forwards;box-shadow:3px 2px 10px rgba(75,79,110,.18)' : (s.turn === 'on' ? 'animation:pgon .6s ease-out both;box-shadow:3px 2px 10px rgba(75,79,110,.18)' : '')),
+      toMix: () => { if (s.turn) return; this.setState({ turn: 'off' }); setTimeout(() => this.setState({ screen: 'mix', turn: null }), 650); },
+      mixBack: () => { if (s.turn) return; this.setState({ screen: 'menu', turn: 'on' }); setTimeout(() => this.setState({ turn: null }), 600); },
+      turnerStyle: (Object.keys(s.learned || {}).filter(k => s.learned[k]).length < 2 ? 'display:none;' : '') + 'position:absolute;right:0;bottom:0;z-index:3;width:132px;height:132px;padding:0;border:0;box-shadow:none;border-radius:0;background:' + this.turnerBg() + ' right bottom/132px 132px no-repeat',
       tagline, vA: this.props.variant !== 'b', pkClass: this.props.variant === 'b' ? 'pkb' : 'pk', ruleStyle: 'height:8px;flex:none;margin:8px 0;background:' + this.trackBg() + ' center/100% 6px no-repeat',
       isMenu: s.screen === 'menu', isPicker: s.screen === 'picker', isStart: s.screen === 'start', isIntro: inLesson && s.intro && (this.props.intro || 'board') !== 'board', isLesson: inLesson && (!s.intro || (this.props.intro || 'board') === 'board'), isResult: s.screen === 'result',
       stepsInfo: [{ t: 'Try', txt: 'font-size:17px;font-weight:800;color:#2d3042', dot: 'width:22px;height:22px;box-sizing:border-box;border-radius:11px;background:#fff;border:4px solid ' + '#c9ccd9' }, { t: 'Learn', txt: 'font-size:17px;font-weight:700;color:#868a9c', dot: 'width:22px;height:22px;box-sizing:border-box;border-radius:11px;background:#fff;border:4px solid ' + '#c9ccd9' }, { t: 'Pick', txt: 'font-size:17px;font-weight:700;color:#868a9c', dot: 'width:22px;height:22px;box-sizing:border-box;border-radius:11px;background:#fff;border:4px solid ' + '#c9ccd9' }, { t: 'Train', txt: 'font-size:17px;font-weight:700;color:#868a9c', dot: 'width:26px;height:26px;box-sizing:border-box;border-radius:13px;background:#fff;border:4px solid ' + '#4b4f6e' }],
       begin: () => this.setState(Object.assign({}, fresh, this.dirInit(s.jid, false))),
-      toMenu: () => this.setState({ screen: s.review ? 'picker' : 'menu', exiting: false, msg: '', kind: '', wrong: null, tries: 0, rd: null, sadLast: false }),
+      toMenu: () => this.setState({ screen: s.mix && s.screen === 'lesson' ? 'mix' : (s.review ? 'picker' : 'menu'), exiting: false, msg: '', kind: '', wrong: null, tries: 0, rd: null, sadLast: false }),
       toMenuFromPicker: () => this.setState({ screen: 'menu', review: false }),
       pickerList: ['Try', 'Learn', 'Pick', 'Train'].map((label, stg) => ({ label: label, dot: 'width:30px;height:30px;flex:none;background:' + this.web(2) + ' center/30px no-repeat', rowStyle: (this.props.variant === 'b' ? 'display:flex;align-items:center;gap:16px;padding:0 18px;margin-bottom:12px;background:#fffdf7;border:2px solid #4b4f6e;border-width:2px 2.7px 2.4px 2.2px;border-radius:26px 20px 28px 22px/22px 28px 20px 26px;' : 'display:flex;align-items:center;gap:18px;padding:6px 0;') + 'width:100%;height:64px;background-color:' + (this.props.variant === 'b' ? '#fffdf7' : 'transparent') + ';font-family:\'Patrick Hand\',Nunito,sans-serif;font-size:30px;color:#2d3042;', act: rvStart(stg) })),
       startStage: () => this.setState({ intro: false }),
       introTitle: intros[st].t, introText: intros[st].d, introButton: intros[st].b,
       lessonTitle: s.review ? 'Review' : J.short, josekiTitle: J.title,
       sideStyle: 'flex:none;width:26px;height:26px;border-radius:13px;box-sizing:border-box;margin-top:1px;' + (st === 1 ? 'display:none' : (white ? 'background:#fff;border:2px solid #2d3042' : 'background:#2d3042')),
-      hangStyle: s.screen !== 'menu' ? 'display:none' : 'position:absolute;z-index:2;pointer-events:none;top:0;right:28px;width:54px;display:flex;flex-direction:column;align-items:center;transform-origin:27px 0;animation:swing 2.4s ease-in-out infinite',
+      hangStyle: s.screen !== 'menu' && s.screen !== 'mix' ? 'display:none' : 'position:absolute;z-index:6;pointer-events:none;top:0;right:28px;width:54px;display:flex;flex-direction:column;align-items:center;transform-origin:27px 0;animation:swing 2.4s ease-in-out infinite',
       threadStyle: 'width:6px;background:' + this.threadBg() + ' center top/6px 22px repeat-y;height:' + hangLen + 'px;animation:l' + hangLen + ' 2.2s ease-out',
       bugStyle: 'flex:none;width:54px;height:54px;margin-top:-17px;background:' + this.sketchSpider() + ' center/64px no-repeat',
       josekiWhy: J.why, thinkSpider: 'width:100%;max-width:330px;height:220px;flex:none;background:' + this.sketch(s.jid) + ' center/contain no-repeat',
@@ -962,7 +1064,7 @@ class Component extends DCLogic {
       barBox: (st === 1 || thr) ? 'display:none' : 'position:relative;height:44px;width:100%;background:' + this.barSvg(false) + ' left 29px/342px 8px no-repeat',
       barFill: 'position:absolute;left:0;top:29px;height:8px;overflow:hidden;background:' + this.barSvg(true) + ' left top/342px 8px no-repeat;transition:width .5s ease;width:' + barPct + '%',
       markerStyle: s.review ? 'display:none' : 'position:absolute;left:calc(62.5% - 13px);top:20px;width:26px;height:26px;background:' + this.web(webOn ? 2 : (!s.review && s.pts >= 10 ? 1 : 0)) + ' center/26px no-repeat' + (webOn ? ';animation:pop .5s ease-out' : ''),
-      walkerStyle: 'position:absolute;top:17px;width:32px;height:32px;transition:left .5s ease;left:calc(' + barPct + '% - 16px);background:' + this.sketchSpider() + ' center/34px no-repeat', gridStyle: 'display:none', edges: [], boardStyle,
+      walkerStyle: 'position:absolute;top:17px;width:32px;height:32px;transition:left .5s ease;left:calc(' + barPct + '% - 16px);background:' + this.sketchSpider() + ' center/34px no-repeat', gridStyle: 'display:none', edges: [], boardStyle: boardStyle + (s.mix ? ';transform-origin:50% 0;transition:transform .5s ease;transform:scale(' + (showQuiz ? 0.353 : 1) + ')' : ''),
                   josekiList: ['j33', 'j44', 'j34', 'j34h'].map((id, k, arr) => {
         const nextOpen = arr.find(x => !s.learned[x]), isDone = !!s.learned[id], isNext = id === nextOpen;
         const D = this.data()[id], done = !!s.learned[id], open = UNLOCK_ALL || k === 0 || !!s.learned[arr[k - 1]];

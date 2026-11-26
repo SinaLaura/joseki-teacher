@@ -56,6 +56,19 @@ there, never on the second question). No other text in Pick except the mistake m
 question starts by itself with "White is thinking …" (no Next button). After the last answer White plays the joseki's
 last move (again after "White is thinking …"), then the button "Good." ends Pick.
 
+**Train freely** (the second menu page): once two joseki are done, a dog-ear at the bottom right of the menu turns the
+page (a dog-ear at the top left turns back). Heading "Train freely with the joseki you know.", line "Tick the ones to
+train.", the finished joseki with pencil tick boxes (empty at first, remembered in `joseki.mix`), "Start" once two are
+ticked. Each corner: a random ticked joseki gives the first stone, random corner and side (the player always sees
+themselves as Black), never both colours. Every ticked joseki in both mirror images is a line; any move that continues a
+line fitting all stones so far is right, and the computer picks at random among the lines still possible
+(`mixLines`). The board is as large as the largest ticked joseki needs. No title, no thread, no stage line, no hints
+what to play: only the opponent's last move (`did`), plus "How do you want to respond?" on the player's first move. A
+wrong move says "That's not one of your joseki."; the second miss sketches a spot as usual. When the joseki is
+finished, the board shrinks to the top, then "Which joseki was it?" and the spider sketches of the ticked joseki (as
+large as possible, two per row); a wrong pick is struck through in red, the right one gets a green tick (every ticked
+joseki that matches the moves counts). Then "Next corner"; "Menu" at the top left leads back to the Train freely page.
+
 ## Look: a sensei with a gift for drawing explains it on a sheet of paper
 
 The whole app is drawn in pencil, and all of the following came from the owner's feedback.

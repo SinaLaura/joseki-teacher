@@ -106,6 +106,10 @@ A spider walks along one pencil thread through the four steps, tangles turn into
 end she rappels down. Progress is saved on the device. Spaced repetition and variations are still to come
 (see "Not built yet" in [CLAUDE.md](CLAUDE.md)).
 
+**Train freely:** once two joseki are done, turn the menu page by its folded corner, tick the joseki you know and
+play them mixed, like in a real game: no name, no hints, any move that belongs to one of them counts, and the
+opponent answers with any of them. At the end of each corner you say which joseki it was.
+
 It's a plain HTML/CSS/JS web app with no libraries, and works as an installable PWA on a phone.
 
 **Online:** every push to `main` is published to GitHub Pages by `.github/workflows/pages.yml`

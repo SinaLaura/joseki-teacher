@@ -2,12 +2,14 @@
 // rendered from Component.renderVals() and patched into the live DOM (so CSS animations keep running).
 const UNLOCK_ALL = true; // set to false to unlock the joseki one after another
 const STORE = 'joseki.learned';
+const MIX_STORE = 'joseki.mix'; // which joseki are ticked for Train freely
 
 class DCLogic {
   constructor(props) { this.props = props || {}; this.state = {}; this._render = null; }
   setState(p) {
     Object.assign(this.state, typeof p === 'function' ? p(this.state) : p);
     if (p && p.learned) { try { localStorage.setItem(STORE, JSON.stringify(this.state.learned)); } catch (e) { /* private mode */ } }
+    if (p && p.mixOn) { try { localStorage.setItem(MIX_STORE, JSON.stringify(this.state.mixOn)); } catch (e) { /* private mode */ } }
     if (this._render) this._render();
   }
 }
@@ -70,8 +72,9 @@ function morphChildren(oldP, newP) {
 
 function mount(root, Comp) {
   const comp = new Comp({}), tpl = document.getElementById('tpl');
-  if (location.search.includes('reset')) { try { localStorage.removeItem(STORE); } catch (e) { /* ignore */ } }
+  if (location.search.includes('reset')) { try { localStorage.removeItem(STORE); localStorage.removeItem(MIX_STORE); } catch (e) { /* ignore */ } }
   try { const saved = JSON.parse(localStorage.getItem(STORE) || 'null'); if (saved) comp.state.learned = saved; } catch (e) { /* ignore */ }
+  try { const mix = JSON.parse(localStorage.getItem(MIX_STORE) || 'null'); if (mix) comp.state.mixOn = mix; } catch (e) { /* ignore */ }
   const draw = () => {
     const vals = comp.renderVals(), tmp = document.createElement('div');
     tpl.content.childNodes.forEach((n, i) => build(n, vals, tmp, String(i), false));
