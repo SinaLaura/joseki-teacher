@@ -907,7 +907,7 @@ class Component extends DCLogic {
             // every ticked joseki whose moves are exactly the ones on the board counts as right
             const played = list, fits = s.mix.set.filter(id => [0, 1].some(dir => { const q = this.data()[id].seq.map(m => this.tf(dir ? { c: m.r, r: m.c, w: m.w } : m, mode)); return q.length === played.length && q.every((m, i) => m.c === played[i].c && m.r === played[i].r); }));
             showQuiz = true;
-            quizItems = s.mix.set.map((id, k) => {
+            quizItems = s.mix.set.map((id, k) => ({ id, k })).filter(o => !s.quiz.ok || o.id === s.quiz.ok).map(({ id, k }) => { // after the right pick only that joseki stays
               const bad = s.quiz.wrong.includes(id), good = s.quiz.ok === id;
               return { name: this.data()[id].short, style: 'position:relative;border:0;background:transparent;padding:0;width:170px;display:flex;flex-direction:column;align-items:center;cursor:pointer',
                 pic: 'width:168px;height:124px;background:' + this.sketch(id) + ' center/contain no-repeat;' + (bad ? 'opacity:.4' : ''),
