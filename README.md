@@ -13,8 +13,6 @@ Made for beginners, best on a phone.
 
 ▶ **[Watch the 50-second demo](https://claude.ai/artifact/8Gv36D8foikAWLujXjSLoc)**
 
-> A few minutes a day. Little effort. A big effect over time.
-
 ---
 
 ## The idea
