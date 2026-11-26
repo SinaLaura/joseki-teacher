@@ -3,7 +3,15 @@ https://sinalaura.github.io/joseki-teacher/
 
 # Joseki Spider Sensei
 
-**A beautiful, low-effort daily joseki trainer for Go. It works like a vocabulary app.**
+*Learn joseki from an eight-legged master.*
+
+In Go, the ancient board game, some move sequences in the corners are so good that players learn them by
+heart. They're called *joseki*. Joseki Spider Sensei teaches them step by step: first you **try** to find the
+moves, then you **learn** why they work, **pick** the right reply, and **train** until you know it. Everything
+is drawn in pencil, like a sensei sketching on paper, and a small spider spins her web as you make progress.
+Made for beginners, best on a phone.
+
+▶ **[Watch the 50-second demo](https://claude.ai/artifact/8Gv36D8foikAWLujXjSLoc)**
 
 > A few minutes a day. Little effort. A big effect over time.
 
