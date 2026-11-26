@@ -49,7 +49,7 @@ both arrays. The owner keeps all these texts in the Sheet "Train instructions â€
 (https://claude.ai/artifact/Lg2gJ7zz8HZkKPbGNTZBkP): keep it and the design file in step.
 **Every sequence starts with only the first stone** (Try, Learn and every Train corner). Moves of the colour the player
 isn't playing are played automatically after a short pause.
-**Pick asks only Black's moves:** two questions per joseki (after White's 1st and 2nd move), real colors, never swapped.
+**Pick asks only Black's moves:** one question after each of White's moves except the last (two in a 6-move joseki, three in an 8-move one), real colors, never swapped.
 Each question plays step by step (state `ph`): "White is thinking â€¦", then White's move drops in, then the three answer
 spots. **In every joseki, the first question says "How should Black respond?" once White's first stone is down** (only
 there, never on the second question). No other text in Pick except the mistake messages. After an answer the next
@@ -73,7 +73,7 @@ The whole app is drawn in pencil, and all of the following came from the owner's
 - **Stones:** wobbly double outline. Black is the pencil color, filled, no hatching or inner ring. Faces are switched off for
   now (`stoneFaces()`, keep the code): when on, they are imperfect (scribbled eyes or `^^`, uneven mouth), and after a
   mistake the previous stone gets a flat `:I` mouth.
-- **Board:** crooked pencil lines with uneven pressure; where the board continues they stop at slightly different lengths,
+- **Board:** as many lines as the joseki needs, with at least one empty line between its outermost stone (or Pick spot) and the open side; always drawn at the same size, so more lines means smaller stones (`gridN()`). Crooked pencil lines with uneven pressure; where the board continues they stop at slightly different lengths,
   the pencil lifting off. Real edges are a firm stroke running a little past the corner. The star point is a soft pencil dot.
 - **Wrong move:** draw the stone, wait a moment, strike it through with one red stroke from bottom left to top right, then
   fade it out. On the second miss the right spot is sketched lightly (thin outline, light hatching, drawn in after the strike;
