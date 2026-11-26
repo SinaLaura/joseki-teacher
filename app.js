@@ -155,6 +155,24 @@ class Component extends DCLogic {
           { shown: 2, opts: [{ c: 5, r: 2 }, { c: 4, r: 3 }, { c: 6, r: 4 }], ok: 1, p: 'White made a small knight approach.' },
           { shown: 4, opts: [{ c: 3, r: 6 }, { c: 6, r: 5 }, { c: 5, r: 5 }], ok: 0, p: 'White stood.' }
         ]
+      },
+      j34h: {
+        d: 0, title: '3-4 point: high approach', short: 'High approach', sub: 'Attach, hane, draw back', tint: '#fbefd6',
+        seq: [B(3, 4), W(5, 4), B(5, 3), W(6, 3), B(4, 3), W(6, 4)],
+        why: 'Black takes the corner, White takes the outside.',
+        fp: 'Play the 3-4 point in the {c} corner.',
+        tc: 'Approach high in the {c} corner.',
+        tryW: 'White makes a high approach.',
+        tryP: { 2: 'Attach underneath.', 4: 'Draw back.' },
+        tb: { 2: 'White approaches high. Attach underneath.', 4: 'White plays a hane. Draw back.' },
+        tw: { 1: 'Approach high in the {c} corner.', 3: 'Hane.', 5: 'Connect solidly.' },
+        go: ['Play the 3-4 point.', 'Approach high.', 'Attach underneath.', 'Hane.', 'Draw back.', 'Connect solidly.'],
+        did: ['Black played the 3-4 point.', 'White approached high.', 'Black attached underneath.', 'White played a hane.', 'Black drew back.', 'White connected solidly.'],
+        ex: ['Black plays the 3-4 point.', 'White approaches high, one space away on the 4th line.', 'Black attaches underneath to protect the corner.', 'White plays a hane and takes the outside.', 'Black draws back and secures the corner.', 'White connects solidly so Black can’t cut.'],
+        qs: [
+          { shown: 2, opts: [{ c: 4, r: 2 }, { c: 6, r: 5 }, { c: 5, r: 3 }], ok: 2, p: 'White made a high approach.' },
+          { shown: 4, opts: [{ c: 4, r: 3 }, { c: 4, r: 4 }, { c: 7, r: 4 }], ok: 0, p: 'White played a hane.' }
+        ]
       }
     };
   }
@@ -378,6 +396,15 @@ class Component extends DCLogic {
       g += hand([[62.4, 69.2], [62.9, 75.5], [62.2, 82.4]], 1, L, 17) + hand([[54, 71.5], [57.2, 77], [58.4, 82]], 0.8, L, 19) + hand([[71, 72], [68.4, 77.4], [67.4, 82.3]], 0.8, L, 23);
       g += sp(62, 64, 1.1, false);
       g += '<path d="M78 66Q100 62 124 66"' + st(L, 1.6) + ' stroke-dasharray="5 4"/><circle cx="124" cy="66" r="2.6" fill="' + L + '"/>';
+    } else if (jid === 'j34h') {
+      // Black tucked into the corner under a small web; White outside, standing on a fence it has built
+      g += '<path d="M123 8Q122 40 123.5 91Q96 92 70 90.5"' + st(P, 2) + '/>';
+      g += hand([[122.5, 52], [111, 57], [101.5, 68.5], [96.5, 90]], 1.2, L, 31) + hand([[122.8, 68], [114.5, 72], [109.5, 81], [108.6, 90]], 1, L, 37);
+      g += hand([[122.6, 89], [113, 76.5], [104, 62]], 0.8, L, 41);
+      g += sp(110, 79, 0.9, false);
+      g += '<path d="M14 66Q46 62.5 82 65.5"' + st(L, 2.2) + '/><path d="M22 58Q23 66 21.5 73M38 57Q37 64 38.5 72M54 56.5Q55.5 64 54 71.5M70 57.5Q69 65 70.5 72.5"' + st(L, 1.2) + '/>';
+      g += sp(46, 48, 1.15, true);
+      g += '<path d="M62 42Q76 34 90 44" stroke-dasharray="2 3"' + st(P, 1.4) + '/>';
     } else {
       g += '<path d="M6 74Q60 70 112 76"' + st(L, 1.6) + '/>';
       g += sp(26, 58, 1, false);
@@ -923,7 +950,7 @@ class Component extends DCLogic {
       barFill: 'position:absolute;left:0;top:29px;height:8px;overflow:hidden;background:' + this.barSvg(true) + ' left top/342px 8px no-repeat;transition:width .5s ease;width:' + barPct + '%',
       markerStyle: s.review ? 'display:none' : 'position:absolute;left:calc(62.5% - 13px);top:20px;width:26px;height:26px;background:' + this.web(webOn ? 2 : (!s.review && s.pts >= 10 ? 1 : 0)) + ' center/26px no-repeat' + (webOn ? ';animation:pop .5s ease-out' : ''),
       walkerStyle: 'position:absolute;top:17px;width:32px;height:32px;transition:left .5s ease;left:calc(' + barPct + '% - 16px);background:' + this.sketchSpider() + ' center/34px no-repeat', gridStyle: 'display:none', edges: [], boardStyle,
-                  josekiList: ['j33', 'j44', 'j34'].map((id, k, arr) => {
+                  josekiList: ['j33', 'j44', 'j34', 'j34h'].map((id, k, arr) => {
         const nextOpen = arr.find(x => !s.learned[x]), isDone = !!s.learned[id], isNext = id === nextOpen;
         const D = this.data()[id], done = !!s.learned[id], open = UNLOCK_ALL || k === 0 || !!s.learned[arr[k - 1]];
         return { thumb: this.thumbBg(id), name: D.title, sub: open ? D.sub : 'After ' + this.data()[arr[k - 1]].short, tint: D.tint,
