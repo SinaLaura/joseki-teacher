@@ -1,3 +1,6 @@
+
+https://sinalaura.github.io/joseki-teacher/
+
 # Joseki Spider Sensei
 
 **A beautiful, low-effort daily joseki trainer for Go. It works like a vocabulary app.**
