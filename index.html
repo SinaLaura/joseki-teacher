@@ -24,18 +24,18 @@
 <div style="{{hangStyle}}"><div style="{{threadStyle}}"></div><div style="{{bugStyle}}"></div></div>
 
 <sc-if value="{{ isMixPage }}" hint-placeholder-val="{{ false }}">
-<div style="position:absolute;inset:0;box-sizing:border-box;padding:96px 28px 32px;display:flex;flex-direction:column;gap:6px;overflow:auto">
+<div style="position:absolute;inset:0;box-sizing:border-box;padding:64px 28px 28px;display:flex;flex-direction:column;overflow:hidden">
 <h1 style="margin:0;padding-right:70px;font-size:32px;line-height:1.15;color:#2d3042">Train freely with the joseki you know.</h1>
-<div style="margin:4px 0 14px;font-size:16px;line-height:1.5;color:#5a5f74">Tick the ones to train.</div>
+<div style="margin:4px 0 8px;font-size:16px;line-height:1.5;color:#5a5f74">Tick the ones to train.</div>
 <sc-for list="{{mixList}}" as="m" hint-placeholder-count="2">
 <button class="pk" onClick="{{m.act}}" aria-label="{{m.aria}}" style="{{m.rowStyle}}">
-<div style="width:58px;height:58px;flex:none;background:{{m.thumb}} center/58px 58px no-repeat"></div>
-<div style="flex:1;min-width:0"><div style="font-family:'Patrick Hand',Nunito,sans-serif;font-size:26px;line-height:1.1;color:#2d3042">{{m.name}}</div><div style="margin-top:4px;font-size:13px;font-weight:600;color:#7a7e90">{{m.sub}}</div></div>
+<div style="{{m.thumbStyle}}"></div>
+<div style="flex:1;min-width:0"><div style="{{m.nameStyle}}">{{m.name}}</div><div style="{{m.subStyle}}">{{m.sub}}</div></div>
 <div style="{{m.markStyle}}"></div>
 </button>
-<div style="{{ruleStyle}}"></div>
+<div style="{{mixRuleStyle}}"></div>
 </sc-for>
-<sc-if value="{{ mixReady }}" hint-placeholder-val="{{ false }}"><button class="pri" onClick="{{mixStart}}" style="margin-top:18px">Start</button></sc-if>
+<sc-if value="{{ mixReady }}" hint-placeholder-val="{{ false }}"><button class="pri" onClick="{{mixStart}}" style="margin-top:14px">Start</button></sc-if>
 </div>
 <button class="stp" aria-label="Turn back to the menu" onClick="{{mixBack}}" style="{{backTurnerStyle}}"></button>
 </sc-if>
@@ -192,6 +192,7 @@
 <button class="stp" aria-label="{{qz.name}}" onClick="{{qz.act}}" style="{{qz.style}}"><div style="{{qz.pic}}"></div><div style="{{qz.nameStyle}}">{{qz.name}}</div><div style="{{qz.mark}}"></div></button>
 </sc-for>
 </div>
+<sc-if value="{{ quizWhyOn }}" hint-placeholder-val="{{ false }}"><div style="{{quizWhyStyle}}">{{quizWhy}}</div></sc-if>
 </sc-if>
 <sc-if value="{{ preview }}" hint-placeholder-val="{{ false }}"><button class="stp" aria-label="Start {{introTitle}}" onClick="{{startStage}}" style="position:absolute;inset:0;border:0;background:transparent;padding:0;z-index:5"></button></sc-if>
 <sc-if value="{{ showOptions }}" hint-placeholder-val="{{ false }}">
